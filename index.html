@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Constructora Pro v10.9 - Fix Gráficos</title>
+    <title>Constructora Pro v11.0 - Formato Real</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -13,17 +13,16 @@
         @media (min-width: 768px) { .main-content { height: calc(100vh - 64px); } }
         .nav-link.active { color: #3b82f6; border-top: 4px solid #3b82f6; }
         @media (min-width: 768px) { .nav-link.active { background: #0f172a; border-left: 4px solid #3b82f6; border-top: none; color: white; } }
-        /* Forzar alto de gráficos */
-        .chart-box { position: relative; height: 250px !important; width: 100%; }
+        .chart-box { position: relative; height: 260px !important; width: 100%; }
         .badge-ivan { background: #3b82f6; color: white; padding: 4px 10px; border-radius: 8px; font-weight: 900; font-size: 10px; }
         .badge-mario { background: #10b981; color: white; padding: 4px 10px; border-radius: 8px; font-weight: 900; font-size: 10px; }
     </style>
 </head>
 <body class="bg-slate-100 flex flex-col">
 
-    <header class="h-16 bg-slate-900 text-white flex justify-between items-center px-4 shrink-0 z-50">
-        <h1 class="font-black text-blue-500 italic text-sm md:text-lg uppercase">Constructora Master</h1>
-        <div id="statusCloud" class="text-[9px] bg-emerald-500 px-3 py-1 rounded-full font-black text-white italic">v10.9 OK</div>
+    <header class="h-16 bg-slate-900 text-white flex justify-between items-center px-4 shrink-0 z-50 shadow-lg">
+        <h1 class="font-black text-blue-500 italic text-sm md:text-lg uppercase tracking-tighter">Constructora Master</h1>
+        <div id="statusCloud" class="text-[9px] bg-emerald-600 px-3 py-1 rounded-full font-black text-white italic">v11.0 ONLINE</div>
     </header>
 
     <div class="flex flex-col md:flex-row flex-grow overflow-hidden">
@@ -40,74 +39,86 @@
             </button>
         </nav>
 
-        <main class="flex-grow main-content p-4 overflow-y-auto bg-slate-100">
+        <main class="flex-grow main-content p-4 overflow-y-auto bg-slate-100 no-scrollbar">
             
             <div id="page-registro" class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="bg-white p-4 rounded-2xl shadow border-l-4 border-blue-500"><span class="text-[9px] font-black text-slate-400">IVAN</span><p id="saldoIvan" class="text-xl font-black">$ 0</p></div>
-                    <div class="bg-white p-4 rounded-2xl shadow border-l-4 border-emerald-500"><span class="text-[9px] font-black text-slate-400">MARIO</span><p id="saldoMario" class="text-xl font-black">$ 0</p></div>
-                    <div class="bg-slate-800 p-4 rounded-2xl shadow"><span class="text-[9px] font-black text-slate-500">TOTAL</span><p id="saldoTotal" class="text-xl font-black text-orange-400">$ 0</p></div>
+                    <div class="bg-white p-4 rounded-2xl shadow border-l-4 border-blue-500"><span class="text-[9px] font-black text-slate-400 uppercase">Ivan</span><p id="saldoIvan" class="text-xl font-black text-slate-800">$ 0</p></div>
+                    <div class="bg-white p-4 rounded-2xl shadow border-l-4 border-emerald-500"><span class="text-[9px] font-black text-slate-400 uppercase">Mario</span><p id="saldoMario" class="text-xl font-black text-slate-800">$ 0</p></div>
+                    <div class="bg-slate-800 p-4 rounded-2xl shadow"><span class="text-[9px] font-black text-slate-500 uppercase">Total</span><p id="saldoTotal" class="text-xl font-black text-orange-400">$ 0</p></div>
                 </div>
 
                 <div class="flex flex-col lg:flex-row gap-6">
-                    <div class="w-full lg:w-72 bg-white p-5 rounded-3xl shadow-lg border-t-4 border-blue-600">
-                        <form id="formMovimiento" class="space-y-3">
-                            <input type="date" id="fecha" required class="w-full p-2 bg-slate-50 border rounded-lg text-sm font-bold">
-                            <select id="obraSelect" required class="w-full p-2 border rounded-lg text-sm font-bold"></select>
-                            <input type="text" id="obraNuevaInput" placeholder="Nombre obra..." class="w-full p-2 border border-blue-300 rounded-lg hidden bg-blue-50 italic text-sm">
-                            <select id="tipoOperacion" required class="w-full p-2 border rounded-lg text-sm font-bold">
+                    <div class="w-full lg:w-80 bg-white p-6 rounded-3xl shadow-xl border-t-8 border-blue-600">
+                        <form id="formMovimiento" class="space-y-4">
+                            <h3 class="font-black text-slate-800 text-[10px] uppercase tracking-widest italic mb-2">Nuevo Registro</h3>
+                            <input type="date" id="fecha" required class="w-full p-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-sm font-bold">
+                            
+                            <select id="obraSelect" required class="w-full p-3 border-2 border-slate-100 rounded-xl text-sm font-bold bg-white"></select>
+                            <input type="text" id="obraNuevaInput" placeholder="Nombre obra nueva..." class="w-full p-3 border-2 border-blue-300 rounded-xl hidden bg-blue-50 italic text-sm">
+                            
+                            <select id="tipoOperacion" required class="w-full p-3 border-2 border-slate-100 rounded-xl text-sm font-bold bg-white">
                                 <option value="" disabled selected>Operación...</option>
                                 <option value="Cobro de pagos">Cobro de pagos</option>
                                 <option value="Pagos de jornales">Pagos de jornales</option>
                                 <option value="Materiales / insumos">Materiales / insumos</option>
                                 <option value="Otras operaciones">Otras operaciones</option>
                             </select>
-                            <input type="text" id="descripcion" placeholder="Detalle..." required class="w-full p-2 border rounded-lg text-sm">
+
+                            <input type="text" id="descripcion" placeholder="Detalle..." required class="w-full p-3 border-2 border-slate-100 rounded-xl text-sm font-medium">
+
                             <div class="grid grid-cols-2 gap-2">
-                                <select id="cuenta" class="p-2 border rounded-lg text-xs font-black"><option value="Ivan">Ivan</option><option value="Mario">Mario</option></select>
-                                <select id="tipoMov" class="p-2 border rounded-lg text-xs font-black text-blue-600"><option value="ingreso">Ingreso</option><option value="egreso">Egreso</option></select>
+                                <select id="cuenta" class="p-3 border-2 border-slate-100 rounded-xl font-black text-xs"><option value="Ivan">Ivan</option><option value="Mario">Mario</option></select>
+                                <select id="tipoMov" class="p-3 border-2 border-slate-100 rounded-xl font-black text-xs text-blue-600"><option value="ingreso">Ingreso (+)</option><option value="egreso">Egreso (-)</option></select>
                             </div>
-                            <input type="number" step="0.01" id="montoReal" placeholder="Monto $" class="w-full p-3 bg-slate-900 text-white rounded-xl text-xl font-black text-center">
-                            <button type="submit" id="btnGuardar" class="w-full bg-blue-600 text-white font-black py-3 rounded-xl uppercase text-[10px] tracking-widest">Sincronizar</button>
+
+                            <div class="relative">
+                                <span class="absolute left-4 top-4 text-slate-300 font-black text-xl">$</span>
+                                <input type="text" id="montoVisual" placeholder="0,00" required class="w-full p-4 pl-10 border-4 border-slate-50 rounded-2xl text-2xl font-black text-right text-slate-800 bg-slate-50 outline-none focus:border-blue-200 transition-all">
+                                <input type="hidden" id="montoReal">
+                            </div>
+
+                            <button type="submit" id="btnGuardar" class="w-full bg-slate-900 text-white font-black py-4 rounded-xl shadow-lg active:scale-95 uppercase text-xs tracking-widest transition-all">Sincronizar Datos</button>
                         </form>
                     </div>
 
-                    <div class="flex-grow bg-white rounded-3xl shadow overflow-hidden">
-                        <table class="w-full text-left">
-                            <thead class="bg-slate-50 text-[9px] font-black uppercase text-slate-500">
-                                <tr><th class="p-4">Obra / Fecha</th><th class="p-4 text-center">Cuenta</th><th class="p-4 text-right">Monto</th></tr>
-                            </thead>
-                            <tbody id="tablaBody" class="text-xs divide-y"></tbody>
-                        </table>
+                    <div class="flex-grow bg-white rounded-3xl shadow-lg overflow-hidden border border-slate-200">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left">
+                                <thead class="bg-slate-50 text-[9px] font-black uppercase text-slate-500 border-b">
+                                    <tr><th class="p-4">Obra / Fecha</th><th class="p-4 text-center">Cuenta</th><th class="p-4 text-right">Monto</th></tr>
+                                </thead>
+                                <tbody id="tablaBody" class="text-xs divide-y divide-slate-50 font-medium"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div id="page-presupuestos" class="hidden space-y-4">
-                <div class="bg-slate-900 p-6 rounded-3xl text-white">
-                    <p class="text-[10px] font-black text-blue-400 uppercase tracking-widest">Cobranzas Próximas (30 días)</p>
-                    <p id="proyeccion30" class="text-3xl font-black">$ 0</p>
+                <div class="bg-slate-900 p-6 rounded-3xl text-white shadow-2xl border-b-8 border-blue-500">
+                    <p class="text-[10px] font-black text-blue-400 uppercase tracking-widest">Cobranzas Estimadas (30 días)</p>
+                    <p id="proyeccion30" class="text-4xl font-black tracking-tighter">$ 0</p>
                 </div>
                 <div id="containerPresupuestos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
             </div>
 
             <div id="page-graficas" class="hidden space-y-6">
-                <div class="bg-white p-4 rounded-2xl shadow flex flex-col md:flex-row justify-between items-center gap-4">
-                    <select id="filtroObra" onchange="updateCharts()" class="w-full md:w-auto p-2 border rounded-lg text-xs font-black"></select>
+                <div class="bg-white p-5 rounded-3xl shadow-lg flex flex-col md:flex-row justify-between items-center gap-4">
+                    <select id="filtroObra" onchange="updateCharts()" class="w-full md:w-auto p-3 border-2 rounded-xl text-xs font-black uppercase bg-slate-50"></select>
                     <div class="text-right">
-                        <p class="text-[9px] font-black text-slate-400">RENTABILIDAD</p>
-                        <p id="rentabilidadValor" class="text-2xl font-black">$ 0</p>
+                        <p class="text-[9px] font-black text-slate-400 uppercase">Rentabilidad</p>
+                        <p id="rentabilidadValor" class="text-3xl font-black">$ 0,00</p>
                     </div>
                 </div>
-                
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="bg-white p-5 rounded-3xl shadow-lg border border-slate-100">
-                        <p class="text-center font-black text-slate-500 text-[10px] uppercase mb-4 tracking-widest">Flujo de Caja</p>
-                        <div class="chart-box" id="containerBar"><canvas id="chartBarras"></canvas></div>
+                    <div class="bg-white p-6 rounded-3xl shadow-md border border-slate-100">
+                        <p class="text-center font-black text-slate-500 text-[10px] uppercase mb-6 tracking-widest">Ingresos vs Gastos</p>
+                        <div class="chart-box" id="chartBoxBar"><canvas id="chartBarras"></canvas></div>
                     </div>
-                    <div class="bg-white p-5 rounded-3xl shadow-lg border border-slate-100">
-                        <p class="text-center font-black text-slate-500 text-[10px] uppercase mb-4 tracking-widest">Gastos por Categoría</p>
-                        <div class="chart-box" id="containerPie"><canvas id="chartTorta"></canvas></div>
+                    <div class="bg-white p-6 rounded-3xl shadow-md border border-slate-100">
+                        <p class="text-center font-black text-slate-500 text-[10px] uppercase mb-6 tracking-widest">Distribución de Gastos</p>
+                        <div class="chart-box" id="chartBoxPie"><canvas id="chartTorta"></canvas></div>
                     </div>
                 </div>
             </div>
@@ -120,16 +131,36 @@
         let pLocal = JSON.parse(localStorage.getItem('presupuestos_v10.7')) || {};
         let chartBarras = null, chartTorta = null;
 
+        // LÓGICA DE SEPARADOR DE MILES (PUNTO) Y DECIMALES (COMA)
+        const vInput = document.getElementById('montoVisual');
+        const rInput = document.getElementById('montoReal');
+
+        vInput.addEventListener('input', (e) => {
+            let value = e.target.value.replace(/\D/g, ""); // Solo números
+            let numericValue = parseFloat(value) / 100;
+            
+            if (isNaN(numericValue)) {
+                rInput.value = 0;
+                vInput.value = "";
+                return;
+            }
+
+            rInput.value = numericValue.toFixed(2);
+            
+            // Formatear: Puntos para miles, coma para decimales
+            vInput.value = numericValue.toLocaleString('es-AR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        });
+
         function showPage(p) {
             document.querySelectorAll('main > div').forEach(div => div.classList.add('hidden'));
             document.querySelectorAll('.nav-link').forEach(btn => btn.classList.remove('active'));
             document.getElementById('page-'+p).classList.remove('hidden');
             document.getElementById('btn-'+p).classList.add('active');
             
-            if(p === 'graficas') {
-                // Pequeño delay para asegurar que el DOM sea visible
-                setTimeout(() => { updateCharts(); }, 150);
-            }
+            if(p === 'graficas') setTimeout(updateCharts, 200);
             if(p === 'presupuestos') renderPresupuestos();
         }
 
@@ -139,7 +170,7 @@
                 const d = await r.json();
                 movimientos = d.map(r => ({ id: r[0], fecha: r[1], obra: r[2], operacion: r[3], desc: r[4], cuenta: r[5], tipo: r[6], monto: parseFloat(r[7]) }));
                 actualizarInterfaz();
-            } catch(e) { console.error("Error cargando datos", e); }
+            } catch(e) { console.error("Error remoto", e); }
         }
 
         function actualizarInterfaz() {
@@ -149,17 +180,20 @@
             [...movimientos].reverse().forEach(m => {
                 const val = m.tipo === 'ingreso' ? m.monto : -m.monto;
                 if(m.cuenta === 'Ivan') sI += val; else sM += val;
-                const dP = m.fecha.split('-');
-                tbody.innerHTML += `<tr><td class="p-4"><b>${m.obra}</b><br><span class="text-slate-400 text-[10px]">${dP[2]}/${dP[1]}/${dP[0]}</span></td><td class="p-4 text-center"><span class="${m.cuenta === 'Ivan' ? 'badge-ivan' : 'badge-mario'}">${m.cuenta}</span></td><td class="p-4 text-right font-black ${m.tipo === 'ingreso' ? 'text-emerald-600' : 'text-red-500'}">$${m.monto.toLocaleString()}</td></tr>`;
+                const f = m.fecha.split('-');
+                tbody.innerHTML += `<tr>
+                    <td class="p-4"><b>${m.obra}</b><br><span class="text-slate-400 text-[9px]">${f[2]}/${f[1]}/${f[0]}</span></td>
+                    <td class="p-4 text-center"><span class="${m.cuenta === 'Ivan' ? 'badge-ivan' : 'badge-mario'}">${m.cuenta.toUpperCase()}</span></td>
+                    <td class="p-4 text-right font-black ${m.tipo === 'ingreso' ? 'text-emerald-600' : 'text-red-500'}">$${m.monto.toLocaleString('es-AR', {minimumFractionDigits:2})}</td>
+                </tr>`;
             });
-            document.getElementById('saldoIvan').innerText = "$ " + sI.toLocaleString();
-            document.getElementById('saldoMario').innerText = "$ " + sM.toLocaleString();
-            document.getElementById('saldoTotal').innerText = "$ " + (sI+sM).toLocaleString();
+            document.getElementById('saldoIvan').innerText = "$ " + sI.toLocaleString('es-AR', {minimumFractionDigits:2});
+            document.getElementById('saldoMario').innerText = "$ " + sM.toLocaleString('es-AR', {minimumFractionDigits:2});
+            document.getElementById('saldoTotal').innerText = "$ " + (sI+sM).toLocaleString('es-AR', {minimumFractionDigits:2});
             
             const obras = [...new Set(movimientos.map(m => m.obra))].filter(Boolean).sort();
-            const s1 = document.getElementById('obraSelect'), s4 = document.getElementById('filtroObra');
-            s1.innerHTML = '<option disabled selected>Obra...</option>' + obras.map(o => `<option value="${o}">${o}</option>`).join('') + '<option value="NUEVA">+ Nueva</option>';
-            s4.innerHTML = '<option value="TODAS">TODAS LAS OBRAS</option>' + obras.map(o => `<option value="${o}">${o}</option>`).join('');
+            document.getElementById('obraSelect').innerHTML = '<option disabled selected>Seleccionar Obra...</option>' + obras.map(o => `<option value="${o}">${o}</option>`).join('') + '<option value="NUEVA" class="text-blue-600 font-black">+ CREAR NUEVA</option>';
+            document.getElementById('filtroObra').innerHTML = '<option value="TODAS">RESUMEN GENERAL</option>' + obras.map(o => `<option value="${o}">${o}</option>`).join('');
         }
 
         function updateCharts() {
@@ -168,29 +202,26 @@
             const ing = filt.filter(m => m.tipo === 'ingreso').reduce((a, b) => a + b.monto, 0);
             const egr = filt.filter(m => m.tipo === 'egreso').reduce((a, b) => a + b.monto, 0);
             
-            document.getElementById('rentabilidadValor').innerText = "$ " + (ing-egr).toLocaleString();
-            document.getElementById('rentabilidadValor').className = `text-2xl font-black ${ing-egr >= 0 ? 'text-emerald-500' : 'text-red-500'}`;
+            const rVal = document.getElementById('rentabilidadValor');
+            rVal.innerText = "$ " + (ing-egr).toLocaleString('es-AR', {minimumFractionDigits:2});
+            rVal.className = `text-3xl font-black ${ing-egr >= 0 ? 'text-emerald-500' : 'text-red-500'}`;
 
-            // Reset de Canvas para evitar bugs visuales
-            const containerBar = document.getElementById('containerBar');
-            containerBar.innerHTML = '<canvas id="chartBarras"></canvas>';
-            const containerPie = document.getElementById('containerPie');
-            containerPie.innerHTML = '<canvas id="chartTorta"></canvas>';
+            // Reset de contenedores para asegurar visibilidad
+            document.getElementById('chartBoxBar').innerHTML = '<canvas id="chartBarras"></canvas>';
+            document.getElementById('chartBoxPie').innerHTML = '<canvas id="chartTorta"></canvas>';
 
-            // Barras
             new Chart(document.getElementById('chartBarras'), {
                 type: 'bar',
-                data: { labels: ['Ingresos','Egresos'], datasets: [{ data:[ing, egr], backgroundColor:['#10b981','#ef4444'], borderRadius: 10 }] },
+                data: { labels: ['Ingresos','Egresos'], datasets: [{ data:[ing, egr], backgroundColor:['#10b981','#ef4444'], borderRadius: 12 }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
             });
 
-            // Torta
             const cats = {}; 
             filt.filter(m => m.tipo === 'egreso').forEach(m => cats[m.operacion] = (cats[m.operacion]||0)+m.monto);
             new Chart(document.getElementById('chartTorta'), {
                 type: 'doughnut',
                 data: { labels: Object.keys(cats), datasets: [{ data: Object.values(cats), backgroundColor: ['#3b82f6','#f59e0b','#8b5cf6','#ec4899','#64748b'] }] },
-                options: { responsive: true, maintainAspectRatio: false, cutout: '70%' }
+                options: { responsive: true, maintainAspectRatio: false, cutout: '75%' }
             });
         }
 
@@ -198,7 +229,6 @@
             const cont = document.getElementById('containerPresupuestos');
             cont.innerHTML = '';
             let totalP = 0; const hoy = new Date(); const lim = new Date(); lim.setDate(hoy.getDate()+30);
-
             Object.keys(pLocal).forEach(o => {
                 const p = pLocal[o];
                 const cob = movimientos.filter(m => m.obra === o && m.operacion === 'Cobro de pagos').reduce((a, b) => a + b.monto, 0);
@@ -209,20 +239,26 @@
                     if(cob < ac && new Date(c.vence) <= lim) totalP += c.monto - Math.max(0, cob - (ac - c.monto));
                 });
                 const por = ((cob*100)/p.total).toFixed(0);
-                cont.innerHTML += `<div class="bg-white p-5 rounded-2xl shadow"><h4 class="font-black text-xs uppercase">${o}</h4><p class="text-orange-500 font-black">$ ${(p.total - cob).toLocaleString()}</p><div class="w-full bg-slate-100 h-1.5 mt-2 rounded-full"><div class="bg-blue-500 h-full rounded-full" style="width:${por}%"></div></div></div>`;
+                cont.innerHTML += `<div class="bg-white p-5 rounded-3xl shadow-md border border-slate-100">
+                    <h4 class="font-black text-xs uppercase text-slate-700">${o}</h4>
+                    <p class="text-orange-500 font-black text-lg mt-1">$ ${(p.total - cob).toLocaleString('es-AR')}</p>
+                    <div class="w-full bg-slate-100 h-2 mt-4 rounded-full overflow-hidden"><div class="bg-blue-600 h-full" style="width:${por}%"></div></div>
+                    <p class="text-[9px] font-bold mt-2 text-slate-400 uppercase tracking-tighter">${por}% COBRADO</p>
+                </div>`;
             });
-            document.getElementById('proyeccion30').innerText = "$ " + totalP.toLocaleString();
+            document.getElementById('proyeccion30').innerText = "$ " + totalP.toLocaleString('es-AR', {minimumFractionDigits:2});
         }
 
         document.getElementById('formMovimiento').onsubmit = async (e) => {
             e.preventDefault();
-            const btn = document.getElementById('btnGuardar'); btn.innerText = "..."; btn.disabled = true;
-            const obra = document.getElementById('obraSelect').value === "NUEVA" ? document.getElementById('obraNuevaInput').value.trim() : document.getElementById('obraSelect').value;
-            const mov = { id: Date.now(), fecha: document.getElementById('fecha').value, obra: obra, operacion: document.getElementById('tipoOperacion').value, descripcion: document.getElementById('descripcion').value, cuenta: document.getElementById('cuenta').value, tipo: document.getElementById('tipoMov').value, monto: parseFloat(document.getElementById('montoReal').value) };
+            const btn = document.getElementById('btnGuardar'); btn.innerText = "PROCESANDO..."; btn.disabled = true;
+            const o = document.getElementById('obraSelect').value === "NUEVA" ? document.getElementById('obraNuevaInput').value.trim() : document.getElementById('obraSelect').value;
+            const mov = { id: Date.now(), fecha: document.getElementById('fecha').value, obra: o, operacion: document.getElementById('tipoOperacion').value, descripcion: document.getElementById('descripcion').value, cuenta: document.getElementById('cuenta').value, tipo: document.getElementById('tipoMov').value, monto: parseFloat(rInput.value) };
             await fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(mov) });
             movimientos.push({...mov, desc: mov.descripcion});
             actualizarInterfaz();
-            e.target.reset(); btn.innerText = "Sincronizar"; btn.disabled = false;
+            e.target.reset(); rInput.value = ""; vInput.value = "";
+            btn.innerText = "Sincronizar Datos"; btn.disabled = false;
         };
 
         document.getElementById('obraSelect').onchange = (e) => document.getElementById('obraNuevaInput').classList.toggle('hidden', e.target.value !== 'NUEVA');
