@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sistema Constructora v14.1</title>
+    <title>Sistema Gestión v15.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -14,17 +14,23 @@
         .sidebar-constructora { background-color: #0f172a; }
         .nav-link.active { color: #3b82f6; border-top: 4px solid #3b82f6; background: rgba(59,130,246,0.1); }
         @media (min-width: 768px) { .nav-link.active { border-left: 4px solid #3b82f6; border-top: none; color: white; } }
-        .editing-mode { border: 4px solid #f59e0b !important; background-color: #fffbeb !important; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body class="bg-slate-100">
 
     <div id="loginPage" class="fixed inset-0 z-[100] bg-slate-900 flex items-center justify-center p-4">
-        <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-sm text-center">
-            <h2 class="text-2xl font-black text-slate-800 mb-6 uppercase italic">Acceso Privado</h2>
-            <input type="password" id="passInput" placeholder="Contraseña de acceso" class="w-full p-4 bg-slate-100 border-2 border-slate-200 rounded-2xl mb-4 text-center font-bold outline-none focus:border-blue-500">
-            <button onclick="checkLogin()" class="w-full bg-blue-600 text-white font-black py-4 rounded-2xl shadow-lg uppercase tracking-widest">Entrar al Sistema</button>
-            <p id="loginError" class="text-red-500 text-xs font-bold mt-4 hidden italic">Contraseña incorrecta</p>
+        <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-sm">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-black text-slate-800 uppercase italic">Acceso Admin</h2>
+                <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">Ingrese credenciales</p>
+            </div>
+            <div class="space-y-4">
+                <input type="text" id="userInput" placeholder="Usuario" class="w-full p-4 bg-slate-100 border-2 border-slate-200 rounded-2xl font-bold outline-none focus:border-blue-500 uppercase text-center">
+                <input type="password" id="passInput" placeholder="Contraseña" class="w-full p-4 bg-slate-100 border-2 border-slate-200 rounded-2xl font-bold outline-none focus:border-blue-500 text-center">
+                <button onclick="checkLogin()" class="w-full bg-blue-600 text-white font-black py-4 rounded-2xl shadow-lg uppercase tracking-widest active:scale-95 transition-all">Iniciar Sesión</button>
+            </div>
+            <p id="loginError" class="text-red-500 text-[10px] font-black mt-4 hidden text-center italic">CREDENCIALES INVÁLIDAS</p>
         </div>
     </div>
 
@@ -33,7 +39,12 @@
             <div class="flex items-center gap-3">
                 <h1 class="font-black text-blue-500 italic text-xs md:text-lg uppercase tracking-tighter">Control de ingresos y egresos</h1>
             </div>
-            <button onclick="logout()" class="text-slate-500 hover:text-white"><i class="fas fa-power-off"></i></button>
+            <div class="flex items-center gap-3">
+                <div id="syncIndicator" class="hidden md:block text-[9px] bg-emerald-600 px-3 py-1 rounded-full font-black text-white italic uppercase shadow-lg shadow-emerald-900/20">
+                    <i class="fas fa-cloud-check mr-1"></i>Sincronizado a la nube
+                </div>
+                <button onclick="logout()" class="text-slate-500 hover:text-white"><i class="fas fa-power-off"></i></button>
+            </div>
         </header>
 
         <div class="flex flex-col md:flex-row flex-grow overflow-hidden">
@@ -41,8 +52,8 @@
                 <button onclick="showPage('registro')" id="btn-registro" class="nav-link active flex flex-col md:flex-row items-center gap-2 md:p-5 text-slate-400">
                     <i class="fas fa-wallet text-xl"></i><span class="text-[10px] font-bold uppercase">Caja</span>
                 </button>
-                <button onclick="showPage('presupuestos')" id="btn-presupuestos" class="nav-link flex flex-col md:flex-row items-center gap-2 md:p-5 text-slate-400">
-                    <i class="fas fa-drafting-compass text-xl"></i><span class="text-[10px] font-bold uppercase">Obras</span>
+                <button onclick="showPage('obras')" id="btn-obras" class="nav-link flex flex-col md:flex-row items-center gap-2 md:p-5 text-slate-400">
+                    <i class="fas fa-hammer text-xl"></i><span class="text-[10px] font-bold uppercase">Reportes Obra</span>
                 </button>
                 <button onclick="showPage('graficas')" id="btn-graficas" class="nav-link flex flex-col md:flex-row items-center gap-2 md:p-5 text-slate-400">
                     <i class="fas fa-chart-pie text-xl"></i><span class="text-[10px] font-bold uppercase">Balance</span>
@@ -53,46 +64,45 @@
                 
                 <div id="page-registro" class="space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div class="bg-white p-5 rounded-3xl shadow-sm border-l-8 border-blue-500"><span class="text-[10px] font-black text-slate-400">IVAN</span><p id="saldoIvan" class="text-2xl font-black text-slate-800">$ 0,00</p></div>
-                        <div class="bg-white p-5 rounded-3xl shadow-sm border-l-8 border-emerald-500"><span class="text-[10px] font-black text-slate-400">MARIO</span><p id="saldoMario" class="text-2xl font-black text-slate-800">$ 0,00</p></div>
-                        <div class="bg-slate-800 p-5 rounded-3xl shadow-lg"><span class="text-[10px] font-black text-orange-400">TOTAL VISTA</span><p id="saldoTotal" class="text-2xl font-black text-orange-400">$ 0,00</p></div>
+                        <div class="bg-white p-5 rounded-3xl shadow-sm border-l-8 border-blue-500"><span class="text-[10px] font-black text-slate-400">IVAN</span><p id="saldoIvan" class="text-2xl font-black">$ 0,00</p></div>
+                        <div class="bg-white p-5 rounded-3xl shadow-sm border-l-8 border-emerald-500"><span class="text-[10px] font-black text-slate-400">MARIO</span><p id="saldoMario" class="text-2xl font-black">$ 0,00</p></div>
+                        <div class="bg-slate-800 p-5 rounded-3xl shadow-lg"><span class="text-[10px] font-black text-orange-400">TOTAL EN VISTA</span><p id="saldoTotal" class="text-2xl font-black text-orange-400">$ 0,00</p></div>
                     </div>
 
                     <div class="flex flex-col xl:flex-row gap-6">
                         <div id="formContainer" class="w-full xl:w-80 bg-white p-6 rounded-3xl shadow-xl border-t-8 border-blue-600 h-fit shrink-0">
-                            <div id="editBadge" class="hidden mb-2 bg-orange-500 text-white text-[9px] font-black py-1 px-3 rounded-full uppercase text-center">Modo Edición</div>
-                            <form id="formMovimiento" class="space-y-4">
+                            <form id="formMovimiento" class="space-y-3">
                                 <input type="hidden" id="editId">
-                                <input type="date" id="fecha" required class="w-full p-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-sm font-bold">
-                                <select id="obraSelect" required class="w-full p-3 border-2 border-slate-100 rounded-xl text-sm font-bold bg-white"></select>
+                                <input type="date" id="fecha" required class="w-full p-3 bg-slate-50 border-2 rounded-xl font-bold text-sm">
+                                <select id="obraSelect" required class="w-full p-3 border-2 rounded-xl font-bold bg-white text-sm"></select>
                                 <input type="text" id="obraNuevaInput" placeholder="Nombre obra nueva..." class="w-full p-3 border-2 border-blue-300 rounded-xl hidden bg-blue-50 italic text-sm">
-                                <select id="tipoOperacion" required class="w-full p-3 border-2 border-slate-100 rounded-xl text-sm font-bold bg-white">
+                                <select id="tipoOperacion" required class="w-full p-3 border-2 rounded-xl font-bold bg-white text-sm">
                                     <option value="" disabled selected>Categoría...</option>
                                     <option value="Cobro de pagos">Cobro de pagos</option>
                                     <option value="Pagos de jornales">Pagos de jornales</option>
                                     <option value="Materiales / insumos">Materiales / insumos</option>
                                     <option value="Otras operaciones">Otras operaciones</option>
                                 </select>
-                                <input type="text" id="descripcion" placeholder="Descripción..." required class="w-full p-3 border-2 border-slate-100 rounded-xl text-sm">
+                                <input type="text" id="descripcion" placeholder="Descripción del movimiento" required class="w-full p-3 border-2 rounded-xl text-sm">
                                 <div class="grid grid-cols-2 gap-2">
-                                    <select id="cuenta" class="p-3 border-2 border-slate-100 rounded-xl font-black text-xs"><option value="Ivan">Ivan</option><option value="Mario">Mario</option></select>
-                                    <select id="tipoMov" class="p-3 border-2 border-slate-100 rounded-xl font-black text-xs text-blue-600"><option value="ingreso">Ingreso (+)</option><option value="egreso">Egreso (-)</option></select>
+                                    <select id="cuenta" class="p-3 border-2 rounded-xl font-black text-xs"><option value="Ivan">Ivan</option><option value="Mario">Mario</option></select>
+                                    <select id="tipoMov" class="p-3 border-2 rounded-xl font-black text-xs"><option value="ingreso">Ingreso (+)</option><option value="egreso">Egreso (-)</option></select>
                                 </div>
                                 <div class="relative">
-                                    <input type="text" id="montoVisual" placeholder="0,00" required class="w-full p-4 border-4 border-slate-50 rounded-2xl text-2xl font-black text-right bg-slate-50 outline-none">
+                                    <input type="text" id="montoVisual" placeholder="0,00" required class="w-full p-4 border-4 bg-slate-50 rounded-2xl text-2xl font-black text-right outline-none">
                                     <input type="hidden" id="montoReal">
                                 </div>
-                                <button type="submit" id="btnGuardar" class="w-full bg-blue-600 text-white font-black py-4 rounded-2xl shadow-lg uppercase text-xs tracking-widest active:scale-95">Ingresar Movimiento</button>
+                                <button type="submit" id="btnGuardar" class="w-full bg-blue-600 text-white font-black py-4 rounded-2xl shadow-lg uppercase text-xs">Guardar Movimiento</button>
                                 <button type="button" id="btnCancelarEdit" onclick="cancelarEdicion()" class="hidden w-full bg-slate-200 text-slate-500 font-bold py-2 rounded-xl text-[10px] uppercase">Cancelar</button>
                             </form>
                         </div>
 
                         <div class="flex-grow bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-200">
-                            <div class="p-4 bg-slate-900 flex flex-col md:flex-row justify-between gap-4">
-                                <input type="text" id="tablaFiltro" onkeyup="filtrarYRecalcular()" placeholder="Filtrar por obra, detalle, categoría..." class="w-full md:w-80 p-3 bg-slate-800 border-none rounded-xl text-xs font-bold text-white outline-none focus:ring-2 focus:ring-blue-500">
+                            <div class="p-4 bg-slate-900">
+                                <input type="text" id="tablaFiltro" onkeyup="filtrarYRecalcular()" placeholder="Buscar en tabla..." class="w-full md:w-80 p-3 bg-slate-800 rounded-xl text-xs text-white outline-none">
                             </div>
                             <div class="overflow-x-auto h-[500px] no-scrollbar">
-                                <table class="w-full text-left">
+                                <table class="w-full text-left" id="mainTable">
                                     <thead class="text-slate-400 text-[10px] font-black uppercase italic bg-slate-900">
                                         <tr>
                                             <th class="p-4" onclick="ordenarYRenderizar('fecha')">Fecha</th>
@@ -110,24 +120,42 @@
                     </div>
                 </div>
 
-                <div id="page-presupuestos" class="hidden space-y-6">
-                    <div class="flex flex-col md:flex-row gap-6">
-                        <div class="w-full md:w-80 bg-white p-6 rounded-3xl shadow-lg border-t-8 border-orange-500 h-fit">
-                            <h3 class="font-black text-xs uppercase mb-4 text-slate-400 italic">Nuevo Presupuesto</h3>
-                            <form id="formPresupuesto" class="space-y-4">
-                                <input type="text" id="presupuestoObra" placeholder="Nombre de la Obra" required class="w-full p-3 border-2 border-slate-100 rounded-xl text-sm font-bold">
-                                <input type="number" id="presupuestoTotal" placeholder="Monto Total $" required class="w-full p-3 border-2 border-slate-100 rounded-xl text-sm font-bold">
-                                <button type="submit" class="w-full bg-slate-900 text-white font-black py-4 rounded-xl text-[10px] uppercase tracking-widest">Guardar Obra</button>
-                            </form>
+                <div id="page-obras" class="hidden space-y-6">
+                    <div class="bg-white p-6 rounded-3xl shadow-xl border-t-8 border-orange-500">
+                        <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
+                            <div>
+                                <h2 class="text-xl font-black uppercase text-slate-800 italic">Análisis por Obra</h2>
+                                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Seleccione una obra para ver su balance</p>
+                            </div>
+                            <select id="reporteObraSelect" onchange="generarReporteObra()" class="w-full md:w-80 p-4 border-2 border-slate-100 rounded-2xl font-black text-sm bg-slate-50 outline-none">
+                                <option value="" disabled selected>Seleccionar Obra...</option>
+                            </select>
                         </div>
-                        <div class="flex-grow grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="containerPresupuestos"></div>
+
+                        <div id="reporteContenido" class="hidden grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="bg-blue-50 p-6 rounded-3xl text-center">
+                                <span class="text-[10px] font-black text-blue-400 uppercase">Total Cobrado</span>
+                                <p id="repIngresos" class="text-3xl font-black text-blue-600 mt-2">$ 0,00</p>
+                            </div>
+                            <div class="bg-red-50 p-6 rounded-3xl text-center">
+                                <span class="text-[10px] font-black text-red-400 uppercase">Total Gastado</span>
+                                <p id="repEgresos" class="text-3xl font-black text-red-600 mt-2">$ 0,00</p>
+                            </div>
+                            <div class="bg-emerald-50 p-6 rounded-3xl text-center">
+                                <span class="text-[10px] font-black text-emerald-400 uppercase">Rentabilidad Actual</span>
+                                <p id="repBalance" class="text-3xl font-black text-emerald-600 mt-2">$ 0,00</p>
+                            </div>
+                            <div class="md:col-span-3 bg-slate-50 p-6 rounded-3xl h-[300px]">
+                                <canvas id="chartObraDetalle"></canvas>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <div id="page-graficas" class="hidden space-y-6">
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div class="bg-white p-6 rounded-3xl shadow-lg h-[400px]"><canvas id="chartBarras"></canvas></div>
-                        <div class="bg-white p-6 rounded-3xl shadow-lg h-[400px]"><canvas id="chartTorta"></canvas></div>
+                        <div class="bg-white p-6 rounded-3xl shadow-lg h-[400px]"><canvas id="chartGral1"></canvas></div>
+                        <div class="bg-white p-6 rounded-3xl shadow-lg h-[400px]"><canvas id="chartGral2"></canvas></div>
                     </div>
                 </div>
 
@@ -139,13 +167,14 @@
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzbYMOqEUdxIcv8We4PbbvTc7441LPn2e_bw6OsIGUhwBDfve1IRaD5zrQCDzXQaEk05A/exec";
         let movimientos = [];
         let movMostrados = [];
-        let pLocal = JSON.parse(localStorage.getItem('obras_v14')) || {};
         let configOrden = { clave: 'fecha', asc: false };
-        let chart1, chart2;
+        let chartObra;
 
         // LOGIN
         function checkLogin() {
-            if (document.getElementById('passInput').value === "1234") {
+            const u = document.getElementById('userInput').value;
+            const p = document.getElementById('passInput').value;
+            if (u.toLowerCase() === "admin" && p === "1234") {
                 document.getElementById('loginPage').classList.add('hidden');
                 document.getElementById('mainApp').classList.remove('hidden');
                 cargarDatos();
@@ -160,12 +189,13 @@
             try {
                 const r = await fetch(WEB_APP_URL);
                 const d = await r.json();
-                movimientos = d.map(r => {
-                    const m = parseFloat(r[7]);
-                    return { id: r[0], fecha: r[1], obra: r[2], operacion: r[3], desc: r[4], cuenta: r[5], tipo: r[6], monto: m, monto_real: (r[6] === 'ingreso' ? m : -m) };
-                });
+                movimientos = d.map(r => ({
+                    id: r[0], fecha: r[1], obra: r[2], operacion: r[3], desc: r[4], cuenta: r[5], tipo: r[6], 
+                    monto: parseFloat(r[7]), monto_real: (r[6] === 'ingreso' ? parseFloat(r[7]) : -parseFloat(r[7]))
+                }));
                 movMostrados = [...movimientos];
                 renderizarTabla();
+                actualizarSelectsObras();
             } catch(e) { console.error(e); }
         }
 
@@ -192,73 +222,54 @@
             document.getElementById('saldoIvan').innerText = "$ " + sI.toLocaleString('es-AR');
             document.getElementById('saldoMario').innerText = "$ " + sM.toLocaleString('es-AR');
             document.getElementById('saldoTotal').innerText = "$ " + (sI+sM).toLocaleString('es-AR');
-            actualizarSelectObras();
         }
 
-        // EDICIÓN Y BORRADO
-        function prepararEdicion(id) {
-            const m = movimientos.find(x => x.id == id);
-            if(!m) return;
-            document.getElementById('editId').value = m.id;
-            document.getElementById('fecha').value = new Date(m.fecha).toISOString().split('T')[0];
-            document.getElementById('obraSelect').value = m.obra;
-            document.getElementById('tipoOperacion').value = m.operacion;
-            document.getElementById('descripcion').value = m.desc;
-            document.getElementById('cuenta').value = m.cuenta;
-            document.getElementById('tipoMov').value = m.tipo;
-            document.getElementById('montoReal').value = m.monto.toFixed(2);
-            document.getElementById('montoVisual').value = m.monto.toLocaleString('es-AR', {minimumFractionDigits:2});
+        // REPORTE POR OBRA
+        function generarReporteObra() {
+            const obra = document.getElementById('reporteObraSelect').value;
+            const movs = movimientos.filter(m => m.obra === obra);
+            const ing = movs.filter(m => m.tipo === 'ingreso').reduce((a,b) => a+b.monto, 0);
+            const egr = movs.filter(m => m.tipo === 'egreso').reduce((a,b) => a+b.monto, 0);
 
-            document.getElementById('formContainer').classList.add('editing-mode');
-            document.getElementById('editBadge').classList.remove('hidden');
-            document.getElementById('btnCancelarEdit').classList.remove('hidden');
-            document.getElementById('btnGuardar').innerText = "Actualizar Movimiento";
-            document.getElementById('btnGuardar').classList.replace('bg-blue-600', 'bg-orange-500');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.getElementById('reporteContenido').classList.remove('hidden');
+            document.getElementById('repIngresos').innerText = "$ " + ing.toLocaleString('es-AR');
+            document.getElementById('repEgresos').innerText = "$ " + egr.toLocaleString('es-AR');
+            document.getElementById('repBalance').innerText = "$ " + (ing-egr).toLocaleString('es-AR');
+
+            if(chartObra) chartObra.destroy();
+            chartObra = new Chart(document.getElementById('chartObraDetalle'), {
+                type: 'bar',
+                data: { labels: ['Ingresos', 'Gastos'], datasets: [{ data: [ing, egr], backgroundColor: ['#3b82f6', '#ef4444'] }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
         }
 
-        function cancelarEdicion() {
-            document.getElementById('formMovimiento').reset();
-            document.getElementById('editId').value = "";
-            document.getElementById('formContainer').classList.remove('editing-mode');
-            document.getElementById('editBadge').classList.add('hidden');
-            document.getElementById('btnCancelarEdit').classList.add('hidden');
-            document.getElementById('btnGuardar').innerText = "Ingresar Movimiento";
-            document.getElementById('btnGuardar').classList.replace('bg-orange-500', 'bg-blue-600');
-        }
-
+        // LÓGICA DE BORRADO Y EDICIÓN (REDIRECCIONADA AL SCRIPT ACTUALIZADO)
         async function borrarRemoto(id) {
-            if(!confirm("¿Deseas eliminar este ID de la nube permanentemente?")) return;
+            if(!confirm("¿CONFIRMA ELIMINAR ESTE REGISTRO? SE BORRARÁ DE LA NUBE COMPLETAMENTE.")) return;
             movimientos = movimientos.filter(m => m.id !== id);
             movMostrados = movMostrados.filter(m => m.id !== id);
             renderizarTabla();
             await fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "delete", id: id }) });
         }
 
-        // NAV
+        // RESTO DE FUNCIONES ESTÁNDAR
         function showPage(p) {
             document.querySelectorAll('main > div').forEach(div => div.classList.add('hidden'));
             document.querySelectorAll('.nav-link').forEach(btn => btn.classList.remove('active'));
             document.getElementById('page-'+p).classList.remove('hidden');
             document.getElementById('btn-'+p).classList.add('active');
-            if(p === 'presupuestos') renderObras();
-            if(p === 'graficas') renderGraficas();
+            if(p === 'graficas') renderGraficasGrales();
         }
 
-        // --- LÓGICA COMPLEMENTARIA ---
-        function filtrarYRecalcular() {
-            const b = document.getElementById("tablaFiltro").value.toLowerCase();
-            movMostrados = movimientos.filter(m => m.obra.toLowerCase().includes(b) || m.desc.toLowerCase().includes(b));
-            renderizarTabla();
+        function actualizarSelectsObras() {
+            const obras = [...new Set(movimientos.map(m => m.obra))].filter(Boolean).sort();
+            const opciones = '<option disabled selected>Obra...</option>' + obras.map(o => `<option value="${o}">${o}</option>`).join('') + '<option value="NUEVA">+ NUEVA</option>';
+            document.getElementById('obraSelect').innerHTML = opciones;
+            document.getElementById('reporteObraSelect').innerHTML = '<option disabled selected>Seleccionar Obra...</option>' + obras.map(o => `<option value="${o}">${o}</option>`).join('');
         }
 
-        function ordenarYRenderizar(clave) {
-            configOrden.asc = configOrden.clave === clave ? !configOrden.asc : true;
-            configOrden.clave = clave;
-            movMostrados.sort((a,b) => (a[clave] < b[clave] ? -1 : 1) * (configOrden.asc ? 1 : -1));
-            renderizarTabla();
-        }
-
+        // INPUTS Y FORM
         const vIn = document.getElementById('montoVisual');
         const rIn = document.getElementById('montoReal');
         vIn.addEventListener('input', (e) => {
@@ -288,47 +299,51 @@
             };
 
             await fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(mov) });
-            cargarDatos(); // Recarga todo para asegurar sincronía
+            cargarDatos();
             cancelarEdicion();
             btn.disabled = false;
         };
 
-        function actualizarSelectObras() {
-            const obras = [...new Set(movimientos.map(m => m.obra))].filter(Boolean).sort();
-            document.getElementById('obraSelect').innerHTML = '<option disabled selected>Obra...</option>' + obras.map(o => `<option value="${o}">${o}</option>`).join('') + '<option value="NUEVA" class="text-blue-600">+ NUEVA</option>';
+        function prepararEdicion(id) {
+            const m = movimientos.find(x => x.id == id);
+            if(!m) return;
+            document.getElementById('editId').value = m.id;
+            document.getElementById('fecha').value = new Date(m.fecha).toISOString().split('T')[0];
+            document.getElementById('obraSelect').value = m.obra;
+            document.getElementById('tipoOperacion').value = m.operacion;
+            document.getElementById('descripcion').value = m.desc;
+            document.getElementById('cuenta').value = m.cuenta;
+            document.getElementById('tipoMov').value = m.tipo;
+            document.getElementById('montoReal').value = m.monto.toFixed(2);
+            document.getElementById('montoVisual').value = m.monto.toLocaleString('es-AR', {minimumFractionDigits:2});
+            document.getElementById('btnGuardar').innerText = "Actualizar";
+            document.getElementById('btnCancelarEdit').classList.remove('hidden');
         }
 
-        // OBRAS
-        document.getElementById('formPresupuesto').onsubmit = (e) => {
-            e.preventDefault();
-            pLocal[document.getElementById('presupuestoObra').value] = { total: parseFloat(document.getElementById('presupuestoTotal').value) };
-            localStorage.setItem('obras_v14', JSON.stringify(pLocal));
-            renderObras(); e.target.reset();
-        };
-
-        function renderObras() {
-            const cont = document.getElementById('containerPresupuestos'); cont.innerHTML = '';
-            Object.keys(pLocal).forEach(o => {
-                const cobrado = movimientos.filter(m => m.obra === o && m.tipo === 'ingreso').reduce((a,b) => a+b.monto, 0);
-                const porc = Math.min(100, (cobrado*100/pLocal[o].total)).toFixed(0);
-                cont.innerHTML += `<div class="bg-white p-5 rounded-3xl shadow-md border-l-8 border-slate-900">
-                    <h4 class="font-black text-slate-800 uppercase text-xs">${o}</h4>
-                    <div class="flex justify-between mt-3 text-[10px] font-bold uppercase text-emerald-600"><span>Cobrado:</span><span>$${cobrado.toLocaleString()}</span></div>
-                    <div class="w-full bg-slate-100 h-2 mt-2 rounded-full overflow-hidden"><div class="bg-blue-600 h-full" style="width:${porc}%"></div></div>
-                </div>`;
-            });
+        function cancelarEdicion() {
+            document.getElementById('formMovimiento').reset();
+            document.getElementById('editId').value = "";
+            document.getElementById('btnGuardar').innerText = "Guardar Movimiento";
+            document.getElementById('btnCancelarEdit').classList.add('hidden');
         }
 
-        // GRAFICAS
-        function renderGraficas() {
+        function filtrarYRecalcular() {
+            const b = document.getElementById("tablaFiltro").value.toLowerCase();
+            movMostrados = movimientos.filter(m => m.obra.toLowerCase().includes(b) || m.desc.toLowerCase().includes(b));
+            renderizarTabla();
+        }
+
+        function ordenarYRenderizar(clave) {
+            configOrden.asc = configOrden.clave === clave ? !configOrden.asc : true;
+            configOrden.clave = clave;
+            movMostrados.sort((a,b) => (a[clave] < b[clave] ? -1 : 1) * (configOrden.asc ? 1 : -1));
+            renderizarTabla();
+        }
+
+        function renderGraficasGrales() {
             const ing = movimientos.filter(m => m.tipo === 'ingreso').reduce((a,b) => a+b.monto, 0);
             const egr = movimientos.filter(m => m.tipo === 'egreso').reduce((a,b) => a+b.monto, 0);
-            if(chart1) chart1.destroy();
-            chart1 = new Chart(document.getElementById('chartBarras'), {
-                type: 'bar',
-                data: { labels: ['Ingresos', 'Gastos'], datasets: [{ data: [ing, egr], backgroundColor: ['#10b981', '#ef4444'] }] },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
+            new Chart(document.getElementById('chartGral1'), { type: 'bar', data: { labels: ['Ingresos', 'Gastos'], datasets: [{ data: [ing, egr], backgroundColor: ['#10b981', '#ef4444'] }] } });
         }
 
         document.getElementById('obraSelect').onchange = (e) => document.getElementById('obraNuevaInput').classList.toggle('hidden', e.target.value !== 'NUEVA');
