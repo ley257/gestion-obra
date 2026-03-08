@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Control de ingresos y egresos v12.5</title>
+    <title>Control de ingresos y egresos v12.6 - Con Logo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -48,8 +48,14 @@
     </div>
 
     <div id="mainApp" class="hidden flex flex-col h-full">
-        <header class="h-16 bg-slate-900 text-white flex justify-between items-center px-4 shrink-0 z-50">
-            <h1 class="font-black text-blue-500 italic text-sm md:text-lg uppercase tracking-tighter">Control de ingresos y egresos</h1>
+        <header class="h-16 bg-slate-900 text-white flex justify-between items-center px-4 md:px-6 shrink-0 z-50 shadow-lg">
+            <div class="flex items-center gap-4">
+                <img src="https://github.com/ley257/gestion-obra/blob/main/tu-logo.png?raw=true" 
+                     alt="Logo Empresa" 
+                     class="h-10 w-auto bg-white p-1 rounded-md shadow-inner"
+                     onerror="this.style.display='none'"> <h1 class="font-black text-blue-500 italic text-sm md:text-lg uppercase tracking-tighter">Control de ingresos y egresos</h1>
+            </div>
+            
             <div class="flex items-center gap-3">
                 <div class="hidden md:block text-[9px] bg-emerald-600 px-3 py-1 rounded-full font-black text-white italic">SINCRONIZADO A LA NUBE</div>
                 <button onclick="logout()" class="text-slate-500 hover:text-white transition-colors"><i class="fas fa-power-off"></i></button>
@@ -204,13 +210,15 @@
         // MANEJO DE MONTOS
         const vInput = document.getElementById('montoVisual');
         const rInput = document.getElementById('montoReal');
-        vInput.addEventListener('input', (e) => {
-            let val = e.target.value.replace(/\D/g, "");
-            let num = parseFloat(val) / 100;
-            if (isNaN(num)) { rInput.value = 0; vInput.value = ""; return; }
-            rInput.value = num.toFixed(2);
-            vInput.value = num.toLocaleString('es-AR', { minimumFractionDigits: 2 });
-        });
+        if(vInput) {
+            vInput.addEventListener('input', (e) => {
+                let val = e.target.value.replace(/\D/g, "");
+                let num = parseFloat(val) / 100;
+                if (isNaN(num)) { rInput.value = 0; vInput.value = ""; return; }
+                rInput.value = num.toFixed(2);
+                vInput.value = num.toLocaleString('es-AR', { minimumFractionDigits: 2 });
+            });
+        }
 
         // NAVEGACIÓN
         function showPage(p) {
@@ -233,6 +241,7 @@
 
         function actualizarInterfaz() {
             const tbody = document.getElementById('tablaBody');
+            if(!tbody) return;
             tbody.innerHTML = '';
             let sI=0, sM=0;
             [...movimientos].reverse().forEach(m => {
@@ -250,22 +259,29 @@
             document.getElementById('saldoTotal').innerText = "$ " + (sI+sM).toLocaleString('es-AR', {minimumFractionDigits:2});
             
             const obras = [...new Set(movimientos.map(m => m.obra))].filter(Boolean).sort();
-            document.getElementById('obraSelect').innerHTML = '<option disabled selected>Obra...</option>' + obras.map(o => `<option value="${o}">${o}</option>`).join('') + '<option value="NUEVA" class="text-blue-600 font-bold">+ CREAR NUEVA</option>';
+            const os = document.getElementById('obraSelect');
+            if(os) {
+                os.innerHTML = '<option disabled selected>Obra...</option>' + obras.map(o => `<option value="${o}">${o}</option>`).join('') + '<option value="NUEVA" class="text-blue-600 font-bold">+ CREAR NUEVA</option>';
+            }
         }
 
         // OBRAS
-        document.getElementById('formPresupuesto').onsubmit = (e) => {
-            e.preventDefault();
-            const nombre = document.getElementById('presupuestoObra').value;
-            const total = parseFloat(document.getElementById('presupuestoTotal').value);
-            pLocal[nombre] = { total: total, fecha: new Date() };
-            localStorage.setItem('obras_v12.5', JSON.stringify(pLocal));
-            renderPresupuestos();
-            e.target.reset();
-        };
+        const fp = document.getElementById('formPresupuesto');
+        if(fp) {
+            fp.onsubmit = (e) => {
+                e.preventDefault();
+                const nombre = document.getElementById('presupuestoObra').value;
+                const total = parseFloat(document.getElementById('presupuestoTotal').value);
+                pLocal[nombre] = { total: total, fecha: new Date() };
+                localStorage.setItem('obras_v12.5', JSON.stringify(pLocal));
+                renderPresupuestos();
+                e.target.reset();
+            };
+        }
 
         function renderPresupuestos() {
             const cont = document.getElementById('containerPresupuestos');
+            if(!cont) return;
             cont.innerHTML = '';
             Object.keys(pLocal).forEach(o => {
                 const cobrado = movimientos.filter(m => m.obra === o && m.tipo === 'ingreso').reduce((a,b) => a+b.monto, 0);
@@ -281,42 +297,59 @@
         }
 
         function updateCharts() {
+            if(!chartBarras) { // Asegurar contenedores para Chart.js
+                const c1 = document.getElementById('chartBoxBar');
+                const c2 = document.getElementById('chartBoxPie');
+                if(c1) c1.innerHTML = '<p class="text-center font-black text-slate-500 text-[10px] uppercase mb-6 tracking-widest">Ingresos vs Gastos</p><div class="chart-box"><canvas id="chartBarras"></canvas></div>';
+                if(c2) c2.innerHTML = '<p class="text-center font-black text-slate-500 text-[10px] uppercase mb-6 tracking-widest">Distribución de Gastos</p><div class="chart-box"><canvas id="chartTorta"></canvas></div>';
+            }
+
             const ing = movimientos.filter(m => m.tipo === 'ingreso').reduce((a, b) => a + b.monto, 0);
             const egr = movimientos.filter(m => m.tipo === 'egreso').reduce((a, b) => a + b.monto, 0);
 
-            document.getElementById('chartBoxBar').innerHTML = '<canvas id="chartBarras"></canvas>';
-            document.getElementById('chartBoxPie').innerHTML = '<canvas id="chartTorta"></canvas>';
+            if(chartBarras) chartBarras.destroy();
+            const ctx1 = document.getElementById('chartBarras');
+            if(ctx1) {
+                chartBarras = new Chart(ctx1, {
+                    type: 'bar',
+                    data: { labels: ['Ingresos','Gastos'], datasets: [{ data:[ing, egr], backgroundColor:['#10b981','#ef4444'], borderRadius: 12 }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                });
+            }
 
-            new Chart(document.getElementById('chartBarras'), {
-                type: 'bar',
-                data: { labels: ['Ingresos','Gastos'], datasets: [{ data:[ing, egr], backgroundColor:['#10b981','#ef4444'], borderRadius: 12 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-            });
-
-            const cats = {}; 
-            movimientos.filter(m => m.tipo === 'egreso').forEach(m => cats[m.operacion] = (cats[m.operacion]||0)+m.monto);
-            new Chart(document.getElementById('chartTorta'), {
-                type: 'doughnut',
-                data: { labels: Object.keys(cats), datasets: [{ data: Object.values(cats), backgroundColor: ['#3b82f6','#f59e0b','#8b5cf6','#ec4899','#64748b'] }] },
-                options: { responsive: true, maintainAspectRatio: false, cutout: '75%' }
-            });
+            if(chartTorta) chartTorta.destroy();
+            const ctx2 = document.getElementById('chartTorta');
+            if(ctx2) {
+                const cats = {}; 
+                movimientos.filter(m => m.tipo === 'egreso').forEach(m => cats[m.operacion] = (cats[m.operacion]||0)+m.monto);
+                chartTorta = new Chart(ctx2, {
+                    type: 'doughnut',
+                    data: { labels: Object.keys(cats), datasets: [{ data: Object.values(cats), backgroundColor: ['#3b82f6','#f59e0b','#8b5cf6','#ec4899','#64748b'] }] },
+                    options: { responsive: true, maintainAspectRatio: false, cutout: '75%' }
+                });
+            }
         }
 
-        document.getElementById('formMovimiento').onsubmit = async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('btnGuardar'); btn.innerText = "INGRESANDO..."; btn.disabled = true;
-            const o = document.getElementById('obraSelect').value === "NUEVA" ? document.getElementById('obraNuevaInput').value.trim() : document.getElementById('obraSelect').value;
-            const mov = { id: Date.now(), fecha: document.getElementById('fecha').value, obra: o, operacion: document.getElementById('tipoOperacion').value, descripcion: document.getElementById('descripcion').value, cuenta: document.getElementById('cuenta').value, tipo: document.getElementById('tipoMov').value, monto: parseFloat(rInput.value) };
-            await fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(mov) });
-            movimientos.push({...mov, desc: mov.descripcion});
-            actualizarInterfaz();
-            e.target.reset(); vInput.value = "";
-            btn.innerText = "Ingresar movimiento"; btn.disabled = false;
-        };
+        const fm = document.getElementById('formMovimiento');
+        if(fm) {
+            fm.onsubmit = async (e) => {
+                e.preventDefault();
+                const btn = document.getElementById('btnGuardar'); btn.innerText = "INGRESANDO..."; btn.disabled = true;
+                const o = document.getElementById('obraSelect').value === "NUEVA" ? document.getElementById('obraNuevaInput').value.trim() : document.getElementById('obraSelect').value;
+                const mov = { id: Date.now(), fecha: document.getElementById('fecha').value, obra: o, operacion: document.getElementById('tipoOperacion').value, descripcion: document.getElementById('descripcion').value, cuenta: document.getElementById('cuenta').value, tipo: document.getElementById('tipoMov').value, monto: parseFloat(rInput.value) };
+                await fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(mov) });
+                movimientos.push({...mov, desc: mov.descripcion});
+                actualizarInterfaz();
+                e.target.reset(); rInput.value = ""; vInput.value = "";
+                btn.innerText = "Ingresar movimiento"; btn.disabled = false;
+            };
+        }
 
         window.onload = () => { if(sessionStorage.getItem('logged')) handleLogin(); };
-        document.getElementById('obraSelect').onchange = (e) => document.getElementById('obraNuevaInput').classList.toggle('hidden', e.target.value !== 'NUEVA');
-        document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
+        const os = document.getElementById('obraSelect');
+        if(os) os.onchange = (e) => document.getElementById('obraNuevaInput').classList.toggle('hidden', e.target.value !== 'NUEVA');
+        const fd = document.getElementById('fecha');
+        if(fd) fd.value = new Date().toISOString().split('T')[0];
     </script>
 </body>
 </html>
