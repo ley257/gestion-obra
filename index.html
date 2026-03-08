@@ -1,209 +1,174 @@
-<header class="bg-slate-900 text-white p-4 shadow-md flex justify-between items-center">
-    <h1 class="font-bold uppercase tracking-tight">Constructora - Control Cloud</h1>
-    <div class="text-[10px] bg-emerald-500 px-2 py-1 rounded font-bold">SINCRO ACTIVADA</div>
-</header>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Obra Cloud v5.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { font-family: sans-serif; background-color: #f3f4f6; }
+        .loader { border: 2px solid #f3f3f3; border-top: 2px solid #ef4444; border-radius: 50%; width: 14px; height: 14px; animation: spin 1s linear infinite; display: inline-block; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="min-h-screen">
 
-<main class="p-4 md:p-8 flex flex-col-mobile flex gap-6">
-    
-    <div class="w-full-mobile w-1/3 bg-white p-6 rounded-xl shadow-lg border-t-4 border-blue-600 h-fit">
-        <h2 class="font-bold text-gray-700 mb-4 uppercase text-sm">Registrar Operación</h2>
-        <form id="formMovimiento" class="space-y-4">
-            
-            <input type="date" id="fecha" required class="w-full p-3 border rounded-lg bg-gray-50">
-            
-            <div>
-                <label class="text-[10px] font-bold text-gray-400 uppercase">Seleccionar Obra</label>
-                <select id="obraSelect" required class="w-full p-3 border rounded-lg bg-white mt-1">
+    <header class="bg-slate-900 text-white p-4 shadow-md flex justify-between items-center">
+        <h1 class="font-bold uppercase text-sm md:text-lg">Constructora - Control Cloud</h1>
+        <div id="statusCloud" class="text-[10px] bg-emerald-500 px-2 py-1 rounded font-bold">NUBE OK</div>
+    </header>
+
+    <main class="p-4 md:p-8 flex flex-col md:flex-row gap-6">
+        <div class="w-full md:w-1/3 bg-white p-6 rounded-xl shadow-lg border-t-4 border-blue-600 h-fit">
+            <h2 class="font-bold text-gray-700 mb-4 uppercase text-xs">Registrar Operación</h2>
+            <form id="formMovimiento" class="space-y-4">
+                <input type="date" id="fecha" required class="w-full p-2 border rounded">
+                <select id="obraSelect" required class="w-full p-2 border rounded bg-white">
                     <option value="" disabled selected>Cargando obras...</option>
                 </select>
-                <input type="text" id="obraNuevaInput" placeholder="Escriba el nombre de la obra nueva..." class="w-full mt-2 p-3 border border-blue-400 rounded-lg hidden bg-blue-50">
-            </div>
-
-            <select id="tipoOperacion" required class="w-full p-3 border rounded-lg bg-white">
-                <option value="" disabled selected>Tipo de Operación...</option>
-                <option value="Cobro de pagos">Cobro de pagos</option>
-                <option value="Pagos de jornales">Pagos de jornales</option>
-                <option value="Materiales / insumos">Materiales / insumos</option>
-                <option value="Otras operaciones">Otras operaciones</option>
-            </select>
-
-            <input type="text" id="descripcion" placeholder="Descripción / Detalle" required class="w-full p-3 border rounded-lg bg-gray-50">
-            
-            <div class="grid grid-cols-2 gap-2">
-                <select id="cuenta" class="p-3 border rounded-lg">
-                    <option value="Ivan">Ivan</option>
-                    <option value="Mario">Mario</option>
+                <input type="text" id="obraNuevaInput" placeholder="Nombre obra nueva..." class="w-full mt-1 p-2 border border-blue-400 rounded hidden bg-blue-50">
+                <select id="tipoOperacion" required class="w-full p-2 border rounded">
+                    <option value="" disabled selected>Tipo de Operación...</option>
+                    <option value="Cobro de pagos">Cobro de pagos</option>
+                    <option value="Pagos de jornales">Pagos de jornales</option>
+                    <option value="Materiales / insumos">Materiales / insumos</option>
+                    <option value="Otras operaciones">Otras operaciones</option>
                 </select>
-                <select id="tipoMov" class="p-3 border rounded-lg font-bold">
-                    <option value="ingreso" class="text-green-600">INGRESO (+)</option>
-                    <option value="egreso" class="text-red-600">EGRESO (-)</option>
-                </select>
-            </div>
-
-            <input type="number" id="monto" placeholder="Monto $ 0.00" step="0.01" required class="w-full p-4 border-2 border-slate-200 rounded-xl text-2xl font-bold text-right text-slate-800 bg-slate-50">
-            
-            <button type="submit" id="btnGuardar" class="w-full bg-blue-600 hover:bg-blue-800 text-white font-bold py-4 rounded-xl shadow-lg transition-all active:scale-95">
-                GUARDAR EN LA NUBE
-            </button>
-        </form>
-    </div>
-
-    <div class="w-full-mobile w-2/3 space-y-6">
-        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-            <div class="bg-white p-4 rounded-lg shadow border-l-4 border-blue-500">
-                <p class="text-[10px] font-bold text-gray-400">CAJA IVAN</p>
-                <p id="saldoIvan" class="text-xl font-bold text-slate-800">$ 0,00</p>
-            </div>
-            <div class="bg-white p-4 rounded-lg shadow border-l-4 border-emerald-500">
-                <p class="text-[10px] font-bold text-gray-400">CAJA MARIO</p>
-                <p id="saldoMario" class="text-xl font-bold text-slate-800">$ 0,00</p>
-            </div>
-            <div class="bg-slate-800 text-white p-4 rounded-lg shadow col-span-2 md:col-span-1 border-l-4 border-orange-500">
-                <p class="text-[10px] font-bold text-slate-400">TOTAL EMPRESA</p>
-                <p id="saldoTotal" class="text-xl font-bold text-orange-400">$ 0,00</p>
-            </div>
+                <input type="text" id="descripcion" placeholder="Descripción" required class="w-full p-2 border rounded">
+                <div class="grid grid-cols-2 gap-2">
+                    <select id="cuenta" class="p-2 border rounded"><option value="Ivan">Ivan</option><option value="Mario">Mario</option></select>
+                    <select id="tipoMov" class="p-2 border rounded font-bold"><option value="ingreso">INGRESO (+)</option><option value="egreso">EGRESO (-)</option></select>
+                </div>
+                <input type="number" id="monto" placeholder="Monto $" step="0.01" required class="w-full p-3 border rounded text-xl font-bold text-right">
+                <button type="submit" id="btnGuardar" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl shadow hover:bg-blue-700 transition">GUARDAR</button>
+            </form>
         </div>
 
-        <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200">
-            <div class="p-3 bg-gray-50 border-b flex justify-between items-center">
-                <span class="text-xs font-bold text-gray-500 uppercase">Movimientos Recientes</span>
-                <button onclick="cargarDatos()" class="text-[10px] bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200">ACTUALIZAR NUBE</button>
+        <div class="w-full md:w-2/3 space-y-6">
+            <div class="grid grid-cols-3 gap-2">
+                <div class="bg-white p-3 rounded shadow border-l-4 border-blue-500"><p class="text-[9px] font-bold text-gray-400">IVAN</p><p id="saldoIvan" class="text-sm md:text-lg font-bold">$ 0,00</p></div>
+                <div class="bg-white p-3 rounded shadow border-l-4 border-emerald-500"><p class="text-[9px] font-bold text-gray-400">MARIO</p><p id="saldoMario" class="text-sm md:text-lg font-bold">$ 0,00</p></div>
+                <div class="bg-slate-800 text-white p-3 rounded shadow"><p class="text-[9px] font-bold text-slate-400">TOTAL</p><p id="saldoTotal" class="text-sm md:text-lg font-bold text-orange-400">$ 0,00</p></div>
             </div>
-            <div class="overflow-x-auto">
+
+            <div class="bg-white rounded-xl shadow overflow-hidden border border-gray-200">
                 <table class="w-full text-xs md:text-sm text-left">
-                    <thead class="bg-gray-100 text-gray-600 uppercase text-[10px]">
+                    <thead class="bg-gray-100 text-[10px] text-gray-500 uppercase">
                         <tr>
-                            <th class="p-4">Obra / Operación</th>
-                            <th class="p-4">Detalle</th>
-                            <th class="p-4 text-right">Monto</th>
+                            <th class="p-3">Obra / Operación</th>
+                            <th class="p-3">Detalle</th>
+                            <th class="p-3 text-right">Monto</th>
+                            <th class="p-3 text-center">Acción</th>
                         </tr>
                     </thead>
                     <tbody id="tablaBody" class="divide-y"></tbody>
                 </table>
             </div>
         </div>
-    </div>
-</main>
+    </main>
 
-<script>
-    // PEGA TU URL DE GOOGLE AQUÍ
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbynyTLycYStCGfYLVWodAniGJxv52k-2xiRxQhF4zTYTk33drfWvUf_lbKOCq4uLYniRA/exec"; 
+    <script>
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbynyTLycYStCGfYLVWodAniGJxv52k-2xiRxQhF4zTYTk33drfWvUf_lbKOCq4uLYniRA/exec"; 
+        let movimientos = [];
 
-    let movimientos = [];
-
-    // Referencias elementos de Obra
-    const selectObra = document.getElementById('obraSelect');
-    const inputObraNueva = document.getElementById('obraNuevaInput');
-
-    // Lógica de mostrar/ocultar input de obra nueva
-    selectObra.onchange = () => {
-        if (selectObra.value === "NUEVA") {
-            inputObraNueva.classList.remove('hidden');
-            inputObraNueva.required = true;
-            inputObraNueva.focus();
-        } else {
-            inputObraNueva.classList.add('hidden');
-            inputObraNueva.required = false;
+        async function cargarDatos() {
+            try {
+                const response = await fetch(WEB_APP_URL);
+                const data = await response.json();
+                movimientos = data.map(r => ({ id: r[0], fecha: r[1], obra: r[2], operacion: r[3], desc: r[4], cuenta: r[5], tipo: r[6], monto: parseFloat(r[7]) }));
+                actualizarInterfaz();
+            } catch (e) { console.log("Error de conexión"); }
         }
-    };
 
-    async function cargarDatos() {
-        try {
-            const response = await fetch(WEB_APP_URL);
-            const data = await response.json();
-            movimientos = data.map(r => ({
-                id: r[0], fecha: r[1], obra: r[2], operacion: r[3], 
-                desc: r[4], cuenta: r[5], tipo: r[6], monto: parseFloat(r[7])
-            }));
-            actualizarInterfaz();
-        } catch (e) {
-            console.log("Error al conectar con la nube. Verifica la URL.");
-            // Si falla, mostramos el menú vacío pero con la opción de agregar
-            actualizarListaObras([]);
+        // FUNCIÓN PARA BORRAR
+        async function borrarEntrada(id) {
+            if (!confirm("¿Seguro que quieres borrar este movimiento?")) return;
+            
+            document.getElementById('statusCloud').innerText = "BORRANDO...";
+            document.getElementById('statusCloud').className = "text-[10px] bg-red-500 px-2 py-1 rounded font-bold";
+
+            try {
+                await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify({ action: "DELETE", id: id })
+                });
+                
+                // Borrar localmente para actualización rápida
+                movimientos = movimientos.filter(m => m.id != id);
+                actualizarInterfaz();
+                alert("✓ Eliminado correctamente");
+            } catch (e) {
+                alert("Error al borrar");
+            } finally {
+                document.getElementById('statusCloud').innerText = "NUBE OK";
+                document.getElementById('statusCloud').className = "text-[10px] bg-emerald-500 px-2 py-1 rounded font-bold";
+            }
         }
-    }
 
-    document.getElementById('formMovimiento').onsubmit = async (e) => {
-        e.preventDefault();
-        const btn = document.getElementById('btnGuardar');
-        btn.innerText = "ENVIANDO...";
-        btn.disabled = true;
+        document.getElementById('formMovimiento').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnGuardar');
+            btn.innerText = "ENVIANDO..."; btn.disabled = true;
 
-        const obraFinal = selectObra.value === "NUEVA" ? inputObraNueva.value.trim() : selectObra.value;
+            const obraFinal = document.getElementById('obraSelect').value === "NUEVA" ? document.getElementById('obraNuevaInput').value.trim() : document.getElementById('obraSelect').value;
+            const mov = { id: Date.now(), fecha: document.getElementById('fecha').value, obra: obraFinal, operacion: document.getElementById('tipoOperacion').value, descripcion: document.getElementById('descripcion').value, cuenta: document.getElementById('cuenta').value, tipo: document.getElementById('tipoMov').value, monto: parseFloat(document.getElementById('monto').value) };
 
-        const mov = {
-            id: Date.now(),
-            fecha: document.getElementById('fecha').value,
-            obra: obraFinal,
-            operacion: document.getElementById('tipoOperacion').value,
-            descripcion: document.getElementById('descripcion').value,
-            cuenta: document.getElementById('cuenta').value,
-            tipo: document.getElementById('tipoMov').value,
-            monto: parseFloat(document.getElementById('monto').value)
+            try {
+                await fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(mov) });
+                movimientos.push({ id: mov.id, fecha: mov.fecha, obra: mov.obra, operacion: mov.operacion, desc: mov.descripcion, cuenta: mov.cuenta, tipo: mov.tipo, monto: mov.monto });
+                e.target.reset();
+                actualizarInterfaz();
+            } catch (err) { alert("Error"); }
+            btn.innerText = "GUARDAR"; btn.disabled = false;
         };
 
-        try {
-            await fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(mov) });
-            movimientos.push({
-                id: mov.id, fecha: mov.fecha, obra: mov.obra, operacion: mov.operacion, 
-                desc: mov.descripcion, cuenta: mov.cuenta, tipo: mov.tipo, monto: mov.monto
+        function actualizarInterfaz() {
+            const tbody = document.getElementById('tablaBody');
+            tbody.innerHTML = '';
+            let sIvan = 0, sMario = 0;
+
+            [...movimientos].reverse().forEach(m => {
+                const val = m.tipo === 'ingreso' ? m.monto : -m.monto;
+                m.cuenta === 'Ivan' ? sIvan += val : sMario += val;
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50 border-b">
+                        <td class="p-3 font-bold">${m.obra}<br><span class="text-[9px] text-blue-600">${m.operacion}</span></td>
+                        <td class="p-3 text-gray-500">${m.desc}<br><span class="text-[8px] uppercase font-bold">${m.fecha} | ${m.cuenta}</span></td>
+                        <td class="p-3 text-right font-bold ${m.tipo === 'ingreso' ? 'text-green-600' : 'text-red-600'}">
+                            $${m.monto.toLocaleString('es-AR')}
+                        </td>
+                        <td class="p-3 text-center">
+                            <button onclick="borrarEntrada(${m.id})" class="bg-red-500 hover:bg-red-700 text-white w-8 h-8 rounded shadow-md transition-all active:scale-90">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>`;
             });
-            e.target.reset();
-            inputObraNueva.classList.add('hidden');
-            setFechaHoy();
-            actualizarInterfaz();
-            alert("✓ Registro exitoso");
-        } catch (err) {
-            alert("Error de conexión");
+
+            document.getElementById('saldoIvan').innerText = "$ " + sIvan.toLocaleString('es-AR');
+            document.getElementById('saldoMario').innerText = "$ " + sMario.toLocaleString('es-AR');
+            document.getElementById('saldoTotal').innerText = "$ " + (sIvan + sMario).toLocaleString('es-AR');
+            actualizarListaObras([...new Set(movimientos.map(m => m.obra))]);
         }
-        btn.innerText = "GUARDAR EN LA NUBE";
-        btn.disabled = false;
-    };
 
-    function actualizarInterfaz() {
-        const tbody = document.getElementById('tablaBody');
-        tbody.innerHTML = '';
-        let sIvan = 0, sMario = 0;
+        function actualizarListaObras(obras) {
+            const select = document.getElementById('obraSelect');
+            const actual = select.value;
+            select.innerHTML = '<option value="" disabled selected>Seleccione Obra...</option>';
+            obras.filter(Boolean).sort().forEach(o => { select.innerHTML += `<option value="${o}">${o}</option>`; });
+            select.innerHTML += '<option value="NUEVA" class="text-blue-600 font-bold">+ AGREGAR NUEVA OBRA</option>';
+            if (actual) select.value = actual;
+        }
 
-        [...movimientos].reverse().forEach(m => {
-            const val = m.tipo === 'ingreso' ? m.monto : -m.monto;
-            if(m.cuenta === 'Ivan') sIvan += val; else sMario += val;
+        document.getElementById('obraSelect').onchange = (e) => {
+            document.getElementById('obraNuevaInput').classList.toggle('hidden', e.target.value !== 'NUEVA');
+        };
 
-            tbody.innerHTML += `
-                <tr class="hover:bg-gray-50 border-b">
-                    <td class="p-4 font-bold text-slate-800">${m.obra}<br><span class="text-[9px] text-blue-600 uppercase font-extrabold">${m.operacion}</span></td>
-                    <td class="p-4 text-gray-500">${m.desc}<br><span class="text-[9px] uppercase font-bold">${m.fecha} | ${m.cuenta}</span></td>
-                    <td class="p-4 text-right font-bold ${m.tipo === 'ingreso' ? 'text-green-600' : 'text-red-600'}">
-                        ${m.tipo === 'ingreso' ? '+' : '-'} $${m.monto.toLocaleString('es-AR', {minimumFractionDigits: 2})}
-                    </td>
-                </tr>`;
-        });
-
-        document.getElementById('saldoIvan').innerText = "$ " + sIvan.toLocaleString('es-AR', {minimumFractionDigits: 2});
-        document.getElementById('saldoMario').innerText = "$ " + sMario.toLocaleString('es-AR', {minimumFractionDigits: 2});
-        document.getElementById('saldoTotal').innerText = "$ " + (sIvan + sMario).toLocaleString('es-AR', {minimumFractionDigits: 2});
-
-        actualizarListaObras([...new Set(movimientos.map(m => m.obra))]);
-    }
-
-    function actualizarListaObras(obrasUnicas) {
-        const valorActual = selectObra.value;
-        selectObra.innerHTML = '<option value="" disabled selected>Seleccione Obra...</option>';
-        
-        obrasUnicas.filter(Boolean).sort().forEach(o => {
-            selectObra.innerHTML += `<option value="${o}">${o}</option>`;
-        });
-
-        selectObra.innerHTML += '<option value="NUEVA" class="text-blue-600 font-bold">+ AGREGAR NUEVA OBRA</option>';
-        
-        // Intentar mantener la selección si no era "NUEVA"
-        if (valorActual && valorActual !== "NUEVA") selectObra.value = valorActual;
-    }
-
-    function setFechaHoy() {
         document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
-    }
-
-    setFechaHoy();
-    cargarDatos();
-</script>
+        cargarDatos();
+    </script>
+</body>
+</html>
