@@ -3,170 +3,315 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Obra Cloud v5.0</title>
+    <title>Sistema Constructora Pro v10.3</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { font-family: sans-serif; background-color: #f3f4f6; }
-        .loader { border: 2px solid #f3f3f3; border-top: 2px solid #ef4444; border-radius: 50%; width: 14px; height: 14px; animation: spin 1s linear infinite; display: inline-block; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        html, body { height: 100%; margin: 0; overflow: hidden; font-family: 'Inter', sans-serif; }
+        .main-container { height: calc(100vh - 64px); display: flex; }
+        .scroll-area { overflow-y: auto; height: 100%; padding-bottom: 100px; scroll-behavior: smooth; }
+        .nav-link.active { background: #0f172a; border-left: 4px solid #3b82f6; color: white; }
+        .card-presu { transition: all 0.3s ease; border: 1px solid #e2e8f0; border-radius: 24px; padding: 2rem; background: white; }
+        .status-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+        .chart-container { position: relative; height: 320px; width: 100%; }
+        .badge-ivan { background-color: #3b82f6; color: white; padding: 4px 10px; border-radius: 8px; font-weight: 900; font-size: 10px; }
+        .badge-mario { background-color: #10b981; color: white; padding: 4px 10px; border-radius: 8px; font-weight: 900; font-size: 10px; }
     </style>
 </head>
-<body class="min-h-screen">
+<body class="bg-slate-50 flex flex-col">
 
-    <header class="bg-slate-900 text-white p-4 shadow-md flex justify-between items-center">
-        <h1 class="font-bold uppercase text-sm md:text-lg">Constructora - Control Cloud</h1>
-        <div id="statusCloud" class="text-[10px] bg-emerald-500 px-2 py-1 rounded font-bold">NUBE OK</div>
+    <header class="h-16 bg-slate-900 text-white flex justify-between items-center px-6 shadow-2xl z-50">
+        <div class="flex items-center gap-4">
+            <img src="https://uce56b60d0438ac1e17d61f4c3b3.previews.dropboxusercontent.com/p/thumb/AC9lLNfVL_E59S1qJFuDglNj8AOu43-ywbO_cu2f5NEmU6gMBr65_QkakQgs48w4nhzlwBN9costtLXtGM41YtDI64td0fqX_3c5gPRpX1rqOKcA0K_57sF91r-e23T8-pNhQ_K6bVMEijdgJG7NYATLlGNLnsNwuVgETOT_NoPsT39ea64hrYSwQSTRTXGeb3z-2odLuoMJIa0ZwYl0rngWLE2cynZ5G6aoNSMMux7ChWgOEFTLq-vIpLx9tGU-YHI7RldaU5BNoKaglu4sz_QS3KViGHL_5b3Gfc-K6-ku_Qa0hwtzrBJFyCYNUgMS_akRIHdyhSZzLg2TaR_B4FJEROZ9Wt_oQIjVTgMzYzd7uWEd1TG8nTWo3ty8FsHmq-c/p.png?is_prewarmed=true" class="h-10 bg-white p-1 rounded shadow-inner" alt="Logo">
+            <h1 class="font-black text-blue-500 tracking-tighter uppercase italic text-lg hidden md:block">SISTEMA DE GESTION DE COBROS Y PAGOS</h1>
+        </div>
+        <div id="statusCloud" class="text-[10px] bg-emerald-500 px-4 py-1.5 rounded-full font-black shadow-lg">SISTEMA ONLINE</div>
     </header>
 
-    <main class="p-4 md:p-8 flex flex-col md:flex-row gap-6">
-        <div class="w-full md:w-1/3 bg-white p-6 rounded-xl shadow-lg border-t-4 border-blue-600 h-fit">
-            <h2 class="font-bold text-gray-700 mb-4 uppercase text-xs">Registrar Operación</h2>
-            <form id="formMovimiento" class="space-y-4">
-                <input type="date" id="fecha" required class="w-full p-2 border rounded">
-                <select id="obraSelect" required class="w-full p-2 border rounded bg-white">
-                    <option value="" disabled selected>Cargando obras...</option>
-                </select>
-                <input type="text" id="obraNuevaInput" placeholder="Nombre obra nueva..." class="w-full mt-1 p-2 border border-blue-400 rounded hidden bg-blue-50">
-                <select id="tipoOperacion" required class="w-full p-2 border rounded">
-                    <option value="" disabled selected>Tipo de Operación...</option>
-                    <option value="Cobro de pagos">Cobro de pagos</option>
-                    <option value="Pagos de jornales">Pagos de jornales</option>
-                    <option value="Materiales / insumos">Materiales / insumos</option>
-                    <option value="Otras operaciones">Otras operaciones</option>
-                </select>
-                <input type="text" id="descripcion" placeholder="Descripción" required class="w-full p-2 border rounded">
-                <div class="grid grid-cols-2 gap-2">
-                    <select id="cuenta" class="p-2 border rounded"><option value="Ivan">Ivan</option><option value="Mario">Mario</option></select>
-                    <select id="tipoMov" class="p-2 border rounded font-bold"><option value="ingreso">INGRESO (+)</option><option value="egreso">EGRESO (-)</option></select>
+    <div class="main-container">
+        <nav class="w-20 md:w-64 bg-slate-800 text-slate-400 flex flex-col pt-6">
+            <button onclick="showPage('registro')" id="btn-registro" class="nav-link active p-5 flex items-center gap-4 hover:bg-slate-700 transition">
+                <i class="fas fa-cash-register w-6 text-center"></i>
+                <span class="hidden md:block font-bold text-xs uppercase tracking-widest">Caja Diaria</span>
+            </button>
+            <button onclick="showPage('presupuestos')" id="btn-presupuestos" class="nav-link p-5 flex items-center gap-4 hover:bg-slate-700 transition">
+                <i class="fas fa-file-invoice-dollar w-6 text-center"></i>
+                <span class="hidden md:block font-bold text-xs uppercase tracking-widest">Presupuestos</span>
+            </button>
+            <button onclick="showPage('graficas')" id="btn-graficas" class="nav-link p-5 flex items-center gap-4 hover:bg-slate-700 transition">
+                <i class="fas fa-chart-line w-6 text-center"></i>
+                <span class="hidden md:block font-bold text-xs uppercase tracking-widest">Rentabilidad</span>
+            </button>
+        </nav>
+
+        <div class="flex-grow scroll-area p-4 md:p-8">
+            
+            <div id="page-registro" class="space-y-6">
+                <div class="flex flex-col xl:flex-row gap-8">
+                    <div class="w-full xl:w-1/3 bg-white p-8 rounded-3xl shadow-xl border-t-[12px] border-blue-600">
+                        <form id="formMovimiento" class="space-y-5">
+                            <h3 class="font-black text-slate-800 text-sm uppercase mb-4 tracking-wider italic">Nuevo Registro</h3>
+                            <div class="grid grid-cols-2 gap-4">
+                                <input type="date" id="fecha" required class="w-full p-3 border-2 border-slate-100 rounded-xl bg-slate-50 font-bold text-sm">
+                                <select id="obraSelect" required class="w-full p-3 border-2 border-slate-100 rounded-xl bg-white font-bold text-sm"></select>
+                            </div>
+                            <input type="text" id="obraNuevaInput" placeholder="Nombre de obra..." class="w-full p-3 border-2 border-blue-300 rounded-xl hidden bg-blue-50 italic">
+                            <select id="tipoOperacion" required class="w-full p-3 border-2 border-slate-100 rounded-xl font-bold bg-white text-slate-600 text-sm">
+                                <option value="" disabled selected>Tipo de Operación...</option>
+                                <option value="Cobro de pagos">Cobro de pagos</option>
+                                <option value="Pagos de jornales">Pagos de jornales</option>
+                                <option value="Materiales / insumos">Materiales / insumos</option>
+                                <option value="Otras operaciones">Otras operaciones</option>
+                            </select>
+                            <input type="text" id="descripcion" placeholder="Descripción detallada" required class="w-full p-3 border-2 border-slate-100 rounded-xl font-semibold">
+                            <div class="grid grid-cols-2 gap-4">
+                                <select id="cuenta" class="p-3 border-2 border-slate-100 rounded-xl font-black text-slate-700 bg-white"><option value="Ivan">Ivan</option><option value="Mario">Mario</option></select>
+                                <select id="tipoMov" class="p-3 border-2 border-slate-100 rounded-xl font-black text-blue-600 bg-white"><option value="ingreso">INGRESO (+)</option><option value="egreso">EGRESO (-)</option></select>
+                            </div>
+                            <div class="relative">
+                                <span class="absolute left-5 top-4 text-slate-400 font-black text-2xl">$</span>
+                                <input type="text" id="montoDisplay" placeholder="0,00" required class="w-full p-5 pl-12 border-4 border-slate-100 rounded-2xl text-4xl font-black text-right text-slate-800 bg-slate-50 outline-none">
+                                <input type="hidden" id="montoReal">
+                            </div>
+                            <button type="submit" id="btnGuardar" class="w-full bg-slate-900 text-white font-black py-5 rounded-2xl shadow-2xl hover:bg-black transition-all uppercase tracking-widest text-sm">Sincronizar</button>
+                        </form>
+                    </div>
+
+                    <div class="w-full xl:w-2/3 space-y-6">
+                        <div class="grid grid-cols-3 gap-6">
+                            <div class="bg-white p-6 rounded-3xl shadow-lg border-b-8 border-blue-500"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">IVA-N</p><p id="saldoIvan" class="text-2xl font-black text-slate-800">$ 0</p></div>
+                            <div class="bg-white p-6 rounded-3xl shadow-lg border-b-8 border-emerald-500"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">MAR-IO</p><p id="saldoMario" class="text-2xl font-black text-slate-800">$ 0</p></div>
+                            <div class="bg-slate-900 text-white p-6 rounded-3xl shadow-lg border-b-8 border-orange-500"><p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">TOTAL CAJA</p><p id="saldoTotal" class="text-2xl font-black text-orange-400">$ 0</p></div>
+                        </div>
+                        <div class="bg-white rounded-3xl shadow-xl overflow-hidden h-[550px] flex flex-col border border-slate-200">
+                            <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 flex justify-between items-center">
+                                <h2 class="font-black text-slate-800 uppercase text-xs tracking-widest italic"><i class="fas fa-list-ul mr-2 text-blue-600"></i> Últimos Movimientos</h2>
+                            </div>
+                            <div class="flex-grow overflow-y-auto">
+                                <table class="w-full text-sm text-left">
+                                    <thead class="bg-slate-100 text-[10px] text-slate-500 uppercase font-black sticky top-0 z-10">
+                                        <tr><th class="p-5">Fecha</th><th class="p-5">Obra / Concepto</th><th class="p-5 text-center">Cuenta</th><th class="p-5 text-right">Monto</th><th class="p-5 text-center">X</th></tr>
+                                    </thead>
+                                    <tbody id="tablaBody" class="divide-y divide-slate-100"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <input type="number" id="monto" placeholder="Monto $" step="0.01" required class="w-full p-3 border rounded text-xl font-bold text-right">
-                <button type="submit" id="btnGuardar" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl shadow hover:bg-blue-700 transition">GUARDAR</button>
-            </form>
-        </div>
-
-        <div class="w-full md:w-2/3 space-y-6">
-            <div class="grid grid-cols-3 gap-2">
-                <div class="bg-white p-3 rounded shadow border-l-4 border-blue-500"><p class="text-[9px] font-bold text-gray-400">IVAN</p><p id="saldoIvan" class="text-sm md:text-lg font-bold">$ 0,00</p></div>
-                <div class="bg-white p-3 rounded shadow border-l-4 border-emerald-500"><p class="text-[9px] font-bold text-gray-400">MARIO</p><p id="saldoMario" class="text-sm md:text-lg font-bold">$ 0,00</p></div>
-                <div class="bg-slate-800 text-white p-3 rounded shadow"><p class="text-[9px] font-bold text-slate-400">TOTAL</p><p id="saldoTotal" class="text-sm md:text-lg font-bold text-orange-400">$ 0,00</p></div>
             </div>
 
-            <div class="bg-white rounded-xl shadow overflow-hidden border border-gray-200">
-                <table class="w-full text-xs md:text-sm text-left">
-                    <thead class="bg-gray-100 text-[10px] text-gray-500 uppercase">
-                        <tr>
-                            <th class="p-3">Obra / Operación</th>
-                            <th class="p-3">Detalle</th>
-                            <th class="p-3 text-right">Monto</th>
-                            <th class="p-3 text-center">Acción</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tablaBody" class="divide-y"></tbody>
-                </table>
+            <div id="page-presupuestos" class="hidden space-y-8">
+                <div class="bg-white p-8 rounded-3xl shadow-xl border-t-[12px] border-orange-500">
+                    <h3 class="font-black text-slate-800 uppercase text-sm mb-6 tracking-widest">Configuración de Cobranzas</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <select id="presupuestoObra" class="p-4 border-2 border-slate-100 rounded-xl bg-slate-50 font-bold outline-none"></select>
+                        <input type="number" id="montoPresupuesto" placeholder="Monto Presupuesto" class="p-4 border-2 border-slate-100 rounded-xl bg-slate-50 font-bold outline-none">
+                        <label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" id="pagoCuotas" class="w-6 h-6"><span class="text-xs font-black text-slate-600 uppercase">Plan de cuotas</span></label>
+                        <input type="date" id="fechaInicioCuota" class="p-4 border-2 border-slate-100 rounded-xl bg-slate-50 hidden">
+                    </div>
+                    <button onclick="guardarPresupuesto()" class="mt-8 bg-orange-600 text-white px-10 py-4 rounded-2xl font-black uppercase text-xs hover:bg-orange-700 shadow-xl active:scale-95 tracking-widest">Guardar Control</button>
+                </div>
+                <div id="containerPresupuestos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
             </div>
+
+            <div id="page-graficas" class="hidden space-y-6">
+                <div class="flex flex-col md:flex-row justify-between items-center bg-white p-8 rounded-3xl shadow-xl border-l-[12px] border-emerald-500 gap-6">
+                    <div class="flex flex-wrap gap-4">
+                        <select id="filtroObra" onchange="updateCharts()" class="p-3 border-2 rounded-xl text-xs font-black uppercase bg-slate-50 outline-none"></select>
+                        <button onclick="generarPDF()" class="bg-red-600 text-white px-8 py-3 rounded-xl font-black text-xs flex items-center gap-3 hover:bg-red-700 shadow-lg uppercase tracking-widest"><i class="fas fa-file-pdf"></i> PDF</button>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Rentabilidad Neta Obra</p>
+                        <p id="rentabilidadValor" class="text-4xl font-black tracking-tighter">$ 0,00</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-white p-8 rounded-3xl shadow-2xl border border-slate-100">
+                        <div class="chart-container"><canvas id="chartBarras"></canvas></div>
+                    </div>
+                    <div class="bg-white p-8 rounded-3xl shadow-2xl border border-slate-100">
+                        <div class="chart-container"><canvas id="chartTorta"></canvas></div>
+                    </div>
+                </div>
+            </div>
+
         </div>
-    </main>
+    </div>
 
     <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbynyTLycYStCGfYLVWodAniGJxv52k-2xiRxQhF4zTYTk33drfWvUf_lbKOCq4uLYniRA/exec"; 
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzbYMOqEUdxIcv8We4PbbvTc7441LPn2e_bw6OsIGUhwBDfve1IRaD5zrQCDzXQaEk05A/exec";
         let movimientos = [];
+        let presupuestosLocal = JSON.parse(localStorage.getItem('presupuestos_v10')) || {};
+        let chartBarras = null;
+        let chartTorta = null;
 
-        async function cargarDatos() {
-            try {
-                const response = await fetch(WEB_APP_URL);
-                const data = await response.json();
-                movimientos = data.map(r => ({ id: r[0], fecha: r[1], obra: r[2], operacion: r[3], desc: r[4], cuenta: r[5], tipo: r[6], monto: parseFloat(r[7]) }));
-                actualizarInterfaz();
-            } catch (e) { console.log("Error de conexión"); }
+        // Moneda Realtime
+        const mDisplay = document.getElementById('montoDisplay');
+        const mReal = document.getElementById('montoReal');
+        mDisplay.addEventListener('input', (e) => {
+            let value = e.target.value.replace(/\D/g, "");
+            let realValue = parseFloat(value) / 100;
+            if (isNaN(realValue)) realValue = 0;
+            mReal.value = realValue;
+            mDisplay.value = realValue.toLocaleString('es-AR', { minimumFractionDigits: 2 });
+        });
+
+        function showPage(p) {
+            document.getElementById('page-registro').classList.add('hidden');
+            document.getElementById('page-presupuestos').classList.add('hidden');
+            document.getElementById('page-graficas').classList.add('hidden');
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            
+            document.getElementById('page-' + p).classList.remove('hidden');
+            document.getElementById('btn-' + p).classList.add('active');
+
+            if (p === 'graficas') setTimeout(updateCharts, 100);
+            if (p === 'presupuestos') renderPresupuestos();
         }
 
-        // FUNCIÓN PARA BORRAR
-        async function borrarEntrada(id) {
-            if (!confirm("¿Seguro que quieres borrar este movimiento?")) return;
-            
-            document.getElementById('statusCloud').innerText = "BORRANDO...";
-            document.getElementById('statusCloud').className = "text-[10px] bg-red-500 px-2 py-1 rounded font-bold";
-
+        async function cargarDatos() {
+            setCloudStatus("ACTUALIZANDO...", "bg-blue-600");
             try {
-                await fetch(WEB_APP_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: JSON.stringify({ action: "DELETE", id: id })
-                });
-                
-                // Borrar localmente para actualización rápida
-                movimientos = movimientos.filter(m => m.id != id);
+                const r = await fetch(WEB_APP_URL);
+                const d = await r.json();
+                movimientos = d.map(r => ({ id: r[0], fecha: r[1], obra: r[2], operacion: r[3], desc: r[4], cuenta: r[5], tipo: r[6], monto: parseFloat(r[7]) }));
                 actualizarInterfaz();
-                alert("✓ Eliminado correctamente");
-            } catch (e) {
-                alert("Error al borrar");
-            } finally {
-                document.getElementById('statusCloud').innerText = "NUBE OK";
-                document.getElementById('statusCloud').className = "text-[10px] bg-emerald-500 px-2 py-1 rounded font-bold";
-            }
+                setCloudStatus("SINCRO OK", "bg-emerald-500");
+            } catch(e) { setCloudStatus("ERROR", "bg-red-500"); }
+        }
+
+        function actualizarInterfaz() {
+            const tbody = document.getElementById('tablaBody');
+            tbody.innerHTML = '';
+            let sI=0, sM=0;
+            [...movimientos].reverse().forEach(m => {
+                const val = m.tipo === 'ingreso' ? m.monto : -m.monto;
+                if(m.cuenta === 'Ivan') sI += val; else sM += val;
+                const bC = m.cuenta === 'Ivan' ? 'badge-ivan' : 'badge-mario';
+                const fL = m.fecha.split('-').reverse().join('/');
+                tbody.innerHTML += `
+                    <tr class="border-b hover:bg-blue-50/40">
+                        <td class="p-5 font-black text-slate-500 text-[11px]">${fL}</td>
+                        <td class="p-5">
+                            <div class="font-black text-slate-800 text-sm uppercase">${m.obra}</div>
+                            <div class="text-[9px] text-blue-600 font-bold uppercase mb-1">${m.operacion}</div>
+                            <div class="text-xs text-slate-600 bg-white border p-1 px-2 rounded-lg font-medium italic shadow-sm inline-block">${m.desc}</div>
+                        </td>
+                        <td class="p-5 text-center"><span class="${bC}">${m.cuenta.toUpperCase()}</span></td>
+                        <td class="p-5 text-right font-black text-base ${m.tipo === 'ingreso' ? 'text-emerald-600' : 'text-red-500'}">$${m.monto.toLocaleString('es-AR', {minimumFractionDigits:2})}</td>
+                        <td class="p-5 text-center"><button onclick="borrarEntrada(${m.id})" class="text-red-200 hover:text-red-600"><i class="fas fa-trash-alt"></i></button></td>
+                    </tr>`;
+            });
+            document.getElementById('saldoIvan').innerText = "$ " + sI.toLocaleString('es-AR', {minimumFractionDigits:2});
+            document.getElementById('saldoMario').innerText = "$ " + sM.toLocaleString('es-AR', {minimumFractionDigits:2});
+            document.getElementById('saldoTotal').innerText = "$ " + (sI+sM).toLocaleString('es-AR', {minimumFractionDigits:2});
+            llenarSelects([...new Set(movimientos.map(m => m.obra))].filter(Boolean).sort());
+        }
+
+        function llenarSelects(obras) {
+            const s1 = document.getElementById('obraSelect'), s2 = document.getElementById('filtroObra'), s3 = document.getElementById('presupuestoObra');
+            let h = '<option value="" disabled selected>Obra...</option>';
+            obras.forEach(o => h += `<option value="${o}">${o}</option>`);
+            s1.innerHTML = h + '<option value="NUEVA" class="text-blue-600 font-black">+ NUEVA OBRA</option>';
+            s2.innerHTML = '<option value="TODAS">RESUMEN GENERAL</option>' + h.replace('selected', '');
+            s3.innerHTML = h.replace('selected', '');
+        }
+
+        // LÓGICA PRESUPUESTOS
+        document.getElementById('pagoCuotas').onchange = (e) => document.getElementById('fechaInicioCuota').classList.toggle('hidden', !e.target.checked);
+        function guardarPresupuesto() {
+            const obra = document.getElementById('presupuestoObra').value, monto = parseFloat(document.getElementById('montoPresupuesto').value);
+            if(!obra || isNaN(monto)) return alert("Faltan datos");
+            presupuestosLocal[obra] = { monto, enCuotas: document.getElementById('pagoCuotas').checked, fechaIn: document.getElementById('fechaInicioCuota').value };
+            localStorage.setItem('presupuestos_v10', JSON.stringify(presupuestosLocal));
+            renderPresupuestos();
+        }
+
+        function renderPresupuestos() {
+            const cont = document.getElementById('containerPresupuestos');
+            cont.innerHTML = '';
+            Object.keys(presupuestosLocal).forEach(obra => {
+                const conf = presupuestosLocal[obra];
+                const cobros = movimientos.filter(m => m.obra === obra && m.operacion === 'Cobro de pagos');
+                const totalC = cobros.reduce((a, b) => a + b.monto, 0);
+                const saldo = conf.monto - totalC;
+                const porc = ((totalC * 100) / conf.monto).toFixed(1);
+                let statusC = 'bg-slate-300', dText = "Sin cobros";
+                if(cobros.length > 0) {
+                    const ult = new Date(Math.max(...cobros.map(m => new Date(m.fecha))));
+                    const dias = Math.floor((new Date() - ult) / (1000*60*60*24));
+                    statusC = dias < 20 ? 'bg-emerald-500' : (dias <= 30 ? 'bg-amber-500' : 'bg-red-500');
+                    dText = dias + " días desde últ. pago";
+                }
+                cont.innerHTML += `
+                    <div class="card-presu relative shadow-lg">
+                        <span class="absolute top-6 right-6 status-dot ${statusC} shadow-lg" title="${dText}"></span>
+                        <h4 class="font-black text-slate-800 uppercase text-xs mb-6 tracking-widest">${obra}</h4>
+                        <div class="space-y-4">
+                            <div class="flex justify-between text-[10px] font-black text-slate-400 uppercase"><span>Presupuesto</span><span>$${conf.monto.toLocaleString()}</span></div>
+                            <div class="flex justify-between text-[10px] font-black text-emerald-500 uppercase"><span>Cobrado</span><span>$${totalC.toLocaleString()}</span></div>
+                            <div class="flex justify-between text-2xl font-black text-orange-600 border-t-2 pt-4"><span>SALDO</span><span>$${saldo.toLocaleString()}</span></div>
+                        </div>
+                        <div class="mt-8 bg-slate-100 rounded-full h-3 overflow-hidden shadow-inner"><div class="h-full rounded-full ${statusC} transition-all duration-1000" style="width:${porc}%"></div></div>
+                        <p class="text-[9px] font-black text-slate-400 mt-2 text-center">${porc}% COBRADO - ${dText}</p>
+                        <button onclick="borrarPresu('${obra}')" class="mt-6 text-[9px] font-black text-red-300 hover:text-red-500 uppercase tracking-widest">Eliminar Registro</button>
+                    </div>`;
+            });
+        }
+
+        // LÓGICA GRÁFICOS
+        function updateCharts() {
+            const fO = document.getElementById('filtroObra').value;
+            const filt = movimientos.filter(m => fO === 'TODAS' || m.obra === fO);
+            const ing = filt.filter(m => m.tipo === 'ingreso').reduce((a, b) => a + b.monto, 0);
+            const egr = filt.filter(m => m.tipo === 'egreso').reduce((a, b) => a + b.monto, 0);
+            const rent = ing - egr;
+            document.getElementById('rentabilidadValor').innerText = `$ ${rent.toLocaleString('es-AR', {minimumFractionDigits:2})}`;
+            document.getElementById('rentabilidadValor').className = `text-4xl font-black tracking-tighter ${rent >= 0 ? 'text-emerald-500' : 'text-red-500'}`;
+            
+            if (chartBarras) chartBarras.destroy();
+            chartBarras = new Chart(document.getElementById('chartBarras').getContext('2d'), {
+                type: 'bar',
+                data: { labels: ['INGRESOS','EGRESOS'], datasets: [{ data:[ing, egr], backgroundColor:['#10b981','#ef4444'], borderRadius: 10 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+            if (chartTorta) chartTorta.destroy();
+            const cats = {}; filt.filter(m => m.tipo === 'egreso').forEach(m => cats[m.operacion] = (cats[m.operacion]||0)+m.monto);
+            chartTorta = new Chart(document.getElementById('chartTorta').getContext('2d'), {
+                type: 'doughnut',
+                data: { labels: Object.keys(cats), datasets: [{ data: Object.values(cats), backgroundColor: ['#3b82f6','#f59e0b','#8b5cf6','#ec4899','#64748b'] }] },
+                options: { responsive: true, maintainAspectRatio: false, cutout: '75%' }
+            });
+        }
+
+        async function borrarEntrada(id) {
+            if(!confirm("¿Eliminar registro?")) return;
+            setCloudStatus("BORRANDO...", "bg-red-600");
+            await fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "DELETE", id: id }) });
+            movimientos = movimientos.filter(m => m.id != id);
+            actualizarInterfaz();
+            setCloudStatus("SINCRO OK", "bg-emerald-500");
         }
 
         document.getElementById('formMovimiento').onsubmit = async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btnGuardar');
-            btn.innerText = "ENVIANDO..."; btn.disabled = true;
-
-            const obraFinal = document.getElementById('obraSelect').value === "NUEVA" ? document.getElementById('obraNuevaInput').value.trim() : document.getElementById('obraSelect').value;
-            const mov = { id: Date.now(), fecha: document.getElementById('fecha').value, obra: obraFinal, operacion: document.getElementById('tipoOperacion').value, descripcion: document.getElementById('descripcion').value, cuenta: document.getElementById('cuenta').value, tipo: document.getElementById('tipoMov').value, monto: parseFloat(document.getElementById('monto').value) };
-
-            try {
-                await fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(mov) });
-                movimientos.push({ id: mov.id, fecha: mov.fecha, obra: mov.obra, operacion: mov.operacion, desc: mov.descripcion, cuenta: mov.cuenta, tipo: mov.tipo, monto: mov.monto });
-                e.target.reset();
-                actualizarInterfaz();
-            } catch (err) { alert("Error"); }
-            btn.innerText = "GUARDAR"; btn.disabled = false;
+            btn.innerText = "PROCESANDO..."; btn.disabled = true;
+            const obra = document.getElementById('obraSelect').value === "NUEVA" ? document.getElementById('obraNuevaInput').value.trim() : document.getElementById('obraSelect').value;
+            const mov = { id: Date.now(), fecha: document.getElementById('fecha').value, obra: obra, operacion: document.getElementById('tipoOperacion').value, descripcion: document.getElementById('descripcion').value, cuenta: document.getElementById('cuenta').value, tipo: document.getElementById('tipoMov').value, monto: parseFloat(mReal.value) };
+            await fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(mov) });
+            movimientos.push({...mov, desc: mov.descripcion});
+            e.target.reset(); mDisplay.value = ""; mReal.value = "";
+            actualizarInterfaz();
+            btn.innerText = "Sincronizar"; btn.disabled = false;
         };
 
-        function actualizarInterfaz() {
-            const tbody = document.getElementById('tablaBody');
-            tbody.innerHTML = '';
-            let sIvan = 0, sMario = 0;
-
-            [...movimientos].reverse().forEach(m => {
-                const val = m.tipo === 'ingreso' ? m.monto : -m.monto;
-                m.cuenta === 'Ivan' ? sIvan += val : sMario += val;
-
-                tbody.innerHTML += `
-                    <tr class="hover:bg-gray-50 border-b">
-                        <td class="p-3 font-bold">${m.obra}<br><span class="text-[9px] text-blue-600">${m.operacion}</span></td>
-                        <td class="p-3 text-gray-500">${m.desc}<br><span class="text-[8px] uppercase font-bold">${m.fecha} | ${m.cuenta}</span></td>
-                        <td class="p-3 text-right font-bold ${m.tipo === 'ingreso' ? 'text-green-600' : 'text-red-600'}">
-                            $${m.monto.toLocaleString('es-AR')}
-                        </td>
-                        <td class="p-3 text-center">
-                            <button onclick="borrarEntrada(${m.id})" class="bg-red-500 hover:bg-red-700 text-white w-8 h-8 rounded shadow-md transition-all active:scale-90">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </td>
-                    </tr>`;
-            });
-
-            document.getElementById('saldoIvan').innerText = "$ " + sIvan.toLocaleString('es-AR');
-            document.getElementById('saldoMario').innerText = "$ " + sMario.toLocaleString('es-AR');
-            document.getElementById('saldoTotal').innerText = "$ " + (sIvan + sMario).toLocaleString('es-AR');
-            actualizarListaObras([...new Set(movimientos.map(m => m.obra))]);
-        }
-
-        function actualizarListaObras(obras) {
-            const select = document.getElementById('obraSelect');
-            const actual = select.value;
-            select.innerHTML = '<option value="" disabled selected>Seleccione Obra...</option>';
-            obras.filter(Boolean).sort().forEach(o => { select.innerHTML += `<option value="${o}">${o}</option>`; });
-            select.innerHTML += '<option value="NUEVA" class="text-blue-600 font-bold">+ AGREGAR NUEVA OBRA</option>';
-            if (actual) select.value = actual;
-        }
-
-        document.getElementById('obraSelect').onchange = (e) => {
-            document.getElementById('obraNuevaInput').classList.toggle('hidden', e.target.value !== 'NUEVA');
-        };
-
+        function setCloudStatus(t, c) { const s = document.getElementById('statusCloud'); s.innerText = t; s.className = `text-[10px] ${c} px-4 py-1.5 rounded-full font-black shadow-lg text-white`; }
+        function borrarPresu(o) { delete presupuestosLocal[o]; localStorage.setItem('presupuestos_v10', JSON.stringify(presupuestosLocal)); renderPresupuestos(); }
+        document.getElementById('obraSelect').onchange = (e) => document.getElementById('obraNuevaInput').classList.toggle('hidden', e.target.value !== 'NUEVA');
         document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
         cargarDatos();
     </script>
