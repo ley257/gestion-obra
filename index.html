@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Constructora Pro v10.5</title>
+    <title>Constructora Pro v10.7 - Flujo de Caja</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -13,13 +13,10 @@
         @media (min-width: 768px) { .main-content { height: calc(100vh - 64px); } }
         .nav-link.active { color: #3b82f6; }
         @media (min-width: 768px) { .nav-link.active { background: #0f172a; border-left: 4px solid #3b82f6; color: white; } }
-        .chart-container { position: relative; height: 280px; width: 100%; }
-        
-        /* Badges con nombre completo */
         .badge-ivan { background: #3b82f6; color: white; padding: 4px 10px; border-radius: 8px; font-weight: 900; font-size: 10px; display: inline-block; min-width: 60px; text-align: center; }
         .badge-mario { background: #10b981; color: white; padding: 4px 10px; border-radius: 8px; font-weight: 900; font-size: 10px; display: inline-block; min-width: 60px; text-align: center; }
-        
         .no-scrollbar::-webkit-scrollbar { display: none; }
+        .card-plan { border: 1px solid #e2e8f0; transition: all 0.3s ease; background: white; }
     </style>
 </head>
 <body class="bg-slate-50 flex flex-col">
@@ -28,42 +25,33 @@
         <div class="flex items-center gap-2">
             <h1 class="font-black text-blue-500 tracking-tighter uppercase italic text-sm md:text-lg">Constructora Master</h1>
         </div>
-        <div id="statusCloud" class="text-[9px] md:text-[10px] bg-emerald-500 px-3 py-1 rounded-full font-black text-white uppercase">Sincronizado</div>
+        <div id="statusCloud" class="text-[9px] md:text-[10px] bg-emerald-500 px-3 py-1 rounded-full font-black text-white uppercase italic">Sincronizado v10.7</div>
     </header>
 
     <div class="flex flex-col md:flex-row flex-grow overflow-hidden">
         
         <nav class="fixed bottom-0 left-0 w-full h-[70px] bg-slate-900 md:relative md:w-64 md:h-full flex md:flex-col justify-around md:justify-start md:pt-6 z-50 border-t border-slate-800 md:border-none">
             <button onclick="showPage('registro')" id="btn-registro" class="nav-link active flex flex-col md:flex-row items-center gap-1 md:gap-4 md:p-5 md:w-full text-slate-400">
-                <i class="fas fa-cash-register text-xl md:text-base"></i>
-                <span class="text-[10px] md:text-xs font-bold uppercase tracking-widest">Caja Diaria</span>
+                <i class="fas fa-cash-register text-xl"></i>
+                <span class="text-[10px] md:text-xs font-bold uppercase tracking-widest">Caja</span>
             </button>
             <button onclick="showPage('presupuestos')" id="btn-presupuestos" class="nav-link flex flex-col md:flex-row items-center gap-1 md:gap-4 md:p-5 md:w-full text-slate-400">
-                <i class="fas fa-file-invoice-dollar text-xl md:text-base"></i>
+                <i class="fas fa-tasks text-xl"></i>
                 <span class="text-[10px] md:text-xs font-bold uppercase tracking-widest">Obras</span>
             </button>
             <button onclick="showPage('graficas')" id="btn-graficas" class="nav-link flex flex-col md:flex-row items-center gap-1 md:gap-4 md:p-5 md:w-full text-slate-400">
-                <i class="fas fa-chart-line text-xl md:text-base"></i>
+                <i class="fas fa-chart-line text-xl"></i>
                 <span class="text-[10px] md:text-xs font-bold uppercase tracking-widest">Balance</span>
             </button>
         </nav>
 
-        <main class="flex-grow main-content p-3 md:p-8 no-scrollbar">
+        <main class="flex-grow main-content p-3 md:p-6 no-scrollbar">
             
-            <div id="page-registro" class="space-y-4 md:space-y-6">
+            <div id="page-registro" class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6">
-                    <div class="bg-white p-4 md:p-6 rounded-2xl shadow-md border-l-4 border-blue-500 flex justify-between md:block">
-                        <span class="text-[9px] font-black text-slate-400 uppercase">IVAN</span>
-                        <p id="saldoIvan" class="text-lg md:text-2xl font-black text-slate-800">$ 0</p>
-                    </div>
-                    <div class="bg-white p-4 md:p-6 rounded-2xl shadow-md border-l-4 border-emerald-500 flex justify-between md:block">
-                        <span class="text-[9px] font-black text-slate-400 uppercase">MARIO</span>
-                        <p id="saldoMario" class="text-lg md:text-2xl font-black text-slate-800">$ 0</p>
-                    </div>
-                    <div class="bg-slate-800 p-4 md:p-6 rounded-2xl shadow-md flex justify-between md:block">
-                        <span class="text-[9px] font-black text-slate-500 uppercase italic">TOTAL</span>
-                        <p id="saldoTotal" class="text-lg md:text-2xl font-black text-orange-400">$ 0</p>
-                    </div>
+                    <div class="bg-white p-4 rounded-2xl shadow-md border-l-4 border-blue-500 flex justify-between md:block"><span class="text-[9px] font-black text-slate-400 uppercase">IVAN</span><p id="saldoIvan" class="text-xl font-black text-slate-800">$ 0</p></div>
+                    <div class="bg-white p-4 rounded-2xl shadow-md border-l-4 border-emerald-500 flex justify-between md:block"><span class="text-[9px] font-black text-slate-400 uppercase">MARIO</span><p id="saldoMario" class="text-xl font-black text-slate-800">$ 0</p></div>
+                    <div class="bg-slate-800 p-4 rounded-2xl shadow-md flex justify-between md:block"><span class="text-[9px] font-black text-slate-500 uppercase italic">TOTAL</span><p id="saldoTotal" class="text-xl font-black text-orange-400">$ 0</p></div>
                 </div>
 
                 <div class="flex flex-col lg:flex-row gap-6">
@@ -81,36 +69,23 @@
                                     <option value="Materiales / insumos">Materiales / insumos</option>
                                     <option value="Otras operaciones">Otras operaciones</option>
                                 </select>
-                                <input type="text" id="descripcion" placeholder="Detalle (Ej: Pago cemento)" required class="w-full p-3 border-2 border-slate-100 rounded-xl text-sm font-medium">
+                                <input type="text" id="descripcion" placeholder="Detalle..." required class="w-full p-3 border-2 border-slate-100 rounded-xl text-sm font-medium">
                                 <div class="grid grid-cols-2 gap-2">
                                     <select id="cuenta" class="p-3 border-2 border-slate-100 rounded-xl font-black text-xs bg-white"><option value="Ivan">Ivan</option><option value="Mario">Mario</option></select>
                                     <select id="tipoMov" class="p-3 border-2 border-slate-100 rounded-xl font-black text-xs text-blue-600 bg-white"><option value="ingreso">Ingreso (+)</option><option value="egreso">Egreso (-)</option></select>
                                 </div>
-                                <div class="relative">
-                                    <span class="absolute left-4 top-3 text-slate-300 font-black text-xl">$</span>
-                                    <input type="text" id="montoDisplay" placeholder="0,00" required class="w-full p-4 pl-10 border-4 border-slate-50 rounded-2xl text-2xl font-black text-right text-slate-800 bg-slate-50 outline-none">
-                                    <input type="hidden" id="montoReal">
-                                </div>
-                                <button type="submit" id="btnGuardar" class="w-full bg-slate-900 text-white font-black py-4 rounded-xl shadow-lg active:scale-95 uppercase text-xs tracking-widest">Guardar en Nube</button>
+                                <div class="relative"><span class="absolute left-4 top-3 text-slate-300 font-black text-xl">$</span><input type="text" id="montoDisplay" placeholder="0,00" required class="w-full p-4 pl-10 border-4 border-slate-50 rounded-2xl text-2xl font-black text-right text-slate-800 bg-slate-50 outline-none"></div>
+                                <input type="hidden" id="montoReal">
+                                <button type="submit" id="btnGuardar" class="w-full bg-slate-900 text-white font-black py-4 rounded-xl shadow-lg active:scale-95 uppercase text-xs tracking-widest">Sincronizar</button>
                             </form>
                         </div>
                     </div>
-
                     <div class="flex-grow">
                         <div class="bg-white rounded-3xl shadow-lg overflow-hidden border border-slate-200">
-                            <div class="bg-slate-50 px-5 py-4 border-b flex justify-between items-center">
-                                <span class="font-black text-slate-800 uppercase text-[11px] tracking-widest italic"><i class="fas fa-history mr-2 text-blue-500"></i> Últimos Movimientos</span>
-                            </div>
+                            <div class="bg-slate-50 px-5 py-4 border-b flex justify-between items-center"><span class="font-black text-slate-800 uppercase text-[11px] tracking-widest italic">Últimos Movimientos</span></div>
                             <div class="overflow-x-auto">
                                 <table class="w-full text-xs text-left">
-                                    <thead class="bg-slate-100 text-[9px] text-slate-500 uppercase font-black">
-                                        <tr>
-                                            <th class="p-4">Fecha / Obra</th>
-                                            <th class="p-4 text-center">Cuenta</th>
-                                            <th class="p-4 text-right">Monto</th>
-                                            <th class="p-4 text-center"></th>
-                                        </tr>
-                                    </thead>
+                                    <thead class="bg-slate-100 text-[9px] text-slate-500 uppercase font-black"><tr><th class="p-4">Fecha / Obra</th><th class="p-4 text-center">Cuenta</th><th class="p-4 text-right">Monto</th><th class="p-4 text-center"></th></tr></thead>
                                     <tbody id="tablaBody" class="divide-y divide-slate-50 font-medium"></tbody>
                                 </table>
                             </div>
@@ -120,23 +95,61 @@
             </div>
 
             <div id="page-presupuestos" class="hidden space-y-6">
-                <div class="bg-white p-5 md:p-8 rounded-3xl shadow-lg border-t-8 border-orange-500">
-                    <h3 class="font-black text-slate-800 uppercase text-xs mb-4">Plan de Cobranzas</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <select id="presupuestoObra" class="p-3 border-2 rounded-xl text-sm font-bold"></select>
-                        <input type="number" id="montoPresupuesto" placeholder="Total Presupuesto" class="p-3 border-2 rounded-xl text-sm font-bold">
-                        <button onclick="guardarPresupuesto()" class="bg-orange-600 text-white py-3 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-orange-700">Vincular Obra</button>
+                <div class="bg-slate-900 p-6 rounded-3xl shadow-2xl flex flex-col md:flex-row items-center justify-between border-b-8 border-blue-500">
+                    <div class="mb-4 md:mb-0">
+                        <h4 class="text-blue-400 font-black text-xs uppercase tracking-[0.2em]">Estimación Ingresos (30 días)</h4>
+                        <p id="proyeccion30" class="text-3xl md:text-4xl text-white font-black tracking-tighter">$ 0</p>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="text-center bg-slate-800 px-4 py-2 rounded-2xl border border-slate-700">
+                            <p class="text-[8px] font-black text-slate-500 uppercase">Alertas Rojas</p>
+                            <p id="contadorRojo" class="text-red-500 font-black text-lg">0</p>
+                        </div>
+                        <div class="text-center bg-slate-800 px-4 py-2 rounded-2xl border border-slate-700">
+                            <p class="text-[8px] font-black text-slate-500 uppercase">Alertas Amarillas</p>
+                            <p id="contadorAmarillo" class="text-amber-500 font-black text-lg">0</p>
+                        </div>
                     </div>
                 </div>
-                <div id="containerPresupuestos" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+
+                <div class="bg-white p-6 rounded-3xl shadow-xl">
+                    <h3 class="font-black text-slate-800 uppercase text-xs mb-4 tracking-widest italic">Configurar Plan de Pagos</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div>
+                            <label class="text-[9px] font-black text-slate-400 uppercase ml-1">Obra</label>
+                            <select id="presupuestoObra" class="w-full p-3 border-2 rounded-xl text-sm font-bold bg-slate-50"></select>
+                        </div>
+                        <div>
+                            <label class="text-[9px] font-black text-slate-400 uppercase ml-1">Total Contrato</label>
+                            <input type="number" id="montoPresupuesto" placeholder="Ej: 2500000" class="w-full p-3 border-2 rounded-xl text-sm font-bold">
+                        </div>
+                        <div>
+                            <label class="text-[9px] font-black text-slate-400 uppercase ml-1">Anticipo (% o $)</label>
+                            <input type="text" id="anticipoPresupuesto" placeholder="Ej: 20%" class="w-full p-3 border-2 rounded-xl text-sm font-bold bg-blue-50">
+                        </div>
+                        <div>
+                            <label class="text-[9px] font-black text-slate-400 uppercase ml-1">Cuotas</label>
+                            <input type="number" id="cuotasPresupuesto" placeholder="Ej: 6" class="w-full p-3 border-2 rounded-xl text-sm font-bold bg-blue-50">
+                        </div>
+                        <div class="lg:col-span-2">
+                            <label class="text-[9px] font-black text-slate-400 uppercase ml-1">Vencimiento 1° Cuota</label>
+                            <input type="date" id="fechaCuota1" class="w-full p-3 border-2 rounded-xl text-sm font-bold">
+                        </div>
+                        <div class="lg:col-span-2 flex items-end">
+                            <button onclick="guardarPresupuesto()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-blue-700 shadow-lg active:scale-95">Generar Plan Financiero</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="containerPresupuestos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
             </div>
 
             <div id="page-graficas" class="hidden space-y-6">
                 <div class="bg-white p-5 rounded-3xl shadow-lg flex flex-col md:flex-row justify-between items-center gap-4">
                     <select id="filtroObra" onchange="updateCharts()" class="w-full md:w-auto p-3 border-2 rounded-xl text-xs font-black uppercase bg-slate-50"></select>
                     <div class="text-center md:text-right">
-                        <p class="text-[9px] font-black text-slate-400 uppercase">Balance de Caja</p>
-                        <p id="rentabilidadValor" class="text-3xl font-black">$ 0,00</p>
+                        <p class="text-[9px] font-black text-slate-400 uppercase">Rentabilidad Neta</p>
+                        <p id="rentabilidadValor" class="text-3xl font-black text-emerald-500">$ 0,00</p>
                     </div>
                 </div>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -150,8 +163,7 @@
     <script>
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzbYMOqEUdxIcv8We4PbbvTc7441LPn2e_bw6OsIGUhwBDfve1IRaD5zrQCDzXQaEk05A/exec";
         let movimientos = [];
-        let presupuestosLocal = JSON.parse(localStorage.getItem('presupuestos_v10')) || {};
-        let chartBarras = null, chartTorta = null;
+        let presupuestosLocal = JSON.parse(localStorage.getItem('presupuestos_v10.7')) || {};
 
         const mDisplay = document.getElementById('montoDisplay'), mReal = document.getElementById('montoReal');
         mDisplay.addEventListener('input', (e) => {
@@ -168,19 +180,18 @@
             });
             document.getElementById('page-'+p).classList.remove('hidden');
             document.getElementById('btn-'+p).classList.add('active');
-            if(p === 'graficas') setTimeout(updateCharts, 150);
             if(p === 'presupuestos') renderPresupuestos();
+            if(p === 'graficas') setTimeout(updateCharts, 150);
         }
 
         async function cargarDatos() {
-            setCloudStatus("CONECTANDO...", "bg-blue-500");
             try {
                 const r = await fetch(WEB_APP_URL);
                 const d = await r.json();
                 movimientos = d.map(r => ({ id: r[0], fecha: r[1], obra: r[2], operacion: r[3], desc: r[4], cuenta: r[5], tipo: r[6], monto: parseFloat(r[7]) }));
                 actualizarInterfaz();
-                setCloudStatus("SINCRONIZADO", "bg-emerald-500");
-            } catch(e) { setCloudStatus("ERROR RED", "bg-red-500"); }
+                if(document.getElementById('btn-presupuestos').classList.contains('active')) renderPresupuestos();
+            } catch(e) { console.error(e); }
         }
 
         function actualizarInterfaz() {
@@ -190,74 +201,115 @@
             [...movimientos].reverse().forEach(m => {
                 const val = m.tipo === 'ingreso' ? m.monto : -m.monto;
                 if(m.cuenta === 'Ivan') sI += val; else sM += val;
-                
-                // Formato de fecha estrictamente DD/MM/AAAA
-                const dateParts = m.fecha.split('-');
-                const fechaLimpia = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
-                
+                const dP = m.fecha.split('-');
+                const fL = `${dP[2]}/${dP[1]}/${dP[0]}`;
                 const bC = m.cuenta === 'Ivan' ? 'badge-ivan' : 'badge-mario';
-                
-                tbody.innerHTML += `
-                    <tr>
-                        <td class="p-4">
-                            <div class="text-[10px] font-black text-slate-400 mb-1">${fechaLimpia}</div>
-                            <div class="font-black text-slate-800 uppercase text-[11px] leading-tight mb-1">${m.obra}</div>
-                            <div class="text-[10px] text-slate-500 italic bg-slate-50 px-2 py-0.5 rounded border border-slate-100 inline-block">${m.desc}</div>
-                        </td>
-                        <td class="p-4 text-center">
-                            <span class="${bC}">${m.cuenta.toUpperCase()}</span>
-                        </td>
-                        <td class="p-4 text-right font-black ${m.tipo === 'ingreso' ? 'text-emerald-600 text-sm' : 'text-red-500 text-sm'}">
-                            $${m.monto.toLocaleString('es-AR', {minimumFractionDigits:2})}
-                        </td>
-                        <td class="p-4 text-center">
-                            <button onclick="borrarEntrada(${m.id})" class="text-red-200 hover:text-red-600 transition-colors"><i class="fas fa-trash-alt"></i></button>
-                        </td>
-                    </tr>`;
+                tbody.innerHTML += `<tr><td class="p-4"><div class="text-[10px] font-black text-slate-400 mb-1">${fL}</div><div class="font-black text-slate-800 uppercase text-[11px] mb-1">${m.obra}</div><div class="text-[10px] text-slate-500 italic bg-slate-50 px-2 py-0.5 rounded border border-slate-100 inline-block">${m.desc}</div></td><td class="p-4 text-center"><span class="${bC}">${m.cuenta.toUpperCase()}</span></td><td class="p-4 text-right font-black ${m.tipo === 'ingreso' ? 'text-emerald-600' : 'text-red-500'}">$${m.monto.toLocaleString()}</td><td class="p-4 text-center"><button onclick="borrarEntrada(${m.id})" class="text-red-200"><i class="fas fa-trash-alt"></i></button></td></tr>`;
             });
-            document.getElementById('saldoIvan').innerText = "$ " + sI.toLocaleString('es-AR', {minimumFractionDigits:2});
-            document.getElementById('saldoMario').innerText = "$ " + sM.toLocaleString('es-AR', {minimumFractionDigits:2});
-            document.getElementById('saldoTotal').innerText = "$ " + (sI+sM).toLocaleString('es-AR', {minimumFractionDigits:2});
+            document.getElementById('saldoIvan').innerText = "$ " + sI.toLocaleString();
+            document.getElementById('saldoMario').innerText = "$ " + sM.toLocaleString();
+            document.getElementById('saldoTotal').innerText = "$ " + (sI+sM).toLocaleString();
             llenarSelects([...new Set(movimientos.map(m => m.obra))].filter(Boolean).sort());
         }
 
         function llenarSelects(obras) {
-            const s1 = document.getElementById('obraSelect'), s2 = document.getElementById('filtroObra'), s3 = document.getElementById('presupuestoObra');
+            const s1 = document.getElementById('obraSelect'), s3 = document.getElementById('presupuestoObra'), s4 = document.getElementById('filtroObra');
             let h = '<option value="" disabled selected>Elegir Obra...</option>';
             obras.forEach(o => h += `<option value="${o}">${o}</option>`);
             s1.innerHTML = h + '<option value="NUEVA" class="text-blue-600 font-black">+ CREAR NUEVA</option>';
-            s2.innerHTML = '<option value="TODAS">DASHBOARD GENERAL</option>' + h.replace('selected', '');
-            s3.innerHTML = h.replace('selected', '');
+            s3.innerHTML = h;
+            s4.innerHTML = '<option value="TODAS">RESUMEN GENERAL</option>' + h.replace('selected', '');
+        }
+
+        function guardarPresupuesto() {
+            const obra = document.getElementById('presupuestoObra').value;
+            const total = parseFloat(document.getElementById('montoPresupuesto').value);
+            const anticipoInput = document.getElementById('anticipoPresupuesto').value;
+            const numCuotas = parseInt(document.getElementById('cuotasPresupuesto').value);
+            const fechaIn = document.getElementById('fechaCuota1').value;
+
+            if(!obra || isNaN(total) || !fechaIn) return alert("Faltan datos");
+
+            let montoAnticipo = anticipoInput.includes('%') ? (total * parseFloat(anticipoInput)) / 100 : parseFloat(anticipoInput) || 0;
+            const valorCuota = numCuotas > 0 ? (total - montoAnticipo) / numCuotas : 0;
+
+            let cronograma = [];
+            for(let i=0; i<numCuotas; i++) {
+                let d = new Date(fechaIn + 'T00:00:00');
+                d.setMonth(d.getMonth() + i);
+                cronograma.push({ nro: i + 1, vence: d.toISOString().split('T')[0], monto: valorCuota });
+            }
+
+            presupuestosLocal[obra] = { total, montoAnticipo, numCuotas, valorCuota, cronograma };
+            localStorage.setItem('presupuestos_v10.7', JSON.stringify(presupuestosLocal));
+            renderPresupuestos();
         }
 
         function renderPresupuestos() {
             const cont = document.getElementById('containerPresupuestos');
             cont.innerHTML = '';
+            const hoy = new Date();
+            const limite30 = new Date(); limite30.setDate(hoy.getDate() + 30);
+            
+            let totalProyeccion = 0;
+            let cRojo = 0, cAmarillo = 0;
+
             Object.keys(presupuestosLocal).forEach(obra => {
-                const conf = presupuestosLocal[obra];
-                const cobros = movimientos.filter(m => m.obra === obra && m.operacion === 'Cobro de pagos');
-                const totalC = cobros.reduce((a, b) => a + b.monto, 0);
-                const porc = ((totalC * 100) / conf.monto).toFixed(0);
-                let st = 'bg-slate-300';
-                if(cobros.length > 0) {
-                    const ult = new Date(Math.max(...cobros.map(m => new Date(m.fecha))));
-                    const d = Math.floor((new Date() - ult) / (1000*60*60*24));
-                    st = d < 20 ? 'bg-emerald-500' : (d <= 30 ? 'bg-amber-500' : 'bg-red-500');
+                const plan = presupuestosLocal[obra];
+                const totalCobrado = movimientos.filter(m => m.obra === obra && m.operacion === 'Cobro de pagos').reduce((a, b) => a + b.monto, 0);
+                
+                let acumuladoPlan = plan.montoAnticipo;
+                let proximoVence = null;
+                let semaforo = 'bg-emerald-500';
+
+                // Cálculo de Proyección e Indicadores
+                if(totalCobrado < plan.montoAnticipo) {
+                    proximoVence = { nro: 'Anticipo', vence: 'PENDIENTE', monto: plan.montoAnticipo - totalCobrado };
+                    semaforo = 'bg-red-500'; cRojo++;
+                    totalProyeccion += proximoVence.monto;
+                } else {
+                    for(let cuota of plan.cronograma) {
+                        acumuladoPlan += cuota.monto;
+                        if(totalCobrado < acumuladoPlan) {
+                            proximoVence = cuota;
+                            const fVence = new Date(cuota.vence + 'T00:00:00');
+                            const diffDays = Math.ceil((fVence - hoy) / (1000 * 60 * 60 * 24));
+                            
+                            if(diffDays < 0) { semaforo = 'bg-red-500'; cRojo++; }
+                            else if(diffDays <= 7) { semaforo = 'bg-amber-500'; cAmarillo++; }
+                            
+                            // Si vence en los próximos 30 días, sumar a la proyección
+                            if(fVence <= limite30) {
+                                totalProyeccion += cuota.monto - (totalCobrado - (acumuladoPlan - cuota.monto));
+                            }
+                            break;
+                        }
+                    }
                 }
+
+                const porc = ((totalCobrado * 100) / plan.total).toFixed(0);
                 cont.innerHTML += `
-                    <div class="bg-white p-6 rounded-3xl shadow-md border-t-4 border-slate-100">
+                    <div class="bg-white p-6 rounded-3xl shadow-lg card-plan">
                         <div class="flex justify-between items-start mb-4">
-                            <h4 class="font-black text-slate-800 uppercase text-xs">${obra}</h4>
-                            <span class="w-3 h-3 rounded-full ${st} shadow-md"></span>
+                            <div><h4 class="font-black text-slate-800 uppercase text-xs">${obra}</h4><p class="text-[9px] font-bold text-slate-400">Total: $${plan.total.toLocaleString()}</p></div>
+                            <span class="w-4 h-4 rounded-full ${semaforo} shadow-md border-2 border-white"></span>
                         </div>
-                        <div class="flex justify-between text-lg font-black text-orange-600">
-                            <span class="text-[9px] text-slate-400 self-center">PENDIENTE</span>
-                            $${(conf.monto - totalC).toLocaleString()}
+                        <div class="bg-slate-50 p-3 rounded-2xl mb-4 border border-slate-100 text-center">
+                            <p class="text-[8px] font-black text-slate-400 uppercase">Estado de Cobro</p>
+                            <p class="text-xs font-black text-slate-700">${proximoVence ? `Cuota ${proximoVence.nro}: ${proximoVence.vence.split('-').reverse().join('/')}` : 'COMPLETO'}</p>
                         </div>
-                        <div class="mt-4 bg-slate-100 rounded-full h-2 overflow-hidden"><div class="h-full ${st}" style="width:${porc}%"></div></div>
-                        <div class="mt-2 flex justify-between text-[9px] font-black text-slate-400"><span>${porc}% COBRADO</span><button onclick="borrarPresu('${obra}')" class="text-red-300 uppercase">Eliminar</button></div>
+                        <div class="flex justify-between text-lg font-black text-orange-600 mb-4">
+                            <span class="text-[9px] text-slate-400 self-center">SALDO</span>
+                            $${(plan.total - totalCobrado).toLocaleString()}
+                        </div>
+                        <div class="mt-4 bg-slate-100 rounded-full h-2 overflow-hidden"><div class="h-full ${semaforo} transition-all duration-1000" style="width:${porc}%"></div></div>
+                        <div class="mt-4 flex justify-between"><span class="text-[10px] font-black text-slate-400">${porc}%</span><button onclick="borrarPresu('${obra}')" class="text-[10px] font-black text-red-300 uppercase">Eliminar</button></div>
                     </div>`;
             });
+
+            document.getElementById('proyeccion30').innerText = "$ " + totalProyeccion.toLocaleString();
+            document.getElementById('contadorRojo').innerText = cRojo;
+            document.getElementById('contadorAmarillo').innerText = cAmarillo;
         }
 
         function updateCharts() {
@@ -266,15 +318,13 @@
             const ing = filt.filter(m => m.tipo === 'ingreso').reduce((a, b) => a + b.monto, 0);
             const egr = filt.filter(m => m.tipo === 'egreso').reduce((a, b) => a + b.monto, 0);
             document.getElementById('rentabilidadValor').innerText = "$ " + (ing-egr).toLocaleString();
-            document.getElementById('rentabilidadValor').className = `text-3xl font-black ${ing-egr >= 0 ? 'text-emerald-500' : 'text-red-500'}`;
             
             if (chartBarras) chartBarras.destroy();
             chartBarras = new Chart(document.getElementById('chartBarras').getContext('2d'), {
                 type: 'bar',
-                data: { labels: ['INGRESOS','EGRESOS'], datasets: [{ data:[ing, egr], backgroundColor:['#10b981','#ef4444'], borderRadius: 8 }] },
+                data: { labels: ['IN','OUT'], datasets: [{ data:[ing, egr], backgroundColor:['#10b981','#ef4444'], borderRadius: 8 }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
             });
-
             if (chartTorta) chartTorta.destroy();
             const cats = {}; filt.filter(m => m.tipo === 'egreso').forEach(m => cats[m.operacion] = (cats[m.operacion]||0)+m.monto);
             chartTorta = new Chart(document.getElementById('chartTorta').getContext('2d'), {
@@ -286,37 +336,24 @@
 
         document.getElementById('formMovimiento').onsubmit = async (e) => {
             e.preventDefault();
-            const btn = document.getElementById('btnGuardar');
-            btn.innerText = "GUARDANDO..."; btn.disabled = true;
+            const btn = document.getElementById('btnGuardar'); btn.innerText = "GUARDANDO..."; btn.disabled = true;
             const obra = document.getElementById('obraSelect').value === "NUEVA" ? document.getElementById('obraNuevaInput').value.trim() : document.getElementById('obraSelect').value;
             const mov = { id: Date.now(), fecha: document.getElementById('fecha').value, obra: obra, operacion: document.getElementById('tipoOperacion').value, descripcion: document.getElementById('descripcion').value, cuenta: document.getElementById('cuenta').value, tipo: document.getElementById('tipoMov').value, monto: parseFloat(mReal.value) };
             await fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(mov) });
             movimientos.push({...mov, desc: mov.descripcion});
             e.target.reset(); mDisplay.value = ""; mReal.value = "";
             actualizarInterfaz();
-            btn.innerText = "Guardar en Nube"; btn.disabled = false;
+            btn.innerText = "Sincronizar"; btn.disabled = false;
         };
 
         async function borrarEntrada(id) {
-            if(!confirm("¿Desea borrar este registro definitivamente?")) return;
-            setCloudStatus("BORRANDO...", "bg-red-500");
+            if(!confirm("¿Borrar?")) return;
             await fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "DELETE", id: id }) });
             movimientos = movimientos.filter(m => m.id != id);
             actualizarInterfaz();
-            setCloudStatus("SINCRONIZADO", "bg-emerald-500");
         }
 
-        function guardarPresupuesto() {
-            const o = document.getElementById('presupuestoObra').value, m = parseFloat(document.getElementById('montoPresupuesto').value);
-            if(!o || !m) return;
-            presupuestosLocal[o] = { monto: m };
-            localStorage.setItem('presupuestos_v10', JSON.stringify(presupuestosLocal));
-            renderPresupuestos();
-            alert("Obra vinculada con éxito");
-        }
-
-        function setCloudStatus(t, c) { const s = document.getElementById('statusCloud'); s.innerText = t; s.className = `text-[9px] ${c} px-3 py-1 rounded-full font-black text-white uppercase`; }
-        function borrarPresu(o) { if(confirm("¿Quitar obra del control?")) { delete presupuestosLocal[o]; localStorage.setItem('presupuestos_v10', JSON.stringify(presupuestosLocal)); renderPresupuestos(); } }
+        function borrarPresu(o) { if(confirm("¿Borrar plan?")) { delete presupuestosLocal[o]; localStorage.setItem('presupuestos_v10.7', JSON.stringify(presupuestosLocal)); renderPresupuestos(); } }
         document.getElementById('obraSelect').onchange = (e) => document.getElementById('obraNuevaInput').classList.toggle('hidden', e.target.value !== 'NUEVA');
         document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
         cargarDatos();
