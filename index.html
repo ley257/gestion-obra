@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Control de ingresos y egresos v12.6 - Con Logo</title>
+    <title>Control de ingresos y egresos v13.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -17,53 +17,49 @@
             background-image: linear-gradient(rgba(59, 130, 246, 0.05) 1px, transparent 1px), 
                               linear-gradient(90deg, rgba(59, 130, 246, 0.05) 1px, transparent 1px);
             background-size: 15px 15px;
-            position: relative;
         }
 
         .nav-link.active { color: #3b82f6; border-top: 4px solid #3b82f6; background: rgba(59, 130, 246, 0.1); }
-        @media (min-width: 768px) { 
-            .nav-link.active { background: #1e293b; border-left: 4px solid #3b82f6; border-top: none; color: white; } 
-        }
+        @media (min-width: 768px) { .nav-link.active { background: #1e293b; border-left: 4px solid #3b82f6; border-top: none; color: white; } }
         
-        .chart-box { position: relative; height: 260px !important; width: 100%; }
+        .sort-btn:hover { background-color: rgba(255,255,255,0.1); cursor: pointer; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
+        
+        /* Estilos para la tabla responsive */
+        .table-container { max-height: 500px; overflow-y: auto; }
+        th { position: sticky; top: 0; z-index: 10; }
     </style>
 </head>
 <body class="bg-slate-100 flex flex-col">
 
     <div id="loginOverlay" class="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900">
-        <div class="w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden">
-            <div class="bg-slate-900 p-8 text-center sidebar-constructora border-b-4 border-blue-600">
-                <div class="inline-block p-4 bg-blue-600 rounded-2xl mb-4 shadow-lg">
-                    <i class="fas fa-hammer text-white text-3xl"></i>
-                </div>
+        <div class="w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden border-b-8 border-blue-600">
+            <div class="bg-slate-900 p-8 text-center sidebar-constructora">
+                <div class="inline-block p-4 bg-blue-600 rounded-2xl mb-4 shadow-lg"><i class="fas fa-hammer text-white text-3xl"></i></div>
                 <h2 class="text-white font-black text-xl uppercase italic">Control de ingresos y egresos</h2>
             </div>
             <div class="p-8 space-y-4">
                 <input type="text" id="userInput" placeholder="Usuario" class="w-full p-4 bg-slate-50 border-2 rounded-2xl font-bold outline-none focus:border-blue-500">
                 <input type="password" id="passInput" placeholder="Contraseña" class="w-full p-4 bg-slate-50 border-2 rounded-2xl font-bold outline-none focus:border-blue-500">
-                <button onclick="handleLogin()" class="w-full bg-blue-600 text-white font-black py-4 rounded-2xl shadow-xl uppercase text-xs tracking-widest active:scale-95 transition-all">Acceder al Panel</button>
+                <button onclick="handleLogin()" class="w-full bg-blue-600 text-white font-black py-4 rounded-2xl shadow-xl uppercase text-xs tracking-widest active:scale-95 transition-all">Ingresar</button>
             </div>
         </div>
     </div>
 
     <div id="mainApp" class="hidden flex flex-col h-full">
-        <header class="h-16 bg-slate-900 text-white flex justify-between items-center px-4 md:px-6 shrink-0 z-50 shadow-lg">
-            <div class="flex items-center gap-4">
-                <img src="https://github.com/ley257/gestion-obra/blob/main/tu-logo.png?raw=true" 
-                     alt="Logo Empresa" 
-                     class="h-10 w-auto bg-white p-1 rounded-md shadow-inner"
-                     onerror="this.style.display='none'"> <h1 class="font-black text-blue-500 italic text-sm md:text-lg uppercase tracking-tighter">Control de ingresos y egresos</h1>
-            </div>
-            
+        <header class="h-16 bg-slate-900 text-white flex justify-between items-center px-4 shrink-0 z-50">
             <div class="flex items-center gap-3">
-                <div class="hidden md:block text-[9px] bg-emerald-600 px-3 py-1 rounded-full font-black text-white italic">SINCRONIZADO A LA NUBE</div>
-                <button onclick="logout()" class="text-slate-500 hover:text-white transition-colors"><i class="fas fa-power-off"></i></button>
+                <img src="https://github.com/ley257/gestion-obra/blob/main/tu-logo.png?raw=true" alt="Logo" class="h-8 bg-white p-0.5 rounded" onerror="this.style.display='none'">
+                <h1 class="font-black text-blue-500 italic text-xs md:text-lg uppercase tracking-tighter">Control de ingresos y egresos</h1>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="hidden md:block text-[9px] bg-emerald-600 px-3 py-1 rounded-full font-black text-white italic uppercase">Sincronizado a la nube</div>
+                <button onclick="logout()" class="text-slate-500 hover:text-white"><i class="fas fa-power-off"></i></button>
             </div>
         </header>
 
         <div class="flex flex-col md:flex-row flex-grow overflow-hidden">
-            <nav class="sidebar-constructora fixed bottom-0 left-0 w-full h-[70px] md:relative md:w-64 md:h-full flex md:flex-col justify-around md:justify-start md:pt-6 z-50 shadow-2xl">
+            <nav class="sidebar-constructora fixed bottom-0 left-0 w-full h-[70px] md:relative md:w-64 md:h-full flex md:flex-col justify-around md:justify-start md:pt-6 z-50">
                 <button onclick="showPage('registro')" id="btn-registro" class="nav-link active flex flex-col md:flex-row items-center gap-2 md:p-5 text-slate-400">
                     <i class="fas fa-wallet text-xl"></i><span class="text-[10px] font-bold uppercase">Caja</span>
                 </button>
@@ -75,18 +71,19 @@
                 </button>
             </nav>
 
-            <main class="flex-grow main-content p-4 overflow-y-auto no-scrollbar">
+            <main class="flex-grow main-content p-4 overflow-y-auto no-scrollbar bg-slate-50">
                 
                 <div id="page-registro" class="space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div class="bg-white p-4 rounded-2xl shadow border-l-4 border-blue-500 flex justify-between md:block"><span class="text-[9px] font-black text-slate-400 uppercase">Ivan</span><p id="saldoIvan" class="text-xl font-black text-slate-800">$ 0</p></div>
-                        <div class="bg-white p-4 rounded-2xl shadow border-l-4 border-emerald-500 flex justify-between md:block"><span class="text-[9px] font-black text-slate-400 uppercase">Mario</span><p id="saldoMario" class="text-xl font-black text-slate-800">$ 0</p></div>
-                        <div class="bg-slate-800 p-4 rounded-2xl shadow flex justify-between md:block"><span class="text-[9px] font-black text-slate-500 uppercase">Total Efectivo</span><p id="saldoTotal" class="text-xl font-black text-orange-400">$ 0</p></div>
+                        <div class="bg-white p-4 rounded-2xl shadow-sm border-l-4 border-blue-500"><span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Ivan</span><p id="saldoIvan" class="text-xl font-black text-slate-800">$ 0</p></div>
+                        <div class="bg-white p-4 rounded-2xl shadow-sm border-l-4 border-emerald-500"><span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Mario</span><p id="saldoMario" class="text-xl font-black text-slate-800">$ 0</p></div>
+                        <div class="bg-slate-800 p-4 rounded-2xl shadow-sm"><span class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Total Efectivo</span><p id="saldoTotal" class="text-xl font-black text-orange-400">$ 0</p></div>
                     </div>
 
-                    <div class="flex flex-col lg:flex-row gap-6">
-                        <div class="w-full lg:w-80 bg-white p-6 rounded-3xl shadow-xl border-t-8 border-blue-600 shrink-0">
-                            <form id="formMovimiento" class="space-y-4">
+                    <div class="flex flex-col xl:flex-row gap-6">
+                        <div class="w-full xl:w-80 bg-white p-6 rounded-3xl shadow-lg border-t-8 border-blue-600 h-fit">
+                            <form id="formMovimiento" class="space-y-3">
+                                <label class="text-[10px] font-black text-slate-400 uppercase">Datos del movimiento</label>
                                 <input type="date" id="fecha" required class="w-full p-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-sm font-bold">
                                 <select id="obraSelect" required class="w-full p-3 border-2 border-slate-100 rounded-xl text-sm font-bold bg-white"></select>
                                 <input type="text" id="obraNuevaInput" placeholder="Nombre obra nueva..." class="w-full p-3 border-2 border-blue-300 rounded-xl hidden bg-blue-50 italic text-sm">
@@ -97,59 +94,52 @@
                                     <option value="Materiales / insumos">Materiales / insumos</option>
                                     <option value="Otras operaciones">Otras operaciones</option>
                                 </select>
-                                <input type="text" id="descripcion" placeholder="Detalle (Ej: Compra cemento)" required class="w-full p-3 border-2 border-slate-100 rounded-xl text-sm font-medium">
+                                <input type="text" id="descripcion" placeholder="Descripción / Detalle" required class="w-full p-3 border-2 border-slate-100 rounded-xl text-sm">
                                 <div class="grid grid-cols-2 gap-2">
                                     <select id="cuenta" class="p-3 border-2 border-slate-100 rounded-xl font-black text-xs"><option value="Ivan">Ivan</option><option value="Mario">Mario</option></select>
                                     <select id="tipoMov" class="p-3 border-2 border-slate-100 rounded-xl font-black text-xs text-blue-600"><option value="ingreso">Ingreso (+)</option><option value="egreso">Egreso (-)</option></select>
                                 </div>
                                 <div class="relative">
                                     <span class="absolute left-4 top-4 text-slate-300 font-black text-xl">$</span>
-                                    <input type="text" id="montoVisual" placeholder="0,00" required class="w-full p-4 pl-10 border-4 border-slate-50 rounded-2xl text-2xl font-black text-right text-slate-800 bg-slate-50 outline-none">
+                                    <input type="text" id="montoVisual" placeholder="0,00" required class="w-full p-4 pl-10 border-4 border-slate-50 rounded-2xl text-2xl font-black text-right text-slate-800 bg-slate-50">
                                     <input type="hidden" id="montoReal">
                                 </div>
-                                <button type="submit" id="btnGuardar" class="w-full bg-blue-600 text-white font-black py-4 rounded-xl shadow-lg uppercase text-xs tracking-widest active:scale-95 transition-all">Ingresar movimiento</button>
+                                <button type="submit" id="btnGuardar" class="w-full bg-blue-600 text-white font-black py-4 rounded-xl shadow-lg uppercase text-xs tracking-widest hover:bg-blue-700 transition-all">Ingresar movimiento</button>
                             </form>
                         </div>
 
                         <div class="flex-grow bg-white rounded-3xl shadow-lg overflow-hidden border border-slate-200">
-                            <div class="p-4 bg-slate-50 border-b flex justify-between items-center">
-                                <h4 class="text-[10px] font-black uppercase tracking-widest text-slate-500 italic"><i class="fas fa-list-ul mr-2"></i>Registros Recientes</h4>
-                                <button onclick="exportToExcel()" class="bg-slate-800 text-white text-[9px] font-black px-3 py-1.5 rounded-lg hover:bg-blue-600 transition-colors uppercase">
-                                    <i class="fas fa-file-excel mr-1"></i> Exportar Reporte
+                            <div class="p-4 bg-slate-50 border-b flex flex-col md:flex-row justify-between gap-4 items-center">
+                                <div class="relative w-full md:w-72">
+                                    <i class="fas fa-search absolute left-4 top-3.5 text-slate-400 text-xs"></i>
+                                    <input type="text" id="tablaFiltro" onkeyup="filtrarTabla()" placeholder="Buscar en registros..." class="w-full pl-10 pr-4 py-3 bg-white border-2 border-slate-100 rounded-xl text-xs font-bold outline-none focus:border-blue-500">
+                                </div>
+                                <button onclick="exportToExcel()" class="w-full md:w-auto bg-slate-800 text-white text-[9px] font-black px-4 py-3 rounded-xl hover:bg-blue-600 transition-colors uppercase tracking-widest">
+                                    <i class="fas fa-file-excel mr-2"></i> Exportar Reporte
                                 </button>
                             </div>
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-left">
-                                    <thead class="bg-slate-900 text-white text-[9px] font-black uppercase">
-                                        <tr><th class="p-4">Fecha</th><th class="p-4">Obra</th><th class="p-4 text-center">Titular</th><th class="p-4 text-right">Importe</th></tr>
+                            
+                            <div class="table-container overflow-x-auto no-scrollbar">
+                                <table class="w-full text-left border-collapse" id="mainTable">
+                                    <thead class="bg-slate-900 text-white text-[9px] font-black uppercase tracking-widest italic">
+                                        <tr>
+                                            <th class="p-4 sort-btn" onclick="ordenarTabla(1)">Fecha <i class="fas fa-sort ml-1 opacity-50"></i></th>
+                                            <th class="p-4 sort-btn" onclick="ordenarTabla(2)">Obra <i class="fas fa-sort ml-1 opacity-50"></i></th>
+                                            <th class="p-4 sort-btn" onclick="ordenarTabla(3)">Categoría <i class="fas fa-sort ml-1 opacity-50"></i></th>
+                                            <th class="p-4 sort-btn" onclick="ordenarTabla(4)">Descripción <i class="fas fa-sort ml-1 opacity-50"></i></th>
+                                            <th class="p-4 sort-btn text-center" onclick="ordenarTabla(5)">Titular <i class="fas fa-sort ml-1 opacity-50"></i></th>
+                                            <th class="p-4 sort-btn text-right" onclick="ordenarTabla(7)">Monto <i class="fas fa-sort ml-1 opacity-50"></i></th>
+                                        </tr>
                                     </thead>
-                                    <tbody id="tablaBody" class="text-xs divide-y divide-slate-100 font-medium"></tbody>
+                                    <tbody id="tablaBody" class="text-[11px] divide-y divide-slate-100 font-medium text-slate-700">
+                                        </tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <div id="page-presupuestos" class="hidden space-y-6">
-                    <div class="flex flex-col md:flex-row gap-6 items-start">
-                        <div class="w-full md:w-80 bg-white p-6 rounded-3xl shadow-lg border-t-8 border-orange-500 shrink-0">
-                            <h3 class="font-black text-[10px] uppercase mb-4 tracking-widest text-slate-400 italic">Gestión de Proyectos</h3>
-                            <form id="formPresupuesto" class="space-y-3">
-                                <input type="text" id="presupuestoObra" placeholder="Nombre de la Obra" required class="w-full p-3 border-2 border-slate-100 rounded-xl text-sm font-bold">
-                                <input type="number" id="presupuestoTotal" placeholder="Presupuesto Total $" required class="w-full p-3 border-2 border-slate-100 rounded-xl text-sm font-bold">
-                                <button type="submit" class="w-full bg-slate-900 text-white font-black py-3 rounded-xl text-[10px] uppercase tracking-widest active:scale-95">Guardar Obra</button>
-                            </form>
-                        </div>
-                        <div class="flex-grow grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4" id="containerPresupuestos"></div>
-                    </div>
-                </div>
-
-                <div id="page-graficas" class="hidden space-y-6">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div class="bg-white p-6 rounded-3xl shadow-md border border-slate-100" id="chartBoxBar"></div>
-                        <div class="bg-white p-6 rounded-3xl shadow-md border border-slate-100" id="chartBoxPie"></div>
-                    </div>
-                </div>
+                <div id="page-presupuestos" class="hidden">...</div>
+                <div id="page-graficas" class="hidden">...</div>
             </main>
         </div>
     </div>
@@ -157,48 +147,11 @@
     <script>
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzbYMOqEUdxIcv8We4PbbvTc7441LPn2e_bw6OsIGUhwBDfve1IRaD5zrQCDzXQaEk05A/exec";
         let movimientos = [];
-        let pLocal = JSON.parse(localStorage.getItem('obras_v12.5')) || {};
-        let chartBarras = null, chartTorta = null;
+        let ordenAsc = true;
 
-        // FORMATO DE FECHA DD/MM/AAAA
-        function formatFecha(stringFecha) {
-            const d = new Date(stringFecha);
-            const dia = String(d.getUTCDate()).padStart(2, '0');
-            const mes = String(d.getUTCMonth() + 1).padStart(2, '0');
-            const anio = d.getUTCFullYear();
-            return `${dia}/${mes}/${anio}`;
-        }
-
-        // EXPORTAR A EXCEL (CSV)
-        function exportToExcel() {
-            let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "FECHA;OBRA;CATEGORIA;DETALLE;TITULAR;TIPO;MONTO\r\n";
-            
-            movimientos.forEach(m => {
-                let row = [
-                    formatFecha(m.fecha),
-                    m.obra,
-                    m.operacion,
-                    m.desc,
-                    m.cuenta,
-                    m.tipo,
-                    m.monto.toFixed(2)
-                ].join(";");
-                csvContent += row + "\r\n";
-            });
-
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `Reporte_Caja_${new Date().toLocaleDateString()}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        // LOGIN
+        // LOGIN & NAVEGACIÓN
         function handleLogin() {
-            if(document.getElementById('userInput').value === 'admin' && document.getElementById('passInput').value === '1234') {
+            if(document.getElementById('userInput').value==='admin' && document.getElementById('passInput').value==='1234'){
                 sessionStorage.setItem('logged', 'true');
                 document.getElementById('loginOverlay').style.display = 'none';
                 document.getElementById('mainApp').classList.remove('hidden');
@@ -206,30 +159,14 @@
             }
         }
         function logout() { sessionStorage.clear(); location.reload(); }
-
-        // MANEJO DE MONTOS
-        const vInput = document.getElementById('montoVisual');
-        const rInput = document.getElementById('montoReal');
-        if(vInput) {
-            vInput.addEventListener('input', (e) => {
-                let val = e.target.value.replace(/\D/g, "");
-                let num = parseFloat(val) / 100;
-                if (isNaN(num)) { rInput.value = 0; vInput.value = ""; return; }
-                rInput.value = num.toFixed(2);
-                vInput.value = num.toLocaleString('es-AR', { minimumFractionDigits: 2 });
-            });
-        }
-
-        // NAVEGACIÓN
         function showPage(p) {
             document.querySelectorAll('main > div').forEach(div => div.classList.add('hidden'));
             document.querySelectorAll('.nav-link').forEach(btn => btn.classList.remove('active'));
             document.getElementById('page-'+p).classList.remove('hidden');
             document.getElementById('btn-'+p).classList.add('active');
-            if(p === 'presupuestos') renderPresupuestos();
-            if(p === 'graficas') setTimeout(updateCharts, 200);
         }
 
+        // CARGA Y RENDER
         async function cargarDatos() {
             try {
                 const r = await fetch(WEB_APP_URL);
@@ -239,117 +176,93 @@
             } catch(e) { console.error(e); }
         }
 
+        function formatFecha(stringFecha) {
+            const d = new Date(stringFecha);
+            return `${String(d.getUTCDate()).padStart(2,'0')}/${String(d.getUTCMonth()+1).padStart(2,'0')}/${d.getUTCFullYear()}`;
+        }
+
         function actualizarInterfaz() {
             const tbody = document.getElementById('tablaBody');
-            if(!tbody) return;
             tbody.innerHTML = '';
             let sI=0, sM=0;
-            [...movimientos].reverse().forEach(m => {
+            
+            movimientos.forEach(m => {
                 const val = m.tipo === 'ingreso' ? m.monto : -m.monto;
                 if(m.cuenta === 'Ivan') sI += val; else sM += val;
-                tbody.innerHTML += `<tr>
-                    <td class="p-4 font-bold text-slate-500">${formatFecha(m.fecha)}</td>
-                    <td class="p-4 font-black uppercase text-slate-800">${m.obra}</td>
-                    <td class="p-4 text-center font-bold text-blue-600">${m.cuenta.toUpperCase()}</td>
-                    <td class="p-4 text-right font-black ${m.tipo === 'ingreso' ? 'text-emerald-600' : 'text-red-500'}">$${m.monto.toLocaleString('es-AR', {minimumFractionDigits:2})}</td>
-                </tr>`;
+                
+                tbody.innerHTML += `
+                    <tr class="hover:bg-blue-50 transition-colors">
+                        <td class="p-4 font-bold text-slate-400 whitespace-nowrap">${formatFecha(m.fecha)}</td>
+                        <td class="p-4 font-black uppercase text-slate-800">${m.obra}</td>
+                        <td class="p-4 text-slate-500 italic">${m.operacion}</td>
+                        <td class="p-4 text-slate-600 font-semibold">${m.desc}</td>
+                        <td class="p-4 text-center"><span class="px-2 py-1 rounded-lg text-[9px] font-black ${m.cuenta==='Ivan'?'bg-blue-100 text-blue-700':'bg-emerald-100 text-emerald-700'}">${m.cuenta.toUpperCase()}</span></td>
+                        <td class="p-4 text-right font-black ${m.tipo === 'ingreso' ? 'text-emerald-600' : 'text-red-500'}">$ ${m.monto.toLocaleString('es-AR',{minimumFractionDigits:2})}</td>
+                    </tr>`;
             });
-            document.getElementById('saldoIvan').innerText = "$ " + sI.toLocaleString('es-AR', {minimumFractionDigits:2});
-            document.getElementById('saldoMario').innerText = "$ " + sM.toLocaleString('es-AR', {minimumFractionDigits:2});
-            document.getElementById('saldoTotal').innerText = "$ " + (sI+sM).toLocaleString('es-AR', {minimumFractionDigits:2});
+            document.getElementById('saldoIvan').innerText = "$ " + sI.toLocaleString('es-AR',{minimumFractionDigits:2});
+            document.getElementById('saldoMario').innerText = "$ " + sM.toLocaleString('es-AR',{minimumFractionDigits:2});
+            document.getElementById('saldoTotal').innerText = "$ " + (sI+sM).toLocaleString('es-AR',{minimumFractionDigits:2});
             
             const obras = [...new Set(movimientos.map(m => m.obra))].filter(Boolean).sort();
-            const os = document.getElementById('obraSelect');
-            if(os) {
-                os.innerHTML = '<option disabled selected>Obra...</option>' + obras.map(o => `<option value="${o}">${o}</option>`).join('') + '<option value="NUEVA" class="text-blue-600 font-bold">+ CREAR NUEVA</option>';
+            document.getElementById('obraSelect').innerHTML = '<option disabled selected>Obra...</option>' + obras.map(o => `<option value="${o}">${o}</option>`).join('') + '<option value="NUEVA" class="text-blue-600 font-black">+ CREAR NUEVA</option>';
+        }
+
+        // FUNCIONES DE TABLA: FILTRO Y ORDEN
+        function filtrarTabla() {
+            const input = document.getElementById("tablaFiltro").value.toLowerCase();
+            const rows = document.getElementById("tablaBody").getElementsByTagName("tr");
+            for (let i = 0; i < rows.length; i++) {
+                const text = rows[i].textContent.toLowerCase();
+                rows[i].style.display = text.includes(input) ? "" : "none";
             }
         }
 
-        // OBRAS
-        const fp = document.getElementById('formPresupuesto');
-        if(fp) {
-            fp.onsubmit = (e) => {
-                e.preventDefault();
-                const nombre = document.getElementById('presupuestoObra').value;
-                const total = parseFloat(document.getElementById('presupuestoTotal').value);
-                pLocal[nombre] = { total: total, fecha: new Date() };
-                localStorage.setItem('obras_v12.5', JSON.stringify(pLocal));
-                renderPresupuestos();
-                e.target.reset();
-            };
-        }
-
-        function renderPresupuestos() {
-            const cont = document.getElementById('containerPresupuestos');
-            if(!cont) return;
-            cont.innerHTML = '';
-            Object.keys(pLocal).forEach(o => {
-                const cobrado = movimientos.filter(m => m.obra === o && m.tipo === 'ingreso').reduce((a,b) => a+b.monto, 0);
-                const porc = Math.min(100, (cobrado*100/pLocal[o].total)).toFixed(0);
-                cont.innerHTML += `<div class="bg-white p-5 rounded-2xl shadow-md border-l-8 border-slate-900 group hover:border-blue-500 transition-all">
-                    <h4 class="font-black text-slate-800 uppercase text-xs">${o}</h4>
-                    <div class="flex justify-between mt-2 text-[10px]"><span class="text-slate-400 font-bold uppercase">Total Obra:</span><span class="font-black">$${pLocal[o].total.toLocaleString()}</span></div>
-                    <div class="flex justify-between text-[10px] text-emerald-600"><span class="font-bold uppercase">Pagado:</span><span class="font-black">$${cobrado.toLocaleString()}</span></div>
-                    <div class="w-full bg-slate-100 h-2 mt-4 rounded-full overflow-hidden shadow-inner"><div class="bg-blue-600 h-full transition-all duration-500" style="width:${porc}%"></div></div>
-                    <p class="text-[9px] font-black text-slate-400 mt-1 text-right">${porc}%</p>
-                </div>`;
+        function ordenarTabla(colIndex) {
+            const claves = ["id", "fecha", "obra", "operacion", "desc", "cuenta", "tipo", "monto"];
+            const clave = claves[colIndex-1];
+            
+            movimientos.sort((a, b) => {
+                let valA = a[clave], valB = b[clave];
+                if(typeof valA === 'string') {
+                    return ordenAsc ? valA.localeCompare(valB) : valB.localeCompare(valA);
+                } else {
+                    return ordenAsc ? valA - valB : valB - valA;
+                }
             });
+            
+            ordenAsc = !ordenAsc;
+            actualizarInterfaz();
         }
 
-        function updateCharts() {
-            if(!chartBarras) { // Asegurar contenedores para Chart.js
-                const c1 = document.getElementById('chartBoxBar');
-                const c2 = document.getElementById('chartBoxPie');
-                if(c1) c1.innerHTML = '<p class="text-center font-black text-slate-500 text-[10px] uppercase mb-6 tracking-widest">Ingresos vs Gastos</p><div class="chart-box"><canvas id="chartBarras"></canvas></div>';
-                if(c2) c2.innerHTML = '<p class="text-center font-black text-slate-500 text-[10px] uppercase mb-6 tracking-widest">Distribución de Gastos</p><div class="chart-box"><canvas id="chartTorta"></canvas></div>';
-            }
+        // INPUTS DE MONTO
+        const vInput = document.getElementById('montoVisual');
+        const rInput = document.getElementById('montoReal');
+        vInput.addEventListener('input', (e) => {
+            let val = e.target.value.replace(/\D/g, "");
+            let num = parseFloat(val) / 100;
+            if (isNaN(num)) { rInput.value = 0; vInput.value = ""; return; }
+            rInput.value = num.toFixed(2);
+            vInput.value = num.toLocaleString('es-AR', { minimumFractionDigits: 2 });
+        });
 
-            const ing = movimientos.filter(m => m.tipo === 'ingreso').reduce((a, b) => a + b.monto, 0);
-            const egr = movimientos.filter(m => m.tipo === 'egreso').reduce((a, b) => a + b.monto, 0);
-
-            if(chartBarras) chartBarras.destroy();
-            const ctx1 = document.getElementById('chartBarras');
-            if(ctx1) {
-                chartBarras = new Chart(ctx1, {
-                    type: 'bar',
-                    data: { labels: ['Ingresos','Gastos'], datasets: [{ data:[ing, egr], backgroundColor:['#10b981','#ef4444'], borderRadius: 12 }] },
-                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-                });
-            }
-
-            if(chartTorta) chartTorta.destroy();
-            const ctx2 = document.getElementById('chartTorta');
-            if(ctx2) {
-                const cats = {}; 
-                movimientos.filter(m => m.tipo === 'egreso').forEach(m => cats[m.operacion] = (cats[m.operacion]||0)+m.monto);
-                chartTorta = new Chart(ctx2, {
-                    type: 'doughnut',
-                    data: { labels: Object.keys(cats), datasets: [{ data: Object.values(cats), backgroundColor: ['#3b82f6','#f59e0b','#8b5cf6','#ec4899','#64748b'] }] },
-                    options: { responsive: true, maintainAspectRatio: false, cutout: '75%' }
-                });
-            }
-        }
-
-        const fm = document.getElementById('formMovimiento');
-        if(fm) {
-            fm.onsubmit = async (e) => {
-                e.preventDefault();
-                const btn = document.getElementById('btnGuardar'); btn.innerText = "INGRESANDO..."; btn.disabled = true;
-                const o = document.getElementById('obraSelect').value === "NUEVA" ? document.getElementById('obraNuevaInput').value.trim() : document.getElementById('obraSelect').value;
-                const mov = { id: Date.now(), fecha: document.getElementById('fecha').value, obra: o, operacion: document.getElementById('tipoOperacion').value, descripcion: document.getElementById('descripcion').value, cuenta: document.getElementById('cuenta').value, tipo: document.getElementById('tipoMov').value, monto: parseFloat(rInput.value) };
-                await fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(mov) });
-                movimientos.push({...mov, desc: mov.descripcion});
-                actualizarInterfaz();
-                e.target.reset(); rInput.value = ""; vInput.value = "";
-                btn.innerText = "Ingresar movimiento"; btn.disabled = false;
-            };
-        }
+        // ENVÍO DE DATOS
+        document.getElementById('formMovimiento').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnGuardar'); btn.innerText = "PROCESANDO..."; btn.disabled = true;
+            const o = document.getElementById('obraSelect').value === "NUEVA" ? document.getElementById('obraNuevaInput').value : document.getElementById('obraSelect').value;
+            const mov = { id: Date.now(), fecha: document.getElementById('fecha').value, obra: o, operacion: document.getElementById('tipoOperacion').value, descripcion: document.getElementById('descripcion').value, cuenta: document.getElementById('cuenta').value, tipo: document.getElementById('tipoMov').value, monto: parseFloat(rInput.value) };
+            
+            await fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(mov) });
+            movimientos.unshift({...mov, desc: mov.descripcion});
+            actualizarInterfaz();
+            e.target.reset(); rInput.value=""; vInput.value="";
+            btn.innerText = "Ingresar movimiento"; btn.disabled = false;
+        };
 
         window.onload = () => { if(sessionStorage.getItem('logged')) handleLogin(); };
-        const os = document.getElementById('obraSelect');
-        if(os) os.onchange = (e) => document.getElementById('obraNuevaInput').classList.toggle('hidden', e.target.value !== 'NUEVA');
-        const fd = document.getElementById('fecha');
-        if(fd) fd.value = new Date().toISOString().split('T')[0];
+        document.getElementById('obraSelect').onchange = (e) => document.getElementById('obraNuevaInput').classList.toggle('hidden', e.target.value !== 'NUEVA');
+        document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
     </script>
 </body>
 </html>
