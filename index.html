@@ -3,105 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sistema Constructora v15.4</title>
+    <title>Sistema de Gestión v15.5</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        html, body { height: 100%; margin: 0; font-family: 'Inter', sans-serif; overflow: hidden; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; overflow: hidden; }
         .main-content { height: calc(100vh - 64px - 70px); overflow-y: auto; }
         @media (min-width: 768px) { .main-content { height: calc(100vh - 64px); } }
         .sidebar-constructora { background-color: #0f172a; }
         .nav-link.active { color: #3b82f6; border-top: 4px solid #3b82f6; background: rgba(59,130,246,0.1); }
         @media (min-width: 768px) { .nav-link.active { border-left: 4px solid #3b82f6; border-top: none; color: white; } }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
+        
+        /* Estilos Login */
+        .login-bg { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
+        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
     </style>
 </head>
 <body class="bg-slate-100">
 
-    <div id="loginPage" class="fixed inset-0 z-[100] bg-slate-900 flex items-center justify-center p-4">
-        <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-sm:max-w-xs max-w-sm">
-            <h2 class="text-2xl font-black text-slate-800 text-center mb-6 uppercase italic">Acceso Admin</h2>
-            <div class="space-y-4">
-                <input type="text" id="userInput" placeholder="Usuario" class="w-full p-4 bg-slate-100 border-2 rounded-2xl font-bold outline-none text-center uppercase">
-                <input type="password" id="passInput" placeholder="Contraseña" class="w-full p-4 bg-slate-100 border-2 rounded-2xl font-bold outline-none text-center">
-                <button onclick="checkLogin()" class="w-full bg-blue-600 text-white font-black py-4 rounded-2xl uppercase tracking-widest active:scale-95 transition-all">Entrar</button>
+    <div id="loginPage" class="fixed inset-0 z-[100] login-bg flex items-center justify-center p-4">
+        <div class="glass-card p-10 rounded-[2.5rem] shadow-2xl w-full max-w-sm border border-white/20">
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-20 h-20 bg-blue-600 rounded-2xl mb-4 shadow-lg">
+                    <i class="fas fa-city text-white text-4xl"></i>
+                </div>
+                <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tighter">Panel Administrativo</h2>
+                <p class="text-slate-500 text-xs font-bold uppercase tracking-widest mt-1 italic">Gestión de Obra</p>
             </div>
-            <p id="loginError" class="text-red-500 text-[10px] font-black mt-4 hidden text-center italic uppercase">Credenciales Inválidas</p>
+            <div class="space-y-4">
+                <div class="relative">
+                    <i class="fas fa-user absolute left-4 top-4 text-slate-400"></i>
+                    <input type="text" id="userInput" placeholder="USUARIO" class="w-full pl-12 p-4 bg-slate-100 border-2 border-transparent focus:border-blue-500 rounded-2xl font-bold outline-none transition-all uppercase">
+                </div>
+                <div class="relative">
+                    <i class="fas fa-lock absolute left-4 top-4 text-slate-400"></i>
+                    <input type="password" id="passInput" placeholder="CONTRASEÑA" class="w-full pl-12 p-4 bg-slate-100 border-2 border-transparent focus:border-blue-500 rounded-2xl font-bold outline-none transition-all">
+                </div>
+                <button onclick="checkLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-2xl shadow-xl shadow-blue-500/20 uppercase tracking-widest transition-all active:scale-95">
+                    Ingresar Sistema
+                </button>
+            </div>
+            <p id="loginError" class="text-red-500 text-[10px] font-black mt-6 hidden text-center italic uppercase animate-pulse">
+                <i class="fas fa-exclamation-triangle mr-1"></i> Acceso Denegado: Datos Incorrectos
+            </p>
         </div>
     </div>
 
     <div id="mainApp" class="hidden flex flex-col h-full">
         <header class="h-16 bg-slate-900 text-white flex justify-between items-center px-4 shrink-0 z-50">
             <div class="flex items-center gap-3">
-                <h1 class="font-black text-blue-500 italic text-xs md:text-lg uppercase">Caja Constructora</h1>
-                <div id="syncIndicator" class="hidden md:block text-[9px] bg-emerald-600 px-3 py-1 rounded-full font-black uppercase shadow-lg">Sincronizado</div>
+                <i class="fas fa-hard-hat text-blue-500 text-xl"></i>
+                <h1 class="font-black text-sm md:text-lg uppercase italic tracking-tighter">Constructora <span class="text-blue-500">v15.5</span></h1>
             </div>
-            <div class="flex items-center gap-2">
-                <button onclick="exportarCSV()" class="bg-slate-800 hover:bg-slate-700 text-orange-400 p-2 rounded-xl text-xs border border-slate-700">
-                    <i class="fas fa-file-export mr-1"></i> <span class="hidden md:inline">Copia de Seguridad</span>
-                </button>
-                <button onclick="logout()" class="text-slate-500 hover:text-white p-2"><i class="fas fa-power-off"></i></button>
-            </div>
+            <button onclick="logout()" class="bg-slate-800 hover:bg-red-500/20 hover:text-red-500 px-4 py-2 rounded-xl text-xs font-black uppercase transition-all">
+                <i class="fas fa-sign-out-alt mr-2"></i>Salir
+            </button>
         </header>
 
         <div class="flex flex-col md:flex-row flex-grow overflow-hidden">
-            <nav class="sidebar-constructora fixed bottom-0 left-0 w-full h-[70px] md:relative md:w-64 md:h-full flex md:flex-col justify-around md:justify-start md:pt-6 z-50">
-                <button onclick="showPage('registro')" id="btn-registro" class="nav-link active flex flex-col md:flex-row items-center gap-2 md:p-5 text-slate-400">
-                    <i class="fas fa-wallet text-xl"></i><span class="text-[10px] font-bold uppercase">Caja</span>
+            <nav class="sidebar-constructora fixed bottom-0 left-0 w-full h-[70px] md:relative md:w-64 md:h-full flex md:flex-col justify-around md:justify-start md:pt-6 z-50 shadow-2xl">
+                <button onclick="showPage('registro')" id="btn-registro" class="nav-link active flex flex-col md:flex-row items-center gap-3 md:p-6 text-slate-400">
+                    <i class="fas fa-cash-register text-xl"></i><span class="text-[10px] font-black uppercase">Movimientos</span>
                 </button>
-                <button onclick="showPage('obras')" id="btn-obras" class="nav-link flex flex-col md:flex-row items-center gap-2 md:p-5 text-slate-400">
-                    <i class="fas fa-hammer text-xl"></i><span class="text-[10px] font-bold uppercase">Reportes</span>
+                <button onclick="showPage('obras')" id="btn-obras" class="nav-link flex flex-col md:flex-row items-center gap-3 md:p-6 text-slate-400">
+                    <i class="fas fa-chart-line text-xl"></i><span class="text-[10px] font-black uppercase">Reportes Obra</span>
                 </button>
             </nav>
 
             <main class="flex-grow main-content p-4 bg-slate-50 pb-24 md:pb-4">
+                
                 <div id="page-registro" class="space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div class="bg-white p-5 rounded-3xl shadow-sm border-l-8 border-blue-500"><span class="text-[10px] font-black text-slate-400 uppercase">Ivan</span><p id="saldoIvan" class="text-2xl font-black text-slate-800">$ 0,00</p></div>
-                        <div class="bg-white p-5 rounded-3xl shadow-sm border-l-8 border-emerald-500"><span class="text-[10px] font-black text-slate-400 uppercase">Mario</span><p id="saldoMario" class="text-2xl font-black text-slate-800">$ 0,00</p></div>
-                        <div class="bg-slate-800 p-5 rounded-3xl shadow-lg"><span class="text-[10px] font-black text-orange-400 uppercase">Saldo Total</span><p id="saldoTotal" class="text-2xl font-black text-orange-400">$ 0,00</p></div>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        <div class="bg-white p-4 rounded-3xl shadow-sm border-l-4 border-blue-500">
+                            <span class="text-[9px] font-black text-slate-400 uppercase">Ivan</span>
+                            <p id="saldoIvan" class="text-lg font-black text-slate-800">$ 0</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-3xl shadow-sm border-l-4 border-emerald-500">
+                            <span class="text-[9px] font-black text-slate-400 uppercase">Mario</span>
+                            <p id="saldoMario" class="text-lg font-black text-slate-800">$ 0</p>
+                        </div>
+                        <div class="col-span-2 md:col-span-1 bg-slate-800 p-4 rounded-3xl shadow-lg">
+                            <span class="text-[9px] font-black text-blue-400 uppercase italic">Caja Total</span>
+                            <p id="saldoTotal" class="text-xl font-black text-white">$ 0</p>
+                        </div>
                     </div>
 
-                    <div class="flex flex-col xl:flex-row gap-6">
-                        <div class="w-full xl:w-80 bg-white p-6 rounded-3xl shadow-xl border-t-8 border-blue-600 h-fit shrink-0">
+                    <div class="flex flex-col xl:flex-row gap-4">
+                        <div class="w-full xl:w-80 bg-white p-6 rounded-[2rem] shadow-xl border-t-4 border-blue-600 h-fit">
                             <form id="formMovimiento" class="space-y-3">
                                 <input type="hidden" id="editId">
-                                <input type="date" id="fecha" required class="w-full p-3 bg-slate-50 border-2 rounded-xl font-bold text-sm outline-none">
-                                <select id="obraSelect" required class="w-full p-3 border-2 rounded-xl font-bold bg-white text-sm outline-none"></select>
-                                <input type="text" id="obraNuevaInput" placeholder="Nueva obra..." class="w-full p-3 border-2 border-blue-300 rounded-xl hidden bg-blue-50 italic text-sm outline-none">
-                                <select id="tipoOperacion" required class="w-full p-3 border-2 rounded-xl font-bold bg-white text-sm outline-none">
-                                    <option value="" disabled selected>Categoría...</option>
-                                    <option value="Cobro de pagos">Cobro de pagos</option>
-                                    <option value="Pagos de jornales">Pagos de jornales</option>
-                                    <option value="Materiales / insumos">Materiales / insumos</option>
-                                </select>
-                                <input type="text" id="descripcion" placeholder="Detalle..." required class="w-full p-3 border-2 rounded-xl text-sm outline-none">
+                                <input type="date" id="fecha" required class="w-full p-3 bg-slate-50 border-2 rounded-xl font-bold text-sm">
+                                <select id="obraSelect" required class="w-full p-3 border-2 rounded-xl font-bold bg-white text-sm"></select>
+                                <input type="text" id="obraNuevaInput" placeholder="Nombre obra nueva..." class="w-full p-3 border-2 border-blue-300 rounded-xl hidden bg-blue-50 italic text-sm">
+                                <input type="text" id="descripcion" placeholder="Descripción / Detalle" required class="w-full p-3 border-2 rounded-xl text-sm">
                                 <div class="grid grid-cols-2 gap-2">
-                                    <select id="cuenta" class="p-3 border-2 rounded-xl font-black text-xs"><option value="Ivan">Ivan</option><option value="Mario">Mario</option></select>
-                                    <select id="tipoMov" class="p-3 border-2 rounded-xl font-black text-xs"><option value="ingreso">Ingreso (+)</option><option value="egreso">Egreso (-)</option></select>
+                                    <select id="cuenta" class="p-3 border-2 rounded-xl font-black text-xs">
+                                        <option value="Ivan">Ivan</option>
+                                        <option value="Mario">Mario</option>
+                                    </select>
+                                    <select id="tipoMov" class="p-3 border-2 rounded-xl font-black text-xs">
+                                        <option value="ingreso">Ingreso (+)</option>
+                                        <option value="egreso">Egreso (-)</option>
+                                    </select>
                                 </div>
                                 <div class="relative">
-                                    <input type="text" id="montoVisual" placeholder="0,00" required class="w-full p-4 border-4 bg-slate-50 rounded-2xl text-2xl font-black text-right outline-none">
+                                    <span class="absolute left-4 top-4 font-black text-slate-400">$</span>
+                                    <input type="text" id="montoVisual" placeholder="0,00" required class="w-full p-4 pl-8 border-4 bg-slate-50 rounded-2xl text-2xl font-black text-right outline-none focus:border-blue-500">
                                     <input type="hidden" id="montoReal">
                                 </div>
-                                <button type="submit" id="btnGuardar" class="w-full bg-blue-600 text-white font-black py-4 rounded-2xl shadow-lg uppercase text-xs">Guardar</button>
-                                <button type="button" id="btnCancelarEdit" onclick="cancelarEdicion()" class="hidden w-full bg-slate-200 text-slate-500 font-bold py-2 rounded-xl text-[10px] uppercase">Cancelar</button>
+                                <button type="submit" id="btnGuardar" class="w-full bg-blue-600 text-white font-black py-4 rounded-2xl shadow-lg uppercase text-xs hover:bg-blue-700 transition-all">Guardar Datos</button>
                             </form>
                         </div>
 
-                        <div class="flex-grow bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-200">
-                            <div class="p-4 bg-slate-900">
-                                <input type="text" id="tablaFiltro" onkeyup="filtrarYRecalcular()" placeholder="Filtrar..." class="w-full md:w-80 p-3 bg-slate-800 rounded-xl text-xs text-white outline-none">
+                        <div class="flex-grow bg-white rounded-[2rem] shadow-xl overflow-hidden border border-slate-200">
+                            <div class="p-4 bg-slate-900 flex justify-between items-center">
+                                <h3 class="text-white font-black uppercase text-[10px] tracking-widest italic">Historial de Movimientos</h3>
+                                <input type="text" id="tablaFiltro" onkeyup="filtrarYRecalcular()" placeholder="Buscar..." class="w-40 p-2 bg-slate-800 rounded-lg text-[10px] text-white outline-none border border-slate-700">
                             </div>
                             <div class="overflow-x-auto h-[500px] no-scrollbar">
                                 <table class="w-full text-left">
-                                    <thead class="text-slate-400 text-[10px] font-black uppercase bg-slate-900 italic">
+                                    <thead class="text-slate-400 text-[10px] font-black uppercase bg-slate-900 italic sticky top-0 z-10">
                                         <tr>
-                                            <th class="p-4" onclick="ordenarYRenderizar('fecha')">Fecha <i class="fas fa-sort-down"></i></th>
+                                            <th class="p-4">Fecha</th>
                                             <th class="p-4">Obra</th>
-                                            <th class="p-4">Descripción</th>
-                                            <th class="p-4 text-center">Titular</th>
+                                            <th class="p-4">Titular</th>
                                             <th class="p-4 text-right">Monto</th>
                                             <th class="p-4 text-center">Acción</th>
                                         </tr>
@@ -114,16 +141,17 @@
                 </div>
 
                 <div id="page-obras" class="hidden space-y-4">
-                    <div class="bg-white p-6 rounded-3xl shadow-xl">
-                        <select id="reporteObraSelect" onchange="generarReporteObra()" class="w-full p-4 border-2 border-slate-100 rounded-2xl font-black text-sm bg-slate-50 mb-6 outline-none"></select>
+                    <div class="bg-white p-6 rounded-[2rem] shadow-xl">
+                        <h2 class="text-xl font-black text-slate-800 uppercase italic mb-4">Reporte por Obra</h2>
+                        <select id="reporteObraSelect" onchange="generarReporteObra()" class="w-full md:w-80 p-4 border-2 rounded-2xl font-black text-sm bg-slate-50 mb-6"></select>
                         <div id="reporteContenido" class="hidden grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div class="bg-blue-50 p-6 rounded-2xl text-center"><span class="text-[10px] font-black uppercase">Ingresos</span><p id="repIngresos" class="text-2xl font-black text-blue-600 mt-1">$ 0,00</p></div>
-                            <div class="bg-red-50 p-6 rounded-2xl text-center"><span class="text-[10px] font-black uppercase">Egresos</span><p id="repEgresos" class="text-2xl font-black text-red-600 mt-1">$ 0,00</p></div>
-                            <div class="bg-emerald-50 p-6 rounded-2xl text-center"><span class="text-[10px] font-black uppercase">Neto</span><p id="repBalance" class="text-2xl font-black text-emerald-600 mt-1">$ 0,00</p></div>
-                            <div class="md:col-span-3 h-[300px] mt-4"><canvas id="chartObraDetalle"></canvas></div>
+                            <div class="bg-blue-50 p-6 rounded-3xl text-center"><span class="text-[10px] font-black text-blue-400">COBRADO</span><p id="repIngresos" class="text-2xl font-black text-blue-600">$ 0</p></div>
+                            <div class="bg-red-50 p-6 rounded-3xl text-center"><span class="text-[10px] font-black text-red-400">GASTADO</span><p id="repEgresos" class="text-2xl font-black text-red-600">$ 0</p></div>
+                            <div class="bg-emerald-50 p-6 rounded-3xl text-center"><span class="text-[10px] font-black text-emerald-400">NETO</span><p id="repBalance" class="text-2xl font-black text-emerald-600">$ 0</p></div>
                         </div>
                     </div>
                 </div>
+
             </main>
         </div>
     </div>
@@ -131,21 +159,22 @@
     <script>
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzbYMOqEUdxIcv8We4PbbvTc7441LPn2e_bw6OsIGUhwBDfve1IRaD5zrQCDzXQaEk05A/exec";
         let movimientos = [];
-        let movMostrados = [];
-        let configOrden = { clave: 'fecha', asc: false };
-        let chartObra;
 
+        // --- SISTEMA DE LOGIN ---
         function checkLogin() {
             const u = document.getElementById('userInput').value;
             const p = document.getElementById('passInput').value;
             if (u.toLowerCase() === "admin" && p === "1234") {
-                document.getElementById('loginPage').classList.add('hidden');
+                document.getElementById('loginPage').style.display = 'none';
                 document.getElementById('mainApp').classList.remove('hidden');
                 cargarDatos();
-            } else { document.getElementById('loginError').classList.remove('hidden'); }
+            } else {
+                document.getElementById('loginError').classList.remove('hidden');
+            }
         }
         function logout() { location.reload(); }
 
+        // --- GESTIÓN DE DATOS ---
         async function cargarDatos() {
             try {
                 const r = await fetch(WEB_APP_URL);
@@ -154,31 +183,31 @@
                     id: r[0], fecha: r[1], obra: r[2], operacion: r[3], desc: r[4], cuenta: r[5], tipo: r[6], 
                     monto: parseFloat(r[7]), monto_real: (r[6] === 'ingreso' ? parseFloat(r[7]) : -parseFloat(r[7]))
                 }));
-                // Orden descendente por defecto
+                // Ordenar por fecha descendente
                 movimientos.sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
-                movMostrados = [...movimientos];
-                renderizarTabla();
+                renderizarTabla(movimientos);
                 actualizarSelectsObras();
-                document.getElementById('syncIndicator').classList.remove('hidden');
             } catch(e) { console.error(e); }
         }
 
-        function renderizarTabla() {
+        function renderizarTabla(lista) {
             const tbody = document.getElementById('tablaBody');
             tbody.innerHTML = '';
             let sI=0, sM=0;
-            movMostrados.forEach(m => {
+
+            lista.forEach(m => {
                 if(m.cuenta === 'Ivan') sI += m.monto_real; else sM += m.monto_real;
                 tbody.innerHTML += `
-                    <tr class="hover:bg-blue-50">
+                    <tr class="hover:bg-blue-50/50 transition-colors">
                         <td class="p-4 font-bold text-slate-400">${new Date(m.fecha).toLocaleDateString('es-AR')}</td>
                         <td class="p-4 font-black uppercase text-slate-800">${m.obra}</td>
-                        <td class="p-4 text-slate-600">${m.desc}</td>
                         <td class="p-4 text-center"><span class="px-2 py-1 rounded text-[9px] font-black ${m.cuenta==='Ivan'?'bg-blue-600 text-white':'bg-emerald-600 text-white'}">${m.cuenta.toUpperCase()}</span></td>
-                        <td class="p-4 text-right font-black ${m.tipo==='ingreso'?'text-emerald-600':'text-red-500'}">$ ${m.monto.toLocaleString('es-AR',{minimumFractionDigits:2})}</td>
+                        <td class="p-4 text-right font-black ${m.tipo==='ingreso'?'text-emerald-600':'text-red-500'}">$ ${m.monto.toLocaleString('es-AR')}</td>
                         <td class="p-4 text-center whitespace-nowrap">
-                            <button onclick="prepararEdicion(${m.id})" class="text-orange-400 hover:text-orange-600 mr-2"><i class="fas fa-edit"></i></button>
-                            <button onclick="borrarRemoto(${m.id})" class="text-slate-300 hover:text-red-500"><i class="fas fa-trash"></i></button>
+                            <button onclick="prepararEdicion(${m.id})" class="text-blue-500 hover:scale-110 transition-transform mr-3"><i class="fas fa-edit"></i></button>
+                            <button onclick="borrarRemoto(${m.id})" class="bg-red-500 hover:bg-red-600 text-white w-8 h-8 rounded-lg shadow-md hover:shadow-red-500/20 transition-all">
+                                <i class="fas fa-trash-alt text-[10px]"></i>
+                            </button>
                         </td>
                     </tr>`;
             });
@@ -188,109 +217,86 @@
         }
 
         async function borrarRemoto(id) {
-            if(!confirm("¿CONFIRMA ELIMINAR REGISTRO? SE BORRARÁ LA FILA COMPLETA EN LA NUBE.")) return;
+            if(!confirm("¿ESTÁS SEGURO? Esta acción borrará la entrada de Google Sheets por completo.")) return;
+            
+            // Borrado visual inmediato
             movimientos = movimientos.filter(m => m.id !== id);
-            movMostrados = movMostrados.filter(m => m.id !== id);
-            renderizarTabla();
-            await fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "delete", id: id }) });
-        }
+            renderizarTabla(movimientos);
 
-        function exportarCSV() {
-            let csv = "ID;Fecha;Obra;Operacion;Descripcion;Cuenta;Tipo;Monto\n";
-            movimientos.forEach(m => {
-                csv += `${m.id};${m.fecha};"${m.obra}";"${m.operacion}";"${m.desc}";${m.cuenta};${m.tipo};${m.monto}\n`;
+            // Borrado en Sheets
+            await fetch(WEB_APP_URL, { 
+                method: 'POST', 
+                mode: 'no-cors', 
+                body: JSON.stringify({ action: "delete", id: id }) 
             });
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = `Backup_Caja_${new Date().toISOString().split('T')[0]}.csv`;
-            link.click();
         }
 
+        // --- FORMULARIO Y LOGICA ---
         document.getElementById('formMovimiento').onsubmit = async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btnGuardar');
             const editId = document.getElementById('editId').value;
             const o = document.getElementById('obraSelect').value === "NUEVA" ? document.getElementById('obraNuevaInput').value : document.getElementById('obraSelect').value;
-            btn.disabled = true;
+            
+            btn.disabled = true; btn.innerText = "Sincronizando...";
 
-            const mov = {
+            const datos = {
                 action: editId ? "update" : "insert",
                 id: editId ? parseInt(editId) : Date.now(),
                 fecha: document.getElementById('fecha').value,
                 obra: o,
-                operacion: document.getElementById('tipoOperacion').value,
+                operacion: "General",
                 descripcion: document.getElementById('descripcion').value,
                 cuenta: document.getElementById('cuenta').value,
                 tipo: document.getElementById('tipoMov').value,
                 monto: parseFloat(document.getElementById('montoReal').value)
             };
 
-            await fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(mov) });
+            await fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(datos) });
             await cargarDatos();
             cancelarEdicion();
-            btn.disabled = false;
+            btn.disabled = false; btn.innerText = "Guardar Datos";
         };
 
         function showPage(p) {
-            document.querySelectorAll('main > div').forEach(div => div.classList.add('hidden'));
-            document.querySelectorAll('.nav-link').forEach(btn => btn.classList.remove('active'));
-            document.getElementById('page-'+p).classList.remove('hidden');
+            document.getElementById('page-registro').classList.toggle('hidden', p !== 'registro');
+            document.getElementById('page-obras').classList.toggle('hidden', p !== 'obras');
+            document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
             document.getElementById('btn-'+p).classList.add('active');
         }
 
         function actualizarSelectsObras() {
             const obras = [...new Set(movimientos.map(m => m.obra))].filter(Boolean).sort();
-            document.getElementById('obraSelect').innerHTML = '<option disabled selected>Obra...</option>' + obras.map(o => `<option value="${o}">${o}</option>`).join('') + '<option value="NUEVA">+ NUEVA</option>';
-            document.getElementById('reporteObraSelect').innerHTML = '<option disabled selected>Ver Reporte de Obra...</option>' + obras.map(o => `<option value="${o}">${o}</option>`).join('');
+            document.getElementById('obraSelect').innerHTML = '<option disabled selected>Obra...</option>' + obras.map(o => `<option value="${o}">${o}</option>`).join('') + '<option value="NUEVA">+ NUEVA OBRA</option>';
+            document.getElementById('reporteObraSelect').innerHTML = '<option disabled selected>Seleccionar Obra...</option>' + obras.map(o => `<option value="${o}">${o}</option>`).join('');
+        }
+
+        function filtrarYRecalcular() {
+            const b = document.getElementById("tablaFiltro").value.toLowerCase();
+            const filtrados = movimientos.filter(m => m.obra.toLowerCase().includes(b) || m.desc.toLowerCase().includes(b));
+            renderizarTabla(filtrados);
         }
 
         function prepararEdicion(id) {
             const m = movimientos.find(x => x.id == id);
-            if(!m) return;
             document.getElementById('editId').value = m.id;
             document.getElementById('fecha').value = new Date(m.fecha).toISOString().split('T')[0];
             document.getElementById('obraSelect').value = m.obra;
-            document.getElementById('tipoOperacion').value = m.operacion;
             document.getElementById('descripcion').value = m.desc;
             document.getElementById('cuenta').value = m.cuenta;
             document.getElementById('tipoMov').value = m.tipo;
-            document.getElementById('montoReal').value = m.monto.toFixed(2);
-            document.getElementById('montoVisual').value = m.monto.toLocaleString('es-AR', {minimumFractionDigits:2});
-            document.getElementById('btnGuardar').innerText = "Actualizar";
-            document.getElementById('btnCancelarEdit').classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.getElementById('montoReal').value = m.monto;
+            document.getElementById('montoVisual').value = m.monto.toLocaleString('es-AR');
+            document.getElementById('btnGuardar').innerText = "Actualizar Registro";
         }
 
         function cancelarEdicion() {
             document.getElementById('formMovimiento').reset();
             document.getElementById('editId').value = "";
-            document.getElementById('btnGuardar').innerText = "Guardar";
-            document.getElementById('btnCancelarEdit').classList.add('hidden');
+            document.getElementById('btnGuardar').innerText = "Guardar Datos";
         }
 
-        function filtrarYRecalcular() {
-            const b = document.getElementById("tablaFiltro").value.toLowerCase();
-            movMostrados = movimientos.filter(m => m.obra.toLowerCase().includes(b) || m.desc.toLowerCase().includes(b));
-            renderizarTabla();
-        }
-
-        function generarReporteObra() {
-            const obra = document.getElementById('reporteObraSelect').value;
-            const movs = movimientos.filter(m => m.obra === obra);
-            const ing = movs.filter(m => m.tipo === 'ingreso').reduce((a,b) => a+b.monto, 0);
-            const egr = movs.filter(m => m.tipo === 'egreso').reduce((a,b) => a+b.monto, 0);
-            document.getElementById('reporteContenido').classList.remove('hidden');
-            document.getElementById('repIngresos').innerText = "$ " + ing.toLocaleString('es-AR');
-            document.getElementById('repEgresos').innerText = "$ " + egr.toLocaleString('es-AR');
-            document.getElementById('repBalance').innerText = "$ " + (ing-egr).toLocaleString('es-AR');
-            if(chartObra) chartObra.destroy();
-            chartObra = new Chart(document.getElementById('chartObraDetalle'), {
-                type: 'bar', data: { labels: ['Ingresos', 'Egresos'], datasets: [{ data: [ing, egr], backgroundColor: ['#3b82f6', '#ef4444'] }] },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
-        }
-
+        // Formateador de moneda dinámico
         const vIn = document.getElementById('montoVisual');
         const rIn = document.getElementById('montoReal');
         vIn.addEventListener('input', (e) => {
