@@ -1,328 +1,209 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Gestión Constructora v3.5 - Cloud</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-        
-        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
-        .glass { background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        
-        /* Optimización Móvil Automática */
-        @media (max-width: 768px) { 
-            .main-layout { flex-direction: column !important; }
-            .side-panel { width: 100% !important; position: static !important; }
-            .content-panel { width: 100% !important; }
-            .card-grid { grid-template-columns: 1fr !important; }
-            .header-logo { height: 32px; }
-            td, th { padding: 8px 4px !important; font-size: 0.75rem; }
-        }
+<header class="bg-slate-900 text-white p-4 shadow-md flex justify-between items-center">
+    <h1 class="font-bold uppercase tracking-tight">Constructora - Control Cloud</h1>
+    <div class="text-[10px] bg-emerald-500 px-2 py-1 rounded font-bold">SINCRO ACTIVADA</div>
+</header>
 
-        /* Spinner de carga */
-        .loader { border: 3px solid #f3f3f3; border-top: 3px solid #3b82f6; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: none; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        .input-focus:focus { border-color: #3b82f6; ring: 2px solid #3b82f633; outline: none; }
-    </style>
-</head>
-<body class="min-h-screen flex flex-col">
-
-    <header class="bg-slate-900 text-white p-4 shadow-2xl flex justify-between items-center sticky top-0 z-50">
-        <div class="flex items-center gap-4">
-            <img src="tu-logo.png" alt="Logo" class="header-logo h-10 w-auto bg-white rounded p-1" onerror="this.src='https://via.placeholder.com/120x40?text=EMPRESA'">
+<main class="p-4 md:p-8 flex flex-col-mobile flex gap-6">
+    
+    <div class="w-full-mobile w-1/3 bg-white p-6 rounded-xl shadow-lg border-t-4 border-blue-600 h-fit">
+        <h2 class="font-bold text-gray-700 mb-4 uppercase text-sm">Registrar Operación</h2>
+        <form id="formMovimiento" class="space-y-4">
+            
+            <input type="date" id="fecha" required class="w-full p-3 border rounded-lg bg-gray-50">
+            
             <div>
-                <h1 class="font-bold text-lg leading-none uppercase tracking-tight">Control de Obras</h1>
-                <span class="text-[10px] text-blue-400 font-bold tracking-widest uppercase">Sistema Sincronizado</span>
-            </div>
-        </div>
-        <div class="flex items-center gap-2">
-            <span class="hidden md:inline text-[10px] font-bold text-slate-400">ESTADO:</span>
-            <div id="statusCloud" class="text-[10px] bg-emerald-500 text-white px-2 py-1 rounded-full font-bold animate-pulse">NUBE OK</div>
-        </div>
-    </header>
-
-    <main class="main-layout flex-grow p-4 md:p-8 flex flex-col md:flex-row gap-8">
-        
-        <div class="side-panel w-full md:w-1/3 glass p-6 h-fit md:sticky md:top-24 border-t-4 border-blue-600 shadow-md">
-            <h2 class="text-xl font-bold mb-6 text-slate-800 flex items-center gap-2 border-b pb-2">
-                <span>📝</span> Nuevo Registro
-            </h2>
-            
-            <form id="mainForm" class="space-y-4">
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="col-span-2">
-                        <label class="text-[10px] font-bold text-gray-500 uppercase ml-1">Fecha</label>
-                        <input type="date" id="fecha" required class="w-full mt-1 p-3 border rounded-lg bg-gray-50 input-focus">
-                    </div>
-
-                    <div class="col-span-2">
-                        <label class="text-[10px] font-bold text-gray-500 uppercase ml-1">Obra</label>
-                        <select id="obraSelect" required class="w-full mt-1 p-3 border rounded-lg bg-white input-focus"></select>
-                        <input type="text" id="obraNueva" placeholder="Nombre de obra nueva..." class="w-full mt-2 p-3 border border-blue-300 rounded-lg hidden bg-blue-50 input-focus">
-                    </div>
-
-                    <div class="col-span-2">
-                        <label class="text-[10px] font-bold text-gray-500 uppercase ml-1">Tipo de Operación</label>
-                        <select id="tipoOperacion" required class="w-full mt-1 p-3 border rounded-lg bg-white input-focus">
-                            <option value="" disabled selected>Seleccione categoría...</option>
-                            <option value="Cobro de pagos">Cobro de pagos</option>
-                            <option value="Pagos de jornales">Pagos de jornales</option>
-                            <option value="Materiales / insumos">Materiales / insumos</option>
-                            <option value="Otras operaciones">Otras operaciones</option>
-                        </select>
-                    </div>
-
-                    <div class="col-span-2">
-                        <label class="text-[10px] font-bold text-gray-500 uppercase ml-1">Descripción Detallada</label>
-                        <input type="text" id="descripcion" placeholder="Ej: Pago quincena oficiales" required class="w-full mt-1 p-3 border rounded-lg bg-gray-50 input-focus">
-                    </div>
-
-                    <div>
-                        <label class="text-[10px] font-bold text-gray-500 uppercase ml-1">Cuenta</label>
-                        <select id="cuenta" class="w-full mt-1 p-3 border rounded-lg bg-slate-50 font-semibold">
-                            <option value="Ivan">Ivan</option>
-                            <option value="Mario">Mario</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-bold text-gray-500 uppercase ml-1">Acción</label>
-                        <select id="tipoMov" class="w-full mt-1 p-3 border rounded-lg font-bold">
-                            <option value="ingreso" class="text-green-600">INGRESO (+)</option>
-                            <option value="egreso" class="text-red-600">EGRESO (-)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="pt-2">
-                    <label class="text-[10px] font-bold text-gray-500 uppercase ml-1">Monto de la Operación</label>
-                    <div class="relative mt-1">
-                        <span class="absolute left-4 top-3 text-slate-400 font-bold text-xl">$</span>
-                        <input type="text" id="montoDisplay" placeholder="0,00" required class="w-full p-4 pl-10 border-2 border-slate-200 rounded-xl text-3xl font-mono font-bold text-right bg-slate-50 text-slate-800 focus:border-blue-500 outline-none transition-all">
-                        <input type="hidden" id="montoReal">
-                    </div>
-                </div>
-
-                <button type="submit" id="btnGuardar" class="w-full bg-slate-800 hover:bg-black text-white font-bold py-5 rounded-2xl shadow-xl transition-all flex justify-center items-center gap-4 active:scale-95 group">
-                    <span id="btnText" class="tracking-widest">GUARDAR EN LA NUBE</span>
-                    <div id="loader" class="loader"></div>
-                </button>
-            </form>
-        </div>
-
-        <div class="content-panel w-full md:w-2/3 space-y-6">
-            
-            <div class="card-grid grid grid-cols-3 gap-4">
-                <div class="glass p-6 border-l-8 border-blue-500">
-                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Saldo Ivan</p>
-                    <p id="sIvan" class="text-2xl font-bold text-slate-800 mt-1">$ 0,00</p>
-                </div>
-                <div class="glass p-6 border-l-8 border-emerald-500">
-                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Saldo Mario</p>
-                    <p id="sMario" class="text-2xl font-bold text-slate-800 mt-1">$ 0,00</p>
-                </div>
-                <div class="glass p-6 bg-slate-800 text-white border-l-8 border-slate-600 shadow-xl">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Saldo Total</p>
-                    <p id="sTotal" class="text-2xl font-bold mt-1 text-emerald-400">$ 0,00</p>
-                </div>
+                <label class="text-[10px] font-bold text-gray-400 uppercase">Seleccionar Obra</label>
+                <select id="obraSelect" required class="w-full p-3 border rounded-lg bg-white mt-1">
+                    <option value="" disabled selected>Cargando obras...</option>
+                </select>
+                <input type="text" id="obraNuevaInput" placeholder="Escriba el nombre de la obra nueva..." class="w-full mt-2 p-3 border border-blue-400 rounded-lg hidden bg-blue-50">
             </div>
 
-            <div class="glass flex flex-col min-h-[500px] overflow-hidden shadow-sm border border-slate-200">
-                <div class="p-5 border-b bg-gray-50 flex justify-between items-center">
-                    <h3 class="font-bold text-slate-700 uppercase text-xs tracking-widest flex items-center gap-2">
-                        <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
-                        Movimientos Sincronizados
-                    </h3>
-                    <button onclick="cargarDatos()" class="text-blue-600 text-xs font-bold hover:bg-blue-50 px-3 py-1 rounded transition">🔄 Actualizar</button>
-                </div>
-                
-                <div class="overflow-x-auto flex-grow">
-                    <table class="w-full text-left">
-                        <thead class="bg-slate-100 sticky top-0 text-[10px] text-slate-500 uppercase font-bold border-b">
-                            <tr>
-                                <th class="p-4">Obra / Operación</th>
-                                <th class="p-4">Detalle / Descripción</th>
-                                <th class="p-4 text-right">Monto</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tablaBody" class="divide-y text-xs md:text-sm">
-                            </tbody>
-                    </table>
-                </div>
+            <select id="tipoOperacion" required class="w-full p-3 border rounded-lg bg-white">
+                <option value="" disabled selected>Tipo de Operación...</option>
+                <option value="Cobro de pagos">Cobro de pagos</option>
+                <option value="Pagos de jornales">Pagos de jornales</option>
+                <option value="Materiales / insumos">Materiales / insumos</option>
+                <option value="Otras operaciones">Otras operaciones</option>
+            </select>
+
+            <input type="text" id="descripcion" placeholder="Descripción / Detalle" required class="w-full p-3 border rounded-lg bg-gray-50">
+            
+            <div class="grid grid-cols-2 gap-2">
+                <select id="cuenta" class="p-3 border rounded-lg">
+                    <option value="Ivan">Ivan</option>
+                    <option value="Mario">Mario</option>
+                </select>
+                <select id="tipoMov" class="p-3 border rounded-lg font-bold">
+                    <option value="ingreso" class="text-green-600">INGRESO (+)</option>
+                    <option value="egreso" class="text-red-600">EGRESO (-)</option>
+                </select>
+            </div>
+
+            <input type="number" id="monto" placeholder="Monto $ 0.00" step="0.01" required class="w-full p-4 border-2 border-slate-200 rounded-xl text-2xl font-bold text-right text-slate-800 bg-slate-50">
+            
+            <button type="submit" id="btnGuardar" class="w-full bg-blue-600 hover:bg-blue-800 text-white font-bold py-4 rounded-xl shadow-lg transition-all active:scale-95">
+                GUARDAR EN LA NUBE
+            </button>
+        </form>
+    </div>
+
+    <div class="w-full-mobile w-2/3 space-y-6">
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div class="bg-white p-4 rounded-lg shadow border-l-4 border-blue-500">
+                <p class="text-[10px] font-bold text-gray-400">CAJA IVAN</p>
+                <p id="saldoIvan" class="text-xl font-bold text-slate-800">$ 0,00</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow border-l-4 border-emerald-500">
+                <p class="text-[10px] font-bold text-gray-400">CAJA MARIO</p>
+                <p id="saldoMario" class="text-xl font-bold text-slate-800">$ 0,00</p>
+            </div>
+            <div class="bg-slate-800 text-white p-4 rounded-lg shadow col-span-2 md:col-span-1 border-l-4 border-orange-500">
+                <p class="text-[10px] font-bold text-slate-400">TOTAL EMPRESA</p>
+                <p id="saldoTotal" class="text-xl font-bold text-orange-400">$ 0,00</p>
             </div>
         </div>
-    </main>
 
-    <script>
-        // --- CONFIGURACIÓN CLOUD ---
-        // PEGA AQUÍ LA URL QUE COPIASTE DE GOOGLE APPS SCRIPT
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbynyTLycYStCGfYLVWodAniGJxv52k-2xiRxQhF4zTYTk33drfWvUf_lbKOCq4uLYniRA/exec"; 
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200">
+            <div class="p-3 bg-gray-50 border-b flex justify-between items-center">
+                <span class="text-xs font-bold text-gray-500 uppercase">Movimientos Recientes</span>
+                <button onclick="cargarDatos()" class="text-[10px] bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200">ACTUALIZAR NUBE</button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-xs md:text-sm text-left">
+                    <thead class="bg-gray-100 text-gray-600 uppercase text-[10px]">
+                        <tr>
+                            <th class="p-4">Obra / Operación</th>
+                            <th class="p-4">Detalle</th>
+                            <th class="p-4 text-right">Monto</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaBody" class="divide-y"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
 
-        let movimientos = [];
+<script>
+    // PEGA TU URL DE GOOGLE AQUÍ
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbynyTLycYStCGfYLVWodAniGJxv52k-2xiRxQhF4zTYTk33drfWvUf_lbKOCq4uLYniRA/exec"; 
 
-        // --- MÁSCARA DE MONEDA (Puntos de miles y Coma decimal) ---
-        const display = document.getElementById('montoDisplay');
-        const real = document.getElementById('montoReal');
-        
-        display.addEventListener('input', (e) => {
-            let value = e.target.value.replace(/\D/g, ""); // Solo números
-            let floatValue = parseFloat(value) / 100;
-            
-            if (isNaN(floatValue)) {
-                real.value = 0;
-                e.target.value = "";
-                return;
-            }
+    let movimientos = [];
 
-            real.value = floatValue;
-            e.target.value = floatValue.toLocaleString('es-AR', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
+    // Referencias elementos de Obra
+    const selectObra = document.getElementById('obraSelect');
+    const inputObraNueva = document.getElementById('obraNuevaInput');
+
+    // Lógica de mostrar/ocultar input de obra nueva
+    selectObra.onchange = () => {
+        if (selectObra.value === "NUEVA") {
+            inputObraNueva.classList.remove('hidden');
+            inputObraNueva.required = true;
+            inputObraNueva.focus();
+        } else {
+            inputObraNueva.classList.add('hidden');
+            inputObraNueva.required = false;
+        }
+    };
+
+    async function cargarDatos() {
+        try {
+            const response = await fetch(WEB_APP_URL);
+            const data = await response.json();
+            movimientos = data.map(r => ({
+                id: r[0], fecha: r[1], obra: r[2], operacion: r[3], 
+                desc: r[4], cuenta: r[5], tipo: r[6], monto: parseFloat(r[7])
+            }));
+            actualizarInterfaz();
+        } catch (e) {
+            console.log("Error al conectar con la nube. Verifica la URL.");
+            // Si falla, mostramos el menú vacío pero con la opción de agregar
+            actualizarListaObras([]);
+        }
+    }
+
+    document.getElementById('formMovimiento').onsubmit = async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('btnGuardar');
+        btn.innerText = "ENVIANDO...";
+        btn.disabled = true;
+
+        const obraFinal = selectObra.value === "NUEVA" ? inputObraNueva.value.trim() : selectObra.value;
+
+        const mov = {
+            id: Date.now(),
+            fecha: document.getElementById('fecha').value,
+            obra: obraFinal,
+            operacion: document.getElementById('tipoOperacion').value,
+            descripcion: document.getElementById('descripcion').value,
+            cuenta: document.getElementById('cuenta').value,
+            tipo: document.getElementById('tipoMov').value,
+            monto: parseFloat(document.getElementById('monto').value)
+        };
+
+        try {
+            await fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(mov) });
+            movimientos.push({
+                id: mov.id, fecha: mov.fecha, obra: mov.obra, operacion: mov.operacion, 
+                desc: mov.descripcion, cuenta: mov.cuenta, tipo: mov.tipo, monto: mov.monto
             });
+            e.target.reset();
+            inputObraNueva.classList.add('hidden');
+            setFechaHoy();
+            actualizarInterfaz();
+            alert("✓ Registro exitoso");
+        } catch (err) {
+            alert("Error de conexión");
+        }
+        btn.innerText = "GUARDAR EN LA NUBE";
+        btn.disabled = false;
+    };
+
+    function actualizarInterfaz() {
+        const tbody = document.getElementById('tablaBody');
+        tbody.innerHTML = '';
+        let sIvan = 0, sMario = 0;
+
+        [...movimientos].reverse().forEach(m => {
+            const val = m.tipo === 'ingreso' ? m.monto : -m.monto;
+            if(m.cuenta === 'Ivan') sIvan += val; else sMario += val;
+
+            tbody.innerHTML += `
+                <tr class="hover:bg-gray-50 border-b">
+                    <td class="p-4 font-bold text-slate-800">${m.obra}<br><span class="text-[9px] text-blue-600 uppercase font-extrabold">${m.operacion}</span></td>
+                    <td class="p-4 text-gray-500">${m.desc}<br><span class="text-[9px] uppercase font-bold">${m.fecha} | ${m.cuenta}</span></td>
+                    <td class="p-4 text-right font-bold ${m.tipo === 'ingreso' ? 'text-green-600' : 'text-red-600'}">
+                        ${m.tipo === 'ingreso' ? '+' : '-'} $${m.monto.toLocaleString('es-AR', {minimumFractionDigits: 2})}
+                    </td>
+                </tr>`;
         });
 
-        // --- MANEJO DE SELECCIÓN DE OBRAS ---
-        const sObra = document.getElementById('obraSelect');
-        const nObra = document.getElementById('obraNueva');
+        document.getElementById('saldoIvan').innerText = "$ " + sIvan.toLocaleString('es-AR', {minimumFractionDigits: 2});
+        document.getElementById('saldoMario').innerText = "$ " + sMario.toLocaleString('es-AR', {minimumFractionDigits: 2});
+        document.getElementById('saldoTotal').innerText = "$ " + (sIvan + sMario).toLocaleString('es-AR', {minimumFractionDigits: 2});
+
+        actualizarListaObras([...new Set(movimientos.map(m => m.obra))]);
+    }
+
+    function actualizarListaObras(obrasUnicas) {
+        const valorActual = selectObra.value;
+        selectObra.innerHTML = '<option value="" disabled selected>Seleccione Obra...</option>';
         
-        sObra.addEventListener('change', () => {
-            if(sObra.value === 'NUEVA') {
-                nObra.classList.remove('hidden');
-                nObra.required = true;
-                nObra.focus();
-            } else {
-                nObra.classList.add('hidden');
-                nObra.required = false;
-            }
+        obrasUnicas.filter(Boolean).sort().forEach(o => {
+            selectObra.innerHTML += `<option value="${o}">${o}</option>`;
         });
 
-        // --- CARGAR DATOS DESDE GOOGLE SHEETS (GET) ---
-        async function cargarDatos() {
-            document.getElementById('statusCloud').innerText = "SINCRONIZANDO...";
-            document.getElementById('statusCloud').classList.replace('bg-emerald-500', 'bg-orange-500');
-
-            try {
-                const response = await fetch(WEB_APP_URL);
-                const data = await response.json();
-                
-                // Mapeo de datos (ID, Fecha, Obra, Operación, Descripción, Cuenta, Tipo, Monto)
-                movimientos = data.map(r => ({
-                    id: r[0], fecha: r[1], obra: r[2], operacion: r[3], 
-                    descripcion: r[4], cuenta: r[5], tipo: r[6], monto: parseFloat(r[7])
-                }));
-                
-                render();
-                document.getElementById('statusCloud').innerText = "NUBE OK";
-                document.getElementById('statusCloud').classList.replace('bg-orange-500', 'bg-emerald-500');
-            } catch (e) { 
-                console.error("Error cargando datos:", e);
-                document.getElementById('statusCloud').innerText = "ERROR DE CONEXIÓN";
-                document.getElementById('statusCloud').classList.replace('bg-emerald-500', 'bg-red-500');
-            }
-        }
-
-        // --- GUARDAR NUEVO REGISTRO (POST) ---
-        document.getElementById('mainForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const btn = document.getElementById('btnGuardar');
-            const loader = document.getElementById('loader');
-            const txt = document.getElementById('btnText');
-
-            const obraFinal = sObra.value === 'NUEVA' ? nObra.value.trim() : sObra.value;
-            
-            const mov = {
-                id: Date.now(),
-                fecha: document.getElementById('fecha').value,
-                obra: obraFinal,
-                operacion: document.getElementById('tipoOperacion').value,
-                descripcion: document.getElementById('descripcion').value.trim(),
-                cuenta: document.getElementById('cuenta').value,
-                tipo: document.getElementById('tipoMov').value,
-                monto: parseFloat(real.value)
-            };
-
-            // Animación de envío
-            btn.disabled = true;
-            loader.style.display = "block";
-            txt.innerText = "ENVIANDO DATOS...";
-
-            try {
-                // Envío real a la nube
-                await fetch(WEB_APP_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: JSON.stringify(mov)
-                });
-                
-                // Actualización inmediata en pantalla (simulada hasta recargar)
-                movimientos.push(mov);
-                this.reset();
-                setHoy();
-                nObra.classList.add('hidden');
-                render();
-                alert("✓ Registro guardado y sincronizado.");
-            } catch (err) {
-                alert("❌ Error al guardar. Verifica tu conexión.");
-            } finally {
-                btn.disabled = false;
-                loader.style.display = "none";
-                txt.innerText = "GUARDAR EN LA NUBE";
-            }
-        });
-
-        // --- RENDERIZAR INTERFAZ ---
-        function render() {
-            const tbody = document.getElementById('tablaBody');
-            tbody.innerHTML = '';
-            let si=0, sm=0;
-
-            // Ordenar: lo más nuevo arriba
-            [...movimientos].sort((a,b) => new Date(b.fecha) - new Date(a.fecha)).reverse().forEach(m => {
-                const montoNum = parseFloat(m.monto);
-                const val = m.tipo === 'ingreso' ? montoNum : -montoNum;
-                
-                if(m.cuenta === 'Ivan') si += val; else sm += val;
-
-                tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50 transition border-b border-slate-100">
-                        <td class="p-4">
-                            <div class="font-bold text-slate-800">${m.obra}</div>
-                            <div class="text-[9px] text-blue-600 font-bold uppercase tracking-widest mt-1">${m.operacion}</div>
-                        </td>
-                        <td class="p-4 text-slate-600">
-                            <span class="font-medium">${m.descripcion}</span><br>
-                            <span class="text-[9px] text-slate-400 font-bold uppercase">${m.fecha} | CAJA: ${m.cuenta}</span>
-                        </td>
-                        <td class="p-4 text-right font-mono font-bold ${m.tipo === 'ingreso' ? 'text-emerald-600' : 'text-red-600'}">
-                            ${m.tipo === 'ingreso' ? '+' : '-'} $${montoNum.toLocaleString('es-AR', {minimumFractionDigits: 2})}
-                        </td>
-                    </tr>`;
-            });
-
-            // Actualizar Salderos de las tarjetas
-            document.getElementById('sIvan').innerText = `$ ${si.toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
-            document.getElementById('sMario').innerText = `$ ${sm.toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
-            document.getElementById('sTotal').innerText = `$ ${(si+sm).toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
-            
-            // Actualizar lista de obras dinámica
-            const obras = [...new Set(movimientos.map(m => m.obra))].filter(Boolean).sort();
-            sObra.innerHTML = '<option value="" disabled selected>Seleccione Obra...</option>';
-            obras.forEach(o => sObra.innerHTML += `<option value="${o}">${o}</option>`);
-            sObra.innerHTML += '<option value="NUEVA" class="text-blue-600 font-bold">➕ AGREGAR OBRA NUEVA</option>';
-        }
-
-        function setHoy() {
-            const hoy = new Date();
-            document.getElementById('fecha').value = hoy.toISOString().split('T')[0];
-        }
+        selectObra.innerHTML += '<option value="NUEVA" class="text-blue-600 font-bold">+ AGREGAR NUEVA OBRA</option>';
         
-        // Carga inicial
-        setHoy();
-        cargarDatos();
-    </script>
-</body>
+        // Intentar mantener la selección si no era "NUEVA"
+        if (valorActual && valorActual !== "NUEVA") selectObra.value = valorActual;
+    }
 
-</html>
+    function setFechaHoy() {
+        document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
+    }
+
+    setFechaHoy();
+    cargarDatos();
+</script>
