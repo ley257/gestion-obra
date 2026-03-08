@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Constructora Pro v11.0 - Formato Real</title>
+    <title>Constructora Pro v11.5 - Secure Access</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -14,144 +14,186 @@
         .nav-link.active { color: #3b82f6; border-top: 4px solid #3b82f6; }
         @media (min-width: 768px) { .nav-link.active { background: #0f172a; border-left: 4px solid #3b82f6; border-top: none; color: white; } }
         .chart-box { position: relative; height: 260px !important; width: 100%; }
-        .badge-ivan { background: #3b82f6; color: white; padding: 4px 10px; border-radius: 8px; font-weight: 900; font-size: 10px; }
-        .badge-mario { background: #10b981; color: white; padding: 4px 10px; border-radius: 8px; font-weight: 900; font-size: 10px; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        
+        /* Estilos Login */
+        #loginOverlay {
+            background: radial-gradient(circle at top right, #1e293b, #0f172a);
+        }
     </style>
 </head>
 <body class="bg-slate-100 flex flex-col">
 
-    <header class="h-16 bg-slate-900 text-white flex justify-between items-center px-4 shrink-0 z-50 shadow-lg">
-        <h1 class="font-black text-blue-500 italic text-sm md:text-lg uppercase tracking-tighter">Constructora Master</h1>
-        <div id="statusCloud" class="text-[9px] bg-emerald-600 px-3 py-1 rounded-full font-black text-white italic">v11.0 ONLINE</div>
-    </header>
-
-    <div class="flex flex-col md:flex-row flex-grow overflow-hidden">
-        
-        <nav class="fixed bottom-0 left-0 w-full h-[70px] bg-slate-900 md:relative md:w-64 md:h-full flex md:flex-col justify-around md:justify-start md:pt-6 z-50">
-            <button onclick="showPage('registro')" id="btn-registro" class="nav-link active flex flex-col md:flex-row items-center gap-2 md:p-5 text-slate-400">
-                <i class="fas fa-cash-register text-xl"></i><span class="text-[10px] font-bold uppercase">Caja</span>
-            </button>
-            <button onclick="showPage('presupuestos')" id="btn-presupuestos" class="nav-link flex flex-col md:flex-row items-center gap-2 md:p-5 text-slate-400">
-                <i class="fas fa-tasks text-xl"></i><span class="text-[10px] font-bold uppercase">Obras</span>
-            </button>
-            <button onclick="showPage('graficas')" id="btn-graficas" class="nav-link flex flex-col md:flex-row items-center gap-2 md:p-5 text-slate-400">
-                <i class="fas fa-chart-line text-xl"></i><span class="text-[10px] font-bold uppercase">Balance</span>
-            </button>
-        </nav>
-
-        <main class="flex-grow main-content p-4 overflow-y-auto bg-slate-100 no-scrollbar">
-            
-            <div id="page-registro" class="space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="bg-white p-4 rounded-2xl shadow border-l-4 border-blue-500"><span class="text-[9px] font-black text-slate-400 uppercase">Ivan</span><p id="saldoIvan" class="text-xl font-black text-slate-800">$ 0</p></div>
-                    <div class="bg-white p-4 rounded-2xl shadow border-l-4 border-emerald-500"><span class="text-[9px] font-black text-slate-400 uppercase">Mario</span><p id="saldoMario" class="text-xl font-black text-slate-800">$ 0</p></div>
-                    <div class="bg-slate-800 p-4 rounded-2xl shadow"><span class="text-[9px] font-black text-slate-500 uppercase">Total</span><p id="saldoTotal" class="text-xl font-black text-orange-400">$ 0</p></div>
+    <div id="loginOverlay" class="fixed inset-0 z-[100] flex items-center justify-center p-6">
+        <div class="w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden">
+            <div class="bg-slate-900 p-8 text-center">
+                <div class="inline-block p-4 bg-blue-600 rounded-2xl mb-4 shadow-lg shadow-blue-500/20">
+                    <i class="fas fa-hard-hat text-white text-3xl"></i>
                 </div>
+                <h2 class="text-white font-black text-xl uppercase tracking-tighter italic">Panel de Control</h2>
+                <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mt-1">Constructora Master v11.5</p>
+            </div>
+            <div class="p-8 space-y-4">
+                <div id="loginError" class="hidden bg-red-50 text-red-500 text-[11px] font-black p-3 rounded-xl border border-red-100 text-center uppercase">
+                    Usuario o clave incorrectos
+                </div>
+                <div>
+                    <label class="text-[10px] font-black text-slate-400 uppercase ml-1">Usuario</label>
+                    <input type="text" id="userInput" placeholder="Nombre de usuario" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-blue-500 outline-none transition-all">
+                </div>
+                <div>
+                    <label class="text-[10px] font-black text-slate-400 uppercase ml-1">Contraseña</label>
+                    <input type="password" id="passInput" placeholder="••••••••" class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-bold focus:border-blue-500 outline-none transition-all">
+                </div>
+                <button onclick="handleLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-2xl shadow-xl shadow-blue-600/20 uppercase text-xs tracking-[0.2em] transition-all active:scale-95">
+                    Entrar al Sistema
+                </button>
+            </div>
+        </div>
+    </div>
 
-                <div class="flex flex-col lg:flex-row gap-6">
-                    <div class="w-full lg:w-80 bg-white p-6 rounded-3xl shadow-xl border-t-8 border-blue-600">
-                        <form id="formMovimiento" class="space-y-4">
-                            <h3 class="font-black text-slate-800 text-[10px] uppercase tracking-widest italic mb-2">Nuevo Registro</h3>
-                            <input type="date" id="fecha" required class="w-full p-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-sm font-bold">
-                            
-                            <select id="obraSelect" required class="w-full p-3 border-2 border-slate-100 rounded-xl text-sm font-bold bg-white"></select>
-                            <input type="text" id="obraNuevaInput" placeholder="Nombre obra nueva..." class="w-full p-3 border-2 border-blue-300 rounded-xl hidden bg-blue-50 italic text-sm">
-                            
-                            <select id="tipoOperacion" required class="w-full p-3 border-2 border-slate-100 rounded-xl text-sm font-bold bg-white">
-                                <option value="" disabled selected>Operación...</option>
-                                <option value="Cobro de pagos">Cobro de pagos</option>
-                                <option value="Pagos de jornales">Pagos de jornales</option>
-                                <option value="Materiales / insumos">Materiales / insumos</option>
-                                <option value="Otras operaciones">Otras operaciones</option>
-                            </select>
+    <div id="mainApp" class="hidden flex flex-col h-full">
+        
+        <header class="h-16 bg-slate-900 text-white flex justify-between items-center px-4 shrink-0 z-50 shadow-lg">
+            <h1 class="font-black text-blue-500 italic text-sm md:text-lg uppercase tracking-tighter">Constructora Master</h1>
+            <div class="flex items-center gap-3">
+                <div id="statusCloud" class="hidden md:block text-[9px] bg-emerald-600 px-3 py-1 rounded-full font-black text-white italic">CONECTADO</div>
+                <button onclick="logout()" class="text-slate-400 hover:text-white transition-colors"><i class="fas fa-sign-out-alt"></i></button>
+            </div>
+        </header>
 
-                            <input type="text" id="descripcion" placeholder="Detalle..." required class="w-full p-3 border-2 border-slate-100 rounded-xl text-sm font-medium">
+        <div class="flex flex-col md:flex-row flex-grow overflow-hidden">
+            <nav class="fixed bottom-0 left-0 w-full h-[70px] bg-slate-900 md:relative md:w-64 md:h-full flex md:flex-col justify-around md:justify-start md:pt-6 z-50">
+                <button onclick="showPage('registro')" id="btn-registro" class="nav-link active flex flex-col md:flex-row items-center gap-2 md:p-5 text-slate-400">
+                    <i class="fas fa-cash-register text-xl"></i><span class="text-[10px] font-bold uppercase">Caja</span>
+                </button>
+                <button onclick="showPage('presupuestos')" id="btn-presupuestos" class="nav-link flex flex-col md:flex-row items-center gap-2 md:p-5 text-slate-400">
+                    <i class="fas fa-tasks text-xl"></i><span class="text-[10px] font-bold uppercase">Obras</span>
+                </button>
+                <button onclick="showPage('graficas')" id="btn-graficas" class="nav-link flex flex-col md:flex-row items-center gap-2 md:p-5 text-slate-400">
+                    <i class="fas fa-chart-line text-xl"></i><span class="text-[10px] font-bold uppercase">Balance</span>
+                </button>
+            </nav>
 
-                            <div class="grid grid-cols-2 gap-2">
-                                <select id="cuenta" class="p-3 border-2 border-slate-100 rounded-xl font-black text-xs"><option value="Ivan">Ivan</option><option value="Mario">Mario</option></select>
-                                <select id="tipoMov" class="p-3 border-2 border-slate-100 rounded-xl font-black text-xs text-blue-600"><option value="ingreso">Ingreso (+)</option><option value="egreso">Egreso (-)</option></select>
-                            </div>
-
-                            <div class="relative">
-                                <span class="absolute left-4 top-4 text-slate-300 font-black text-xl">$</span>
-                                <input type="text" id="montoVisual" placeholder="0,00" required class="w-full p-4 pl-10 border-4 border-slate-50 rounded-2xl text-2xl font-black text-right text-slate-800 bg-slate-50 outline-none focus:border-blue-200 transition-all">
-                                <input type="hidden" id="montoReal">
-                            </div>
-
-                            <button type="submit" id="btnGuardar" class="w-full bg-slate-900 text-white font-black py-4 rounded-xl shadow-lg active:scale-95 uppercase text-xs tracking-widest transition-all">Sincronizar Datos</button>
-                        </form>
+            <main class="flex-grow main-content p-4 overflow-y-auto bg-slate-100 no-scrollbar">
+                
+                <div id="page-registro" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-white p-4 rounded-2xl shadow border-l-4 border-blue-500"><span class="text-[9px] font-black text-slate-400 uppercase">Ivan</span><p id="saldoIvan" class="text-xl font-black text-slate-800">$ 0</p></div>
+                        <div class="bg-white p-4 rounded-2xl shadow border-l-4 border-emerald-500"><span class="text-[9px] font-black text-slate-400 uppercase">Mario</span><p id="saldoMario" class="text-xl font-black text-slate-800">$ 0</p></div>
+                        <div class="bg-slate-800 p-4 rounded-2xl shadow"><span class="text-[9px] font-black text-slate-500 uppercase">Total</span><p id="saldoTotal" class="text-xl font-black text-orange-400">$ 0</p></div>
                     </div>
 
-                    <div class="flex-grow bg-white rounded-3xl shadow-lg overflow-hidden border border-slate-200">
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left">
-                                <thead class="bg-slate-50 text-[9px] font-black uppercase text-slate-500 border-b">
-                                    <tr><th class="p-4">Obra / Fecha</th><th class="p-4 text-center">Cuenta</th><th class="p-4 text-right">Monto</th></tr>
-                                </thead>
-                                <tbody id="tablaBody" class="text-xs divide-y divide-slate-50 font-medium"></tbody>
-                            </table>
+                    <div class="flex flex-col lg:flex-row gap-6">
+                        <div class="w-full lg:w-80 bg-white p-6 rounded-3xl shadow-xl border-t-8 border-blue-600">
+                            <form id="formMovimiento" class="space-y-4">
+                                <h3 class="font-black text-slate-800 text-[10px] uppercase tracking-widest italic mb-2">Nuevo Registro</h3>
+                                <input type="date" id="fecha" required class="w-full p-3 bg-slate-50 border-2 border-slate-100 rounded-xl text-sm font-bold">
+                                <select id="obraSelect" required class="w-full p-3 border-2 border-slate-100 rounded-xl text-sm font-bold bg-white"></select>
+                                <input type="text" id="obraNuevaInput" placeholder="Nombre obra nueva..." class="w-full p-3 border-2 border-blue-300 rounded-xl hidden bg-blue-50 italic text-sm">
+                                <select id="tipoOperacion" required class="w-full p-3 border-2 border-slate-100 rounded-xl text-sm font-bold bg-white">
+                                    <option value="" disabled selected>Operación...</option>
+                                    <option value="Cobro de pagos">Cobro de pagos</option>
+                                    <option value="Pagos de jornales">Pagos de jornales</option>
+                                    <option value="Materiales / insumos">Materiales / insumos</option>
+                                    <option value="Otras operaciones">Otras operaciones</option>
+                                </select>
+                                <input type="text" id="descripcion" placeholder="Detalle..." required class="w-full p-3 border-2 border-slate-100 rounded-xl text-sm font-medium">
+                                <div class="grid grid-cols-2 gap-2">
+                                    <select id="cuenta" class="p-3 border-2 border-slate-100 rounded-xl font-black text-xs"><option value="Ivan">Ivan</option><option value="Mario">Mario</option></select>
+                                    <select id="tipoMov" class="p-3 border-2 border-slate-100 rounded-xl font-black text-xs text-blue-600"><option value="ingreso">Ingreso (+)</option><option value="egreso">Egreso (-)</option></select>
+                                </div>
+                                <div class="relative">
+                                    <span class="absolute left-4 top-4 text-slate-300 font-black text-xl">$</span>
+                                    <input type="text" id="montoVisual" placeholder="0,00" required class="w-full p-4 pl-10 border-4 border-slate-50 rounded-2xl text-2xl font-black text-right text-slate-800 bg-slate-50 outline-none">
+                                    <input type="hidden" id="montoReal">
+                                </div>
+                                <button type="submit" id="btnGuardar" class="w-full bg-slate-900 text-white font-black py-4 rounded-xl shadow-lg active:scale-95 uppercase text-xs tracking-widest">Sincronizar Datos</button>
+                            </form>
+                        </div>
+
+                        <div class="flex-grow bg-white rounded-3xl shadow-lg overflow-hidden border border-slate-200">
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left">
+                                    <thead class="bg-slate-50 text-[9px] font-black uppercase text-slate-500 border-b">
+                                        <tr><th class="p-4">Obra / Fecha</th><th class="p-4 text-center">Cuenta</th><th class="p-4 text-right">Monto</th></tr>
+                                    </thead>
+                                    <tbody id="tablaBody" class="text-xs divide-y divide-slate-50 font-medium"></tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div id="page-presupuestos" class="hidden space-y-4">
-                <div class="bg-slate-900 p-6 rounded-3xl text-white shadow-2xl border-b-8 border-blue-500">
-                    <p class="text-[10px] font-black text-blue-400 uppercase tracking-widest">Cobranzas Estimadas (30 días)</p>
-                    <p id="proyeccion30" class="text-4xl font-black tracking-tighter">$ 0</p>
+                <div id="page-presupuestos" class="hidden space-y-4">
+                    <div class="bg-slate-900 p-6 rounded-3xl text-white shadow-2xl border-b-8 border-blue-500">
+                        <p class="text-[10px] font-black text-blue-400 uppercase tracking-widest">Cobranzas Estimadas (30 días)</p>
+                        <p id="proyeccion30" class="text-4xl font-black tracking-tighter">$ 0</p>
+                    </div>
+                    <div id="containerPresupuestos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
                 </div>
-                <div id="containerPresupuestos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-            </div>
 
-            <div id="page-graficas" class="hidden space-y-6">
-                <div class="bg-white p-5 rounded-3xl shadow-lg flex flex-col md:flex-row justify-between items-center gap-4">
-                    <select id="filtroObra" onchange="updateCharts()" class="w-full md:w-auto p-3 border-2 rounded-xl text-xs font-black uppercase bg-slate-50"></select>
-                    <div class="text-right">
-                        <p class="text-[9px] font-black text-slate-400 uppercase">Rentabilidad</p>
-                        <p id="rentabilidadValor" class="text-3xl font-black">$ 0,00</p>
+                <div id="page-graficas" class="hidden space-y-6">
+                    <div class="bg-white p-5 rounded-3xl shadow-lg flex flex-col md:flex-row justify-between items-center gap-4">
+                        <select id="filtroObra" onchange="updateCharts()" class="w-full md:w-auto p-3 border-2 rounded-xl text-xs font-black uppercase bg-slate-50"></select>
+                        <div class="text-right">
+                            <p class="text-[9px] font-black text-slate-400 uppercase">Rentabilidad</p>
+                            <p id="rentabilidadValor" class="text-3xl font-black">$ 0,00</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white p-6 rounded-3xl shadow-md border border-slate-100">
+                            <p class="text-center font-black text-slate-500 text-[10px] uppercase mb-6 tracking-widest">Ingresos vs Gastos</p>
+                            <div class="chart-box" id="chartBoxBar"><canvas id="chartBarras"></canvas></div>
+                        </div>
+                        <div class="bg-white p-6 rounded-3xl shadow-md border border-slate-100">
+                            <p class="text-center font-black text-slate-500 text-[10px] uppercase mb-6 tracking-widest">Distribución de Gastos</p>
+                            <div class="chart-box" id="chartBoxPie"><canvas id="chartTorta"></canvas></div>
+                        </div>
                     </div>
                 </div>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-3xl shadow-md border border-slate-100">
-                        <p class="text-center font-black text-slate-500 text-[10px] uppercase mb-6 tracking-widest">Ingresos vs Gastos</p>
-                        <div class="chart-box" id="chartBoxBar"><canvas id="chartBarras"></canvas></div>
-                    </div>
-                    <div class="bg-white p-6 rounded-3xl shadow-md border border-slate-100">
-                        <p class="text-center font-black text-slate-500 text-[10px] uppercase mb-6 tracking-widest">Distribución de Gastos</p>
-                        <div class="chart-box" id="chartBoxPie"><canvas id="chartTorta"></canvas></div>
-                    </div>
-                </div>
-            </div>
-        </main>
+            </main>
+        </div>
     </div>
 
     <script>
+        // --- LOGICA DE LOGIN ---
+        function handleLogin() {
+            const user = document.getElementById('userInput').value;
+            const pass = document.getElementById('passInput').value;
+            const error = document.getElementById('loginError');
+
+            if(user === 'admin' && pass === '1234') {
+                sessionStorage.setItem('isLogged', 'true');
+                document.getElementById('loginOverlay').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                cargarDatos();
+            } else {
+                error.classList.remove('hidden');
+                setTimeout(() => { error.classList.add('hidden'); }, 3000);
+            }
+        }
+
+        function logout() {
+            sessionStorage.removeItem('isLogged');
+            location.reload();
+        }
+
+        // --- RESTO DE LA LOGICA DEL SISTEMA ---
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzbYMOqEUdxIcv8We4PbbvTc7441LPn2e_bw6OsIGUhwBDfve1IRaD5zrQCDzXQaEk05A/exec";
         let movimientos = [];
         let pLocal = JSON.parse(localStorage.getItem('presupuestos_v10.7')) || {};
         let chartBarras = null, chartTorta = null;
 
-        // LÓGICA DE SEPARADOR DE MILES (PUNTO) Y DECIMALES (COMA)
         const vInput = document.getElementById('montoVisual');
         const rInput = document.getElementById('montoReal');
 
         vInput.addEventListener('input', (e) => {
-            let value = e.target.value.replace(/\D/g, ""); // Solo números
+            let value = e.target.value.replace(/\D/g, "");
             let numericValue = parseFloat(value) / 100;
-            
-            if (isNaN(numericValue)) {
-                rInput.value = 0;
-                vInput.value = "";
-                return;
-            }
-
+            if (isNaN(numericValue)) { rInput.value = 0; vInput.value = ""; return; }
             rInput.value = numericValue.toFixed(2);
-            
-            // Formatear: Puntos para miles, coma para decimales
-            vInput.value = numericValue.toLocaleString('es-AR', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            });
+            vInput.value = numericValue.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         });
 
         function showPage(p) {
@@ -159,7 +201,6 @@
             document.querySelectorAll('.nav-link').forEach(btn => btn.classList.remove('active'));
             document.getElementById('page-'+p).classList.remove('hidden');
             document.getElementById('btn-'+p).classList.add('active');
-            
             if(p === 'graficas') setTimeout(updateCharts, 200);
             if(p === 'presupuestos') renderPresupuestos();
         }
@@ -206,7 +247,6 @@
             rVal.innerText = "$ " + (ing-egr).toLocaleString('es-AR', {minimumFractionDigits:2});
             rVal.className = `text-3xl font-black ${ing-egr >= 0 ? 'text-emerald-500' : 'text-red-500'}`;
 
-            // Reset de contenedores para asegurar visibilidad
             document.getElementById('chartBoxBar').innerHTML = '<canvas id="chartBarras"></canvas>';
             document.getElementById('chartBoxPie').innerHTML = '<canvas id="chartTorta"></canvas>';
 
@@ -243,7 +283,6 @@
                     <h4 class="font-black text-xs uppercase text-slate-700">${o}</h4>
                     <p class="text-orange-500 font-black text-lg mt-1">$ ${(p.total - cob).toLocaleString('es-AR')}</p>
                     <div class="w-full bg-slate-100 h-2 mt-4 rounded-full overflow-hidden"><div class="bg-blue-600 h-full" style="width:${por}%"></div></div>
-                    <p class="text-[9px] font-bold mt-2 text-slate-400 uppercase tracking-tighter">${por}% COBRADO</p>
                 </div>`;
             });
             document.getElementById('proyeccion30').innerText = "$ " + totalP.toLocaleString('es-AR', {minimumFractionDigits:2});
@@ -261,9 +300,17 @@
             btn.innerText = "Sincronizar Datos"; btn.disabled = false;
         };
 
+        // Verificación de sesión al cargar
+        window.onload = () => {
+            if(sessionStorage.getItem('isLogged') === 'true') {
+                document.getElementById('loginOverlay').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                cargarDatos();
+            }
+        };
+
         document.getElementById('obraSelect').onchange = (e) => document.getElementById('obraNuevaInput').classList.toggle('hidden', e.target.value !== 'NUEVA');
         document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
-        cargarDatos();
     </script>
 </body>
 </html>
