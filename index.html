@@ -3,318 +3,1109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sistema de Gestión v15.6</title>
+    <title>GestiObra Pro v18</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-        body { font-family: 'Inter', sans-serif; overflow: hidden; }
-        .main-content { height: calc(100vh - 64px - 70px); overflow-y: auto; }
-        @media (min-width: 768px) { .main-content { height: calc(100vh - 64px); } }
-        .sidebar-constructora { background-color: #0f172a; }
-        .nav-link.active { color: #3b82f6; border-top: 4px solid #3b82f6; background: rgba(59,130,246,0.1); }
-        @media (min-width: 768px) { .nav-link.active { border-left: 4px solid #3b82f6; border-top: none; color: white; } }
-        
-        .login-bg { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
-        .glass-card { background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); }
-        .logo-img { max-width: 180px; height: auto; object-fit: contain; }
+        :root { --brand:#f59e0b; --brand-dark:#d97706; --navy:#0f172a; --surface:#f1f5f9; }
+        *{box-sizing:border-box;}
+        body{font-family:'Barlow',sans-serif;background:var(--surface);overflow:hidden;}
+        h1,h2,h3,.tf{font-family:'Barlow Condensed',sans-serif;}
+        #mainApp{display:none;flex-direction:column;height:100vh;}
+        #mainApp.visible{display:flex;}
+        .main-content{height:calc(100vh - 64px - 68px);overflow-y:auto;}
+        @media(min-width:768px){.main-content{height:calc(100vh - 64px);}}
+        .no-scrollbar::-webkit-scrollbar{display:none;} .no-scrollbar{-ms-overflow-style:none;scrollbar-width:none;}
+        .nav-link{transition:all .2s;}
+        .nav-link.active{color:var(--brand)!important;border-top:3px solid var(--brand);background:rgba(245,158,11,.08);}
+        @media(min-width:768px){.nav-link.active{border-left:3px solid var(--brand);border-top:none;background:rgba(245,158,11,.08);}}
+        .stat-card{border-radius:1.5rem;padding:1.1rem 1.3rem;box-shadow:0 2px 12px rgba(0,0,0,.08);}
+        .card-glass{background:white;border-radius:1.5rem;box-shadow:0 4px 24px rgba(0,0,0,.07);border:1px solid #e2e8f0;}
+        @keyframes spin{to{transform:rotate(360deg);}} .spin{animation:spin 1s linear infinite;}
+        @keyframes pd{0%,100%{opacity:1}50%{opacity:.3}} .pulse-dot{animation:pd 1.5s infinite;}
+        #toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;transition:all .35s;z-index:9999;pointer-events:none;white-space:nowrap;}
+        #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+        #loginPage{background:linear-gradient(135deg,#0f172a 0%,#1e293b 60%,#0f172a 100%);}
+        .login-card{background:white;border-radius:2rem;padding:3rem 2.5rem;box-shadow:0 30px 80px rgba(0,0,0,.5);}
+        .login-stripe{height:6px;background:linear-gradient(90deg,var(--brand),var(--brand-dark));border-radius:99px;margin-bottom:2rem;}
+        input:focus,select:focus,textarea:focus{border-color:var(--brand)!important;outline:none;box-shadow:0 0 0 3px rgba(245,158,11,.15);}
+        .progress-bg{height:8px;background:#e2e8f0;border-radius:99px;overflow:hidden;}
+        .progress-fill{height:100%;border-radius:99px;transition:width .6s ease;}
+        .badge{display:inline-flex;align-items:center;gap:.2rem;padding:.2rem .65rem;border-radius:.5rem;font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;}
+        .bi{background:#1d4ed8;color:white;} .bm{background:#059669;color:white;}
+        .ba{background:#d1fae5;color:#065f46;} .bp{background:#fef3c7;color:#92400e;} .bt{background:#f1f5f9;color:#475569;}
+        .field{width:100%;padding:.7rem 1rem;border:2px solid #e2e8f0;border-radius:.875rem;font-family:'Barlow',sans-serif;font-weight:600;font-size:.85rem;background:#f8fafc;transition:border .2s;}
+        .field:focus{border-color:var(--brand);outline:none;}
+        .btn-p{background:var(--brand);color:var(--navy);font-family:'Barlow Condensed',sans-serif;font-weight:900;letter-spacing:.08em;text-transform:uppercase;padding:.85rem 1.5rem;border-radius:1rem;border:none;cursor:pointer;font-size:1rem;transition:all .2s;width:100%;}
+        .btn-p:hover:not(:disabled){background:var(--brand-dark);box-shadow:0 4px 16px rgba(245,158,11,.4);}
+        .btn-p:disabled{opacity:.5;cursor:not-allowed;}
+        .btn-sm{font-size:.65rem;padding:.3rem .7rem;border-radius:.5rem;border:none;cursor:pointer;font-weight:800;font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;transition:all .15s;}
+        .btn-d{background:transparent;border:1.5px solid #fca5a5;color:#ef4444;padding:.25rem .55rem;border-radius:.5rem;cursor:pointer;font-size:.7rem;transition:all .2s;}
+        .btn-d:hover{background:#ef4444;color:white;}
+        .dt th{position:sticky;top:0;background:var(--navy);color:#94a3b8;font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;padding:.75rem 1rem;font-family:'Barlow Condensed',sans-serif;z-index:5;}
+        .dt td{padding:.75rem 1rem;font-size:.73rem;border-bottom:1px solid #f1f5f9;vertical-align:middle;}
+        .dt tr:hover td{background:#f8fafc;}
+        .sec-hdr{background:var(--navy);color:white;padding:.9rem 1.4rem;display:flex;align-items:center;justify-content:space-between;border-radius:1.5rem 1.5rem 0 0;}
+        .sec-hdr h3{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:.8rem;text-transform:uppercase;letter-spacing:.12em;color:var(--brand);}
+        .pi{background:#fffbeb;border:1.5px dashed #fbbf24;border-radius:.875rem;padding:.75rem 1rem;display:flex;align-items:center;gap:.6rem;}
+        .pi.venc{background:#fff1f2;border-color:#fca5a5;}
+        .pi.prox{background:#eff6ff;border-color:#93c5fd;}
+        .tw{overflow-x:auto;overflow-y:auto;max-height:400px;}
+        @media(max-width:767px){.tw{max-height:340px;}}
+        .donut-wrap{position:relative;display:inline-flex;align-items:center;justify-content:center;}
+        .donut-wrap svg{transform:rotate(-90deg);}
+        .donut-center{position:absolute;text-align:center;pointer-events:none;}
+        .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem;}
+        .modal-box{background:white;border-radius:1.5rem;padding:2rem;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;box-shadow:0 25px 80px rgba(0,0,0,.35);}
+        .cr{display:flex;align-items:center;gap:.5rem;padding:.5rem .75rem;border-radius:.6rem;border:1px solid #e2e8f0;margin-bottom:.4rem;}
+        .cr.cok{background:#f0fdf4;border-color:#86efac;}
+        .cr.cvenc{background:#fff1f2;border-color:#fca5a5;}
+        .cr.cprox{background:#eff6ff;border-color:#93c5fd;}
     </style>
 </head>
-<body class="bg-slate-100">
+<body>
 
-    <div id="loginPage" class="fixed inset-0 z-[100] login-bg flex items-center justify-center p-4">
-        <div class="glass-card p-10 rounded-[2.5rem] shadow-2xl w-full max-w-sm border border-white/20">
-            <div class="text-center mb-8">
-                <div class="flex justify-center mb-6">
-                    <img src="https://ley257.github.io/gestion-obra/tu-logo.png" alt="Logotipo Empresa" class="logo-img">
-                </div>
-                <h2 class="text-xl font-black text-slate-800 uppercase tracking-tighter">Acceso al Sistema</h2>
-                <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mt-1 italic">Gestión de Obra & Caja</p>
-            </div>
-            <div class="space-y-4">
-                <div class="relative">
-                    <i class="fas fa-user absolute left-4 top-4 text-slate-400"></i>
-                    <input type="text" id="userInput" placeholder="USUARIO" class="w-full pl-12 p-4 bg-slate-100 border-2 border-transparent focus:border-blue-500 rounded-2xl font-bold outline-none transition-all uppercase">
-                </div>
-                <div class="relative">
-                    <i class="fas fa-lock absolute left-4 top-4 text-slate-400"></i>
-                    <input type="password" id="passInput" placeholder="CONTRASEÑA" class="w-full pl-12 p-4 bg-slate-100 border-2 border-transparent focus:border-blue-500 rounded-2xl font-bold outline-none transition-all">
-                </div>
-                <button onclick="checkLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-2xl shadow-xl shadow-blue-500/20 uppercase tracking-widest transition-all active:scale-95">
-                    Ingresar
-                </button>
-            </div>
-            <p id="loginError" class="text-red-500 text-[10px] font-black mt-6 hidden text-center italic uppercase">
-                <i class="fas fa-exclamation-triangle mr-1"></i> Credenciales Incorrectas
-            </p>
+<!-- LOGIN -->
+<div id="loginPage" class="fixed inset-0 z-[300] flex items-center justify-center p-4">
+    <div class="login-card w-full max-w-sm text-center">
+        <div class="login-stripe"></div>
+        <img src="https://ley257.github.io/gestion-obra/tu-logo.png" alt="Logo" class="mx-auto mb-4 h-14 object-contain" onerror="this.style.display='none'">
+        <h2 class="tf text-3xl font-black text-slate-800 uppercase mb-1">GestiObra Pro</h2>
+        <p class="text-slate-400 text-xs mb-6">Sistema de Gestión de Obras</p>
+        <div class="space-y-3 text-left">
+            <input type="text" id="userInput" placeholder="Usuario" class="field" onkeydown="if(event.key==='Enter')document.getElementById('passInput').focus()">
+            <input type="password" id="passInput" placeholder="Contraseña" class="field" onkeydown="if(event.key==='Enter')checkLogin()">
+            <button onclick="checkLogin()" class="btn-p mt-2">Ingresar al sistema</button>
+        </div>
+        <p id="loginError" class="text-red-500 text-xs font-bold mt-4 hidden">⚠ Usuario o contraseña incorrectos</p>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="bg-slate-800 text-white px-5 py-3 rounded-2xl shadow-2xl text-xs font-bold flex items-center gap-2">
+    <i id="toastIcon" class="fas fa-check-circle text-emerald-400"></i><span id="toastMsg">OK</span>
+</div>
+
+<!-- MODAL ESTADO -->
+<div id="modalEstado" class="modal-overlay hidden">
+    <div class="modal-box">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="tf font-black text-slate-800 uppercase text-lg">Cambiar Estado</h3>
+            <button onclick="cerrarModal('modalEstado')" class="text-slate-400 hover:text-red-500 text-xl"><i class="fas fa-times"></i></button>
+        </div>
+        <p id="modalEstadoNombre" class="font-black text-slate-500 uppercase text-xs mb-4"></p>
+        <div class="space-y-2">
+            <button onclick="aplicarEstado('activa')" class="w-full text-left px-4 py-3 rounded-xl border-2 border-emerald-300 bg-emerald-50 font-bold text-emerald-700 hover:bg-emerald-100">🟢 En ejecución</button>
+            <button onclick="aplicarEstado('pausada')" class="w-full text-left px-4 py-3 rounded-xl border-2 border-amber-300 bg-amber-50 font-bold text-amber-700 hover:bg-amber-100">🟡 Pausada</button>
+            <button onclick="aplicarEstado('terminada')" class="w-full text-left px-4 py-3 rounded-xl border-2 border-slate-300 bg-slate-50 font-bold text-slate-600 hover:bg-slate-100">⚫ Terminada</button>
         </div>
     </div>
+</div>
 
-    <div id="mainApp" class="hidden flex flex-col h-full">
-        <header class="h-16 bg-slate-900 text-white flex justify-between items-center px-4 shrink-0 z-50">
-            <div class="flex items-center gap-4">
-                <img src="https://ley257.github.io/gestion-obra/tu-logo.png" alt="Logo" class="h-8 md:h-10 w-auto">
-                <h1 class="hidden md:block font-black text-sm uppercase italic tracking-tighter border-l border-slate-700 pl-4">Sistema de Gestión</h1>
+<!-- MODAL CUOTAS -->
+<div id="modalCuotas" class="modal-overlay hidden">
+    <div class="modal-box">
+        <div class="flex justify-between items-center mb-1">
+            <h3 class="tf font-black text-slate-800 uppercase text-lg">Plan de Cobros</h3>
+            <button onclick="cerrarModal('modalCuotas')" class="text-slate-400 hover:text-red-500 text-xl"><i class="fas fa-times"></i></button>
+        </div>
+        <p id="modalCuotasNombre" class="font-black text-amber-600 uppercase text-xs mb-4"></p>
+        <div id="modalCuotasContent"></div>
+    </div>
+</div>
+
+<!-- APP -->
+<div id="mainApp" class="flex flex-col" style="height:100vh">
+    <header style="background:var(--navy);height:64px;" class="flex justify-between items-center px-5 shrink-0 z-50 shadow-xl">
+        <div class="flex items-center gap-3">
+            <img src="https://ley257.github.io/gestion-obra/tu-logo.png" alt="" class="h-9 object-contain" onerror="this.style.display='none'">
+            <div>
+                <div class="tf font-black text-lg leading-none" style="color:var(--brand)">GestiObra Pro</div>
+                <div class="text-slate-500 text-[9px] font-semibold uppercase tracking-widest">Control Empresarial</div>
             </div>
-            <button onclick="logout()" class="bg-slate-800 hover:bg-red-600 hover:text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all">
-                <i class="fas fa-power-off"></i>
+        </div>
+        <div class="flex items-center gap-2">
+            <div id="syncBadge" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full" style="background:#1e293b;border:1px solid #334155;">
+                <div id="syncDot" class="w-2 h-2 rounded-full" style="background:#10b981"></div>
+                <span id="syncText" class="text-[9px] font-black uppercase tracking-wider text-slate-400">Sincronizado</span>
+            </div>
+            <button onclick="cargarDatos()" class="p-2 rounded-xl text-slate-400 hover:text-amber-400" style="background:#1e293b"><i id="reloadIcon" class="fas fa-sync-alt text-sm"></i></button>
+            <button onclick="confirmLogout()" class="p-2 rounded-xl text-slate-400 hover:text-red-400" style="background:#1e293b"><i class="fas fa-sign-out-alt text-sm"></i></button>
+        </div>
+    </header>
+
+    <div class="flex flex-col md:flex-row flex-grow overflow-hidden">
+        <nav style="background:var(--navy);" class="fixed bottom-0 left-0 w-full md:relative md:w-56 md:h-full flex md:flex-col z-50 shadow-2xl shrink-0">
+            <button onclick="showPage('caja')" id="btn-caja" class="nav-link active flex-1 md:flex-none flex flex-col md:flex-row items-center gap-1 md:gap-3 py-2 md:p-5 text-slate-400">
+                <i class="fas fa-wallet text-lg"></i><span class="text-[9px] md:text-xs font-black uppercase tracking-tighter">Caja</span>
             </button>
-        </header>
+            <button onclick="showPage('obras')" id="btn-obras" class="nav-link flex-1 md:flex-none flex flex-col md:flex-row items-center gap-1 md:gap-3 py-2 md:p-5 text-slate-400">
+                <i class="fas fa-hard-hat text-lg"></i><span class="text-[9px] md:text-xs font-black uppercase tracking-tighter">Obras</span>
+            </button>
+            <button onclick="showPage('resumen')" id="btn-resumen" class="nav-link flex-1 md:flex-none flex flex-col md:flex-row items-center gap-1 md:gap-3 py-2 md:p-5 text-slate-400">
+                <i class="fas fa-chart-pie text-lg"></i><span class="text-[9px] md:text-xs font-black uppercase tracking-tighter">Resumen</span>
+            </button>
+            <button onclick="showPage('pendientes')" id="btn-pendientes" class="nav-link flex-1 md:flex-none flex flex-col md:flex-row items-center gap-1 md:gap-3 py-2 md:p-5 text-slate-400 relative">
+                <i class="fas fa-calendar-check text-lg"></i><span class="text-[9px] md:text-xs font-black uppercase tracking-tighter">Cobros</span>
+                <span id="pendBadge" class="hidden absolute top-1 right-2 w-4 h-4 rounded-full text-[8px] font-black bg-red-500 text-white flex items-center justify-center"></span>
+            </button>
+        </nav>
 
-        <div class="flex flex-col md:flex-row flex-grow overflow-hidden">
-            <nav class="sidebar-constructora fixed bottom-0 left-0 w-full h-[70px] md:relative md:w-64 md:h-full flex md:flex-col justify-around md:justify-start md:pt-6 z-50 shadow-2xl">
-                <button onclick="showPage('registro')" id="btn-registro" class="nav-link active flex flex-col md:flex-row items-center gap-3 md:p-6 text-slate-400">
-                    <i class="fas fa-cash-register text-xl"></i><span class="text-[10px] font-black uppercase">Movimientos</span>
-                </button>
-                <button onclick="showPage('obras')" id="btn-obras" class="nav-link flex flex-col md:flex-row items-center gap-3 md:p-6 text-slate-400">
-                    <i class="fas fa-chart-line text-xl"></i><span class="text-[10px] font-black uppercase">Reportes</span>
-                </button>
-            </nav>
+        <main class="flex-grow main-content no-scrollbar p-3 md:p-5">
 
-            <main class="flex-grow main-content p-4 bg-slate-50 pb-24 md:pb-4">
-                
-                <div id="page-registro" class="space-y-4">
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-                        <div class="bg-white p-4 rounded-3xl shadow-sm border-l-4 border-blue-500">
-                            <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider">Ivan</span>
-                            <p id="saldoIvan" class="text-lg font-black text-slate-800">$ 0</p>
+            <!-- CAJA -->
+            <div id="page-caja" class="space-y-4">
+                <div class="grid grid-cols-3 gap-3">
+                    <div class="stat-card border-t-4" style="border-color:#3b82f6;background:white;">
+                        <div class="text-[9px] font-black text-slate-400 uppercase mb-1">Caja Iván</div>
+                        <div id="saldoIvan" class="tf text-xl font-black text-slate-800">$ 0</div>
+                    </div>
+                    <div class="stat-card border-t-4" style="border-color:#10b981;background:white;">
+                        <div class="text-[9px] font-black text-slate-400 uppercase mb-1">Caja Mario</div>
+                        <div id="saldoMario" class="tf text-xl font-black text-slate-800">$ 0</div>
+                    </div>
+                    <div class="stat-card border-t-4" style="border-color:var(--brand);background:var(--navy);">
+                        <div class="text-[9px] font-black uppercase mb-1" style="color:var(--brand)">Total Empresa</div>
+                        <div id="saldoTotal" class="tf text-xl font-black text-white">$ 0</div>
+                    </div>
+                </div>
+                <div class="flex flex-col xl:flex-row gap-4">
+                    <div class="w-full xl:w-80 card-glass p-5 shrink-0">
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="w-1 h-6 rounded-full" style="background:var(--brand)"></div>
+                            <h3 class="tf font-black text-slate-700 uppercase text-sm">Nuevo Movimiento</h3>
                         </div>
-                        <div class="bg-white p-4 rounded-3xl shadow-sm border-l-4 border-emerald-500">
-                            <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider">Mario</span>
-                            <p id="saldoMario" class="text-lg font-black text-slate-800">$ 0</p>
+                        <form id="formMovimiento" class="space-y-2.5">
+                            <input type="date" id="fecha" required class="field">
+                            <select id="obraSelect" required class="field"><option value="" disabled selected>— Seleccionar Obra —</option></select>
+                            <select id="tipoOperacion" required class="field">
+                                <option value="Cobro de pagos">💰 Cobro de pagos</option>
+                                <option value="Anticipo de cliente">💵 Anticipo de cliente</option>
+                                <option value="Pagos de jornales">👷 Pagos de jornales</option>
+                                <option value="Materiales / insumos">🧱 Materiales / insumos</option>
+                                <option value="Herramientas">🔧 Herramientas</option>
+                                <option value="Gastos generales">📋 Gastos generales</option>
+                            </select>
+                            <input type="text" id="descripcion" placeholder="Detalle..." required class="field uppercase">
+                            <div class="grid grid-cols-2 gap-2">
+                                <select id="cuenta" class="field text-xs"><option value="Ivan">👤 Iván</option><option value="Mario">👤 Mario</option></select>
+                                <select id="tipoMov" class="field text-xs"><option value="ingreso">🟢 Ingreso</option><option value="egreso">🔴 Egreso</option></select>
+                            </div>
+                            <div class="relative">
+                                <span class="absolute left-4 top-1/2 -translate-y-1/2 font-black text-slate-400">$</span>
+                                <input type="text" id="montoVisual" placeholder="0,00" required inputmode="decimal" class="field text-right text-2xl font-black pl-8" style="padding-top:.85rem;padding-bottom:.85rem;">
+                                <input type="hidden" id="montoReal">
+                            </div>
+                            <button type="submit" id="btnSubmit" class="btn-p"><i class="fas fa-save mr-2"></i>Guardar Movimiento</button>
+                        </form>
+                    </div>
+                    <div class="flex-grow card-glass overflow-hidden">
+                        <div class="sec-hdr">
+                            <h3>Movimientos</h3>
+                            <div class="flex items-center gap-2">
+                                <input type="text" id="tablaFiltro" oninput="renderTablaMovimientos()" placeholder="Filtrar..." class="text-[10px] px-3 py-1.5 rounded-lg text-white outline-none" style="background:#334155;border:1px solid #475569;width:110px;">
+                                <select id="filtroObra" onchange="renderTablaMovimientos()" class="text-[10px] px-2 py-1.5 rounded-lg text-white outline-none" style="background:#334155;border:1px solid #475569;max-width:120px;">
+                                    <option value="">Todas las obras</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="col-span-2 md:col-span-1 bg-slate-800 p-4 rounded-3xl shadow-lg flex flex-col justify-center">
-                            <span class="text-[9px] font-black text-blue-400 uppercase italic">Caja Total</span>
-                            <p id="saldoTotal" class="text-xl font-black text-white">$ 0</p>
+                        <div class="tw no-scrollbar">
+                            <table class="w-full dt">
+                                <thead><tr><th>Fecha</th><th>Cuenta</th><th>Obra / Detalle</th><th class="text-right">Monto</th><th class="text-center">—</th></tr></thead>
+                                <tbody id="tablaBody"></tbody>
+                            </table>
                         </div>
                     </div>
+                </div>
+            </div>
 
-                    <div class="flex flex-col xl:flex-row gap-4">
-                        <div class="w-full xl:w-80 bg-white p-6 rounded-[2rem] shadow-xl border-t-4 border-blue-600 h-fit">
-                            <form id="formMovimiento" class="space-y-3">
-                                <input type="hidden" id="editId">
-                                <label class="text-[9px] font-black text-slate-400 uppercase ml-1">Fecha</label>
-                                <input type="date" id="fecha" required class="w-full p-3 bg-slate-50 border-2 rounded-xl font-bold text-sm">
-                                
-                                <label class="text-[9px] font-black text-slate-400 uppercase ml-1">Obra</label>
-                                <select id="obraSelect" required class="w-full p-3 border-2 rounded-xl font-bold bg-white text-sm"></select>
-                                <input type="text" id="obraNuevaInput" placeholder="Nombre obra nueva..." class="w-full p-3 border-2 border-blue-300 rounded-xl hidden bg-blue-50 italic text-sm">
-                                
-                                <label class="text-[9px] font-black text-slate-400 uppercase ml-1">Detalle</label>
-                                <input type="text" id="descripcion" placeholder="Ej: Pago materiales" required class="w-full p-3 border-2 rounded-xl text-sm font-medium">
-                                
-                                <div class="grid grid-cols-2 gap-2">
-                                    <div>
-                                        <label class="text-[9px] font-black text-slate-400 uppercase ml-1">Cuenta</label>
-                                        <select id="cuenta" class="w-full p-3 border-2 rounded-xl font-black text-xs"><option value="Ivan">Ivan</option><option value="Mario">Mario</option></select>
-                                    </div>
-                                    <div>
-                                        <label class="text-[9px] font-black text-slate-400 uppercase ml-1">Tipo</label>
-                                        <select id="tipoMov" class="w-full p-3 border-2 rounded-xl font-black text-xs"><option value="ingreso">Ingreso (+)</option><option value="egreso">Egreso (-)</option></select>
-                                    </div>
-                                </div>
-                                
-                                <div class="pt-2">
-                                    <label class="text-[9px] font-black text-slate-400 uppercase ml-1">Importe</label>
-                                    <div class="relative">
-                                        <span class="absolute left-4 top-4 font-black text-slate-400">$</span>
-                                        <input type="text" id="montoVisual" placeholder="0,00" required class="w-full p-4 pl-8 border-4 bg-slate-50 rounded-2xl text-2xl font-black text-right outline-none focus:border-blue-500">
-                                        <input type="hidden" id="montoReal">
-                                    </div>
-                                </div>
-                                <button type="submit" id="btnGuardar" class="w-full bg-blue-600 text-white font-black py-4 rounded-2xl shadow-lg uppercase text-xs hover:bg-blue-700 transition-all">Confirmar Registro</button>
-                            </form>
+            <!-- OBRAS -->
+            <div id="page-obras" class="hidden space-y-4">
+                <div class="flex flex-col xl:flex-row gap-4">
+                    <div class="w-full xl:w-80 card-glass p-5 shrink-0">
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="w-1 h-6 rounded-full" style="background:#10b981"></div>
+                            <h3 class="tf font-black text-slate-700 uppercase text-sm">Alta de Obra</h3>
                         </div>
-
-                        <div class="flex-grow bg-white rounded-[2rem] shadow-xl overflow-hidden border border-slate-200">
-                            <div class="p-4 bg-slate-900 flex justify-between items-center">
-                                <h3 class="text-white font-black uppercase text-[10px] tracking-widest italic">Últimos Movimientos</h3>
-                                <input type="text" id="tablaFiltro" onkeyup="filtrarYRecalcular()" placeholder="Filtrar por obra..." class="w-40 p-2 bg-slate-800 rounded-lg text-[10px] text-white outline-none border border-slate-700">
+                        <form id="formObraConfig" class="space-y-2.5">
+                            <input type="text" id="nombreObraConfig" placeholder="Nombre de la obra" required class="field uppercase">
+                            <input type="text" id="clienteObra" placeholder="Cliente" class="field">
+                            <input type="text" id="direccionObra" placeholder="Dirección" class="field">
+                            <input type="date" id="fechaInicioObra" class="field" title="Fecha de inicio">
+                            <select id="estadoObra" class="field">
+                                <option value="activa">🟢 En ejecución</option>
+                                <option value="pausada">🟡 Pausada</option>
+                                <option value="terminada">⚫ Terminada</option>
+                            </select>
+                            <div class="p-3 rounded-xl space-y-2.5" style="background:#f8fafc;border:2px solid #e2e8f0;">
+                                <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Presupuesto y Plan de Cobros</div>
+                                <input type="text" id="presupuestoTotal" placeholder="Presupuesto total $" required class="field" inputmode="decimal" oninput="calcularPreviewCuotas()">
+                                <input type="text" id="anticipoObra" placeholder="Anticipo inicial $" class="field" inputmode="decimal" oninput="calcularPreviewCuotas()">
+                                <div class="grid grid-cols-2 gap-2">
+                                    <input type="number" id="cantCuotas" placeholder="Cant. cuotas" min="1" max="60" class="field text-center" oninput="calcularPreviewCuotas()">
+                                    <input type="date" id="fechaPrimeraCuota" class="field text-xs" title="Fecha 1ª cuota" oninput="calcularPreviewCuotas()">
+                                </div>
+                                <div id="previewCuotas" class="text-[10px] text-slate-500 font-semibold hidden p-2 rounded-lg" style="background:#fffbeb;border:1px solid #fde68a;"></div>
                             </div>
-                            <div class="overflow-x-auto h-[500px] no-scrollbar">
-                                <table class="w-full text-left">
-                                    <thead class="text-slate-400 text-[10px] font-black uppercase bg-slate-900 italic sticky top-0 z-10">
-                                        <tr>
-                                            <th class="p-4">Fecha</th>
-                                            <th class="p-4">Obra / Detalle</th>
-                                            <th class="p-4 text-center">Titular</th>
-                                            <th class="p-4 text-right">Monto</th>
-                                            <th class="p-4 text-center">Acción</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="tablaBody" class="text-[11px] divide-y divide-slate-100 font-medium"></tbody>
+                            <textarea id="notasObra" placeholder="Notas..." rows="2" class="field resize-none text-sm"></textarea>
+                            <button type="submit" class="btn-p" style="background:#10b981"><i class="fas fa-plus mr-2"></i>Agregar Obra</button>
+                        </form>
+                    </div>
+                    <div class="flex-grow space-y-3">
+                        <div class="flex gap-2 flex-wrap items-center">
+                            <button onclick="setFiltroEstado('')" id="filtro-all" class="badge text-xs py-1.5 px-3 cursor-pointer ring-2 ring-amber-400" style="background:var(--navy);color:white;">Todas</button>
+                            <button onclick="setFiltroEstado('activa')" id="filtro-activa" class="badge ba text-xs py-1.5 px-3 cursor-pointer">Activas</button>
+                            <button onclick="setFiltroEstado('pausada')" id="filtro-pausada" class="badge bp text-xs py-1.5 px-3 cursor-pointer">Pausadas</button>
+                            <button onclick="setFiltroEstado('terminada')" id="filtro-terminada" class="badge bt text-xs py-1.5 px-3 cursor-pointer">Terminadas</button>
+                            <span id="obraCount" class="ml-auto badge" style="background:var(--brand);color:var(--navy)">0 obras</span>
+                        </div>
+                        <div class="card-glass overflow-hidden">
+                            <div class="sec-hdr"><h3>Cartera de Obras</h3></div>
+                            <div class="tw no-scrollbar">
+                                <table class="w-full dt">
+                                    <thead><tr>
+                                        <th>Obra / Progreso</th><th>Cliente</th>
+                                        <th class="text-right">Presupuesto</th><th class="text-right">Cobrado</th><th class="text-right">Saldo</th>
+                                        <th class="text-center">Estado</th><th class="text-center">Cuotas</th><th class="text-center">—</th>
+                                    </tr></thead>
+                                    <tbody id="tablaObrasBody"></tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div id="page-obras" class="hidden space-y-4">
-                    <div class="bg-white p-6 rounded-[2rem] shadow-xl">
-                        <h2 class="text-xl font-black text-slate-800 uppercase italic mb-4">Balance por Obra</h2>
-                        <select id="reporteObraSelect" onchange="generarReporteObra()" class="w-full md:w-80 p-4 border-2 rounded-2xl font-black text-sm bg-slate-50 mb-6"></select>
-                        <div id="reporteContenido" class="hidden grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div class="bg-blue-50 p-6 rounded-3xl text-center"><span class="text-[10px] font-black text-blue-400">TOTAL INGRESOS</span><p id="repIngresos" class="text-2xl font-black text-blue-600">$ 0</p></div>
-                            <div class="bg-red-50 p-6 rounded-3xl text-center"><span class="text-[10px] font-black text-red-400">TOTAL GASTOS</span><p id="repEgresos" class="text-2xl font-black text-red-600">$ 0</p></div>
-                            <div class="bg-emerald-50 p-6 rounded-3xl text-center"><span class="text-[10px] font-black text-emerald-400">SALDO NETO</span><p id="repBalance" class="text-2xl font-black text-emerald-600">$ 0</p></div>
+            <!-- RESUMEN -->
+            <div id="page-resumen" class="hidden space-y-4">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div class="stat-card border-t-4" style="border-color:#3b82f6;background:white;">
+                        <div class="text-[9px] font-black text-slate-400 uppercase mb-1">Total Ingresos</div>
+                        <div id="resIngresos" class="tf text-xl font-black text-emerald-600">$ 0</div>
+                    </div>
+                    <div class="stat-card border-t-4" style="border-color:#ef4444;background:white;">
+                        <div class="text-[9px] font-black text-slate-400 uppercase mb-1">Total Egresos</div>
+                        <div id="resEgresos" class="tf text-xl font-black text-red-500">$ 0</div>
+                    </div>
+                    <div class="stat-card border-t-4" style="border-color:#8b5cf6;background:white;">
+                        <div class="text-[9px] font-black text-slate-400 uppercase mb-1">Obras Activas</div>
+                        <div id="resObras" class="tf text-xl font-black text-slate-800">0</div>
+                    </div>
+                    <div class="stat-card border-t-4" style="border-color:var(--brand);background:var(--navy);">
+                        <div class="text-[9px] font-black uppercase mb-1" style="color:var(--brand)">Saldo Empresa</div>
+                        <div id="resSaldo" class="tf text-xl font-black text-white">$ 0</div>
+                    </div>
+                </div>
+
+                <!-- GRÁFICO DONUT POR OBRA -->
+                <div class="card-glass p-4">
+                    <div class="flex items-center gap-3 mb-4 flex-wrap">
+                        <div class="w-1 h-6 rounded-full" style="background:var(--brand)"></div>
+                        <h3 class="tf font-black text-slate-700 uppercase text-sm flex-grow">Distribución de Egresos por Obra</h3>
+                        <select id="obraResumenSelect" onchange="renderGraficoObra()" class="field text-xs" style="max-width:200px;">
+                            <option value="">— Seleccionar Obra —</option>
+                        </select>
+                    </div>
+                    <div id="graficoObraWrap" class="flex flex-col md:flex-row items-center gap-6">
+                        <div class="donut-wrap shrink-0">
+                            <svg id="donutSvg" width="160" height="160" viewBox="0 0 160 160">
+                                <circle cx="80" cy="80" r="60" fill="none" stroke="#e2e8f0" stroke-width="22"/>
+                                <g id="donutArcs"></g>
+                            </svg>
+                            <div class="donut-center">
+                                <div id="donutTotal" class="tf font-black text-slate-800 text-sm leading-tight"></div>
+                                <div class="text-[9px] text-slate-400 font-semibold">egresos</div>
+                            </div>
+                        </div>
+                        <div id="donutLeyenda" class="flex-grow space-y-2 min-w-0">
+                            <p class="text-xs text-slate-400">Seleccioná una obra para ver la distribución de sus egresos.</p>
                         </div>
                     </div>
                 </div>
 
-            </main>
-        </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="card-glass overflow-hidden">
+                        <div class="sec-hdr"><h3>Egresos por Categoría (Global)</h3></div>
+                        <div id="categoriaChart" class="p-4 space-y-3"></div>
+                    </div>
+                    <div class="card-glass overflow-hidden">
+                        <div class="sec-hdr"><h3>Balance por Obra</h3></div>
+                        <div id="obraChart" class="p-4 space-y-3"></div>
+                    </div>
+                </div>
+                <div class="card-glass overflow-hidden">
+                    <div class="sec-hdr"><h3>Comparativa por Cuenta</h3></div>
+                    <div id="cuentaResumen" class="p-4 grid grid-cols-2 gap-4"></div>
+                </div>
+            </div>
+
+            <!-- COBROS PENDIENTES -->
+            <div id="page-pendientes" class="hidden space-y-4">
+                <div class="card-glass overflow-hidden">
+                    <div class="sec-hdr">
+                        <h3>Cuotas Programadas (Automáticas)</h3>
+                        <span id="totalCuotasPend" class="badge bg-red-500 text-white">0 pendiente</span>
+                    </div>
+                    <div id="listaCuotasProg" class="p-4 space-y-2"></div>
+                </div>
+                <div class="card-glass p-5">
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="w-1 h-5 rounded-full bg-purple-500"></div>
+                        <h3 class="tf font-black text-slate-700 uppercase text-sm">Registrar Cobro Adicional</h3>
+                    </div>
+                    <form id="formPendiente" class="grid grid-cols-1 md:grid-cols-4 gap-2.5">
+                        <select id="pendienteObra" class="field" required><option value="" disabled selected>— Obra —</option></select>
+                        <input type="text" id="pendienteDesc" placeholder="Descripción" class="field" required>
+                        <input type="text" id="pendienteMonto" placeholder="Monto $" class="field" inputmode="decimal" required>
+                        <button type="submit" class="btn-p" style="background:#7c3aed"><i class="fas fa-plus mr-2"></i>Agregar Cobro</button>
+                    </form>
+                </div>
+                <div class="card-glass overflow-hidden">
+                    <div class="sec-hdr">
+                        <h3>Cobros Adicionales</h3>
+                        <span id="totalPendiente" class="badge bg-purple-600 text-white">$ 0</span>
+                    </div>
+                    <div id="listaPendientes" class="p-4 space-y-2"></div>
+                </div>
+            </div>
+
+        </main>
     </div>
+</div>
 
-    <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzbYMOqEUdxIcv8We4PbbvTc7441LPn2e_bw6OsIGUhwBDfve1IRaD5zrQCDzXQaEk05A/exec";
-        let movimientos = [];
+<script>
+// ================================================================
+// CONFIG — Reemplazar URL
+// ================================================================
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzbYMOqEUdxIcv8We4PbbvTc7441LPn2e_bw6OsIGUhwBDfve1IRaD5zrQCDzXQaEk05A/exec";
+const CREDENTIALS = { user: "admin", pass: "1234" };
+const DONUT_COLORS = ['#f59e0b','#3b82f6','#10b981','#ef4444','#8b5cf6','#ec4899','#06b6d4','#84cc16','#f97316','#6366f1'];
 
-        function checkLogin() {
-            const u = document.getElementById('userInput').value;
-            const p = document.getElementById('passInput').value;
-            if (u.toLowerCase() === "admin" && p === "1234") {
-                document.getElementById('loginPage').style.display = 'none';
-                document.getElementById('mainApp').classList.remove('hidden');
-                cargarDatos();
-            } else {
-                document.getElementById('loginError').classList.remove('hidden');
-            }
-        }
-        function logout() { location.reload(); }
+// ================================================================
+// ESTADO GLOBAL
+// ================================================================
+let movimientos = [], obrasPresupuestos = [], pendientes = [];
+let filtroEstadoObras = "", cargando = false, obraEnModal = null;
 
-        async function cargarDatos() {
-            try {
-                const r = await fetch(WEB_APP_URL);
-                const d = await r.json();
-                movimientos = d.map(r => ({
-                    id: r[0], fecha: r[1], obra: r[2], operacion: r[3], desc: r[4], cuenta: r[5], tipo: r[6], 
-                    monto: parseFloat(r[7]), monto_real: (r[6] === 'ingreso' ? parseFloat(r[7]) : -parseFloat(r[7]))
-                }));
-                
-                // --- ORDEN CRONOLÓGICO DESCENDENTE (Más nuevos primero) ---
-                movimientos.sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
-                
-                renderizarTabla(movimientos);
-                actualizarSelectsObras();
-            } catch(e) { console.error(e); }
-        }
+// ================================================================
+// PERSISTENCIA LOCAL
+// ================================================================
+function saveLocal() {
+    try {
+        localStorage.setItem('go_obras_v18', JSON.stringify(obrasPresupuestos));
+        localStorage.setItem('go_pend_v18', JSON.stringify(pendientes));
+    } catch(e) {}
+}
+function loadLocal() {
+    try {
+        obrasPresupuestos = JSON.parse(localStorage.getItem('go_obras_v18')) || [];
+        pendientes = JSON.parse(localStorage.getItem('go_pend_v18')) || [];
+    } catch(e) { obrasPresupuestos = []; pendientes = []; }
+}
 
-        function renderizarTabla(lista) {
-            const tbody = document.getElementById('tablaBody');
-            tbody.innerHTML = '';
-            let sI=0, sM=0;
+// ================================================================
+// LOGIN
+// ================================================================
+function checkLogin() {
+    const u = document.getElementById('userInput').value.trim().toLowerCase();
+    const p = document.getElementById('passInput').value;
+    if (u === CREDENTIALS.user && p === CREDENTIALS.pass) {
+        document.getElementById('loginPage').classList.add('hidden');
+        document.getElementById('mainApp').classList.add('visible');
+        loadLocal();
+        cargarDatos();
+    } else {
+        document.getElementById('loginError').classList.remove('hidden');
+        document.getElementById('passInput').value = "";
+    }
+}
+function confirmLogout() { if(confirm('¿Cerrar sesión?')) location.reload(); }
 
-            lista.forEach(m => {
-                if(m.cuenta === 'Ivan') sI += m.monto_real; else sM += m.monto_real;
-                tbody.innerHTML += `
-                    <tr class="hover:bg-blue-50/50 transition-colors">
-                        <td class="p-4 font-bold text-slate-400">${new Date(m.fecha).toLocaleDateString('es-AR')}</td>
-                        <td class="p-4">
-                            <div class="font-black uppercase text-slate-800">${m.obra}</div>
-                            <div class="text-[9px] text-slate-500 italic">${m.desc}</div>
-                        </td>
-                        <td class="p-4 text-center"><span class="px-2 py-1 rounded text-[9px] font-black ${m.cuenta==='Ivan'?'bg-blue-600 text-white':'bg-emerald-600 text-white'}">${m.cuenta.toUpperCase()}</span></td>
-                        <td class="p-4 text-right font-black ${m.tipo==='ingreso'?'text-emerald-600':'text-red-500'}">$ ${m.monto.toLocaleString('es-AR')}</td>
-                        <td class="p-4 text-center whitespace-nowrap">
-                            <button onclick="prepararEdicion(${m.id})" class="text-blue-500 hover:scale-110 transition-transform mr-3"><i class="fas fa-edit"></i></button>
-                            <button onclick="borrarRemoto(${m.id})" class="bg-red-500 hover:bg-red-600 text-white w-8 h-8 rounded-lg shadow-md transition-all">
-                                <i class="fas fa-trash-alt text-[10px]"></i>
-                            </button>
-                        </td>
-                    </tr>`;
-            });
-            document.getElementById('saldoIvan').innerText = "$ " + sI.toLocaleString('es-AR');
-            document.getElementById('saldoMario').innerText = "$ " + sM.toLocaleString('es-AR');
-            document.getElementById('saldoTotal').innerText = "$ " + (sI+sM).toLocaleString('es-AR');
-        }
+// ================================================================
+// SYNC
+// ================================================================
+function setSyncing(s, err = false) {
+    const dot = document.getElementById('syncDot'), txt = document.getElementById('syncText'), ic = document.getElementById('reloadIcon');
+    if (s) { dot.style.background='#3b82f6'; dot.classList.add('pulse-dot'); txt.textContent='Sincronizando...'; txt.style.color='#60a5fa'; ic.classList.add('spin'); }
+    else if (err) { dot.style.background='#ef4444'; dot.classList.remove('pulse-dot'); txt.textContent='Sin conexión'; txt.style.color='#f87171'; ic.classList.remove('spin'); }
+    else { dot.style.background='#10b981'; dot.classList.remove('pulse-dot'); txt.textContent='Sincronizado'; txt.style.color='#6b7280'; ic.classList.remove('spin'); }
+}
 
-        async function borrarRemoto(id) {
-            if(!confirm("¿CONFIRMA ELIMINAR REGISTRO? Se borrará permanentemente de la base de datos.")) return;
-            movimientos = movimientos.filter(m => m.id !== id);
-            renderizarTabla(movimientos);
-            await fetch(WEB_APP_URL, { 
-                method: 'POST', 
-                mode: 'no-cors', 
-                body: JSON.stringify({ action: "delete", id: id }) 
-            });
-        }
+// ================================================================
+// TOAST
+// ================================================================
+let _tt;
+function showToast(msg, type='ok') {
+    const t=document.getElementById('toast'), ic=document.getElementById('toastIcon');
+    document.getElementById('toastMsg').textContent = msg;
+    ic.className = type==='ok' ? 'fas fa-check-circle text-emerald-400' : type==='error' ? 'fas fa-exclamation-circle text-red-400' : 'fas fa-info-circle text-blue-400';
+    t.classList.add('show'); clearTimeout(_tt); _tt = setTimeout(()=>t.classList.remove('show'), 3500);
+}
 
-        document.getElementById('formMovimiento').onsubmit = async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('btnGuardar');
-            const editId = document.getElementById('editId').value;
-            const o = document.getElementById('obraSelect').value === "NUEVA" ? document.getElementById('obraNuevaInput').value : document.getElementById('obraSelect').value;
-            
-            btn.disabled = true; btn.innerText = "Procesando...";
+// ================================================================
+// MODALES
+// ================================================================
+function cerrarModal(id) { document.getElementById(id).classList.add('hidden'); }
 
-            const datos = {
-                action: editId ? "update" : "insert",
-                id: editId ? parseInt(editId) : Date.now(),
-                fecha: document.getElementById('fecha').value,
-                obra: o,
-                operacion: "General",
-                descripcion: document.getElementById('descripcion').value,
-                cuenta: document.getElementById('cuenta').value,
-                tipo: document.getElementById('tipoMov').value,
-                monto: parseFloat(document.getElementById('montoReal').value)
-            };
+function abrirModalEstado(nombre) {
+    obraEnModal = nombre;
+    document.getElementById('modalEstadoNombre').textContent = nombre;
+    document.getElementById('modalEstado').classList.remove('hidden');
+}
+function aplicarEstado(nuevo) {
+    if (!obraEnModal) return;
+    const o = obrasPresupuestos.find(x => x.nombre === obraEnModal);
+    if (o) { o.estado = nuevo; saveLocal(); enviarObrasAGoogle(); actualizarInterfaz(); showToast('Estado actualizado', 'ok'); }
+    cerrarModal('modalEstado'); obraEnModal = null;
+}
 
-            await fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(datos) });
-            await cargarDatos();
-            cancelarEdicion();
-            btn.disabled = false; btn.innerText = "Confirmar Registro";
-        };
-
-        function showPage(p) {
-            document.getElementById('page-registro').classList.toggle('hidden', p !== 'registro');
-            document.getElementById('page-obras').classList.toggle('hidden', p !== 'obras');
-            document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
-            document.getElementById('btn-'+p).classList.add('active');
-        }
-
-        function actualizarSelectsObras() {
-            const obras = [...new Set(movimientos.map(m => m.obra))].filter(Boolean).sort();
-            document.getElementById('obraSelect').innerHTML = '<option disabled selected>Seleccione Obra...</option>' + obras.map(o => `<option value="${o}">${o}</option>`).join('') + '<option value="NUEVA">+ CARGAR OBRA NUEVA</option>';
-            document.getElementById('reporteObraSelect').innerHTML = '<option disabled selected>Seleccione Obra...</option>' + obras.map(o => `<option value="${o}">${o}</option>`).join('');
-        }
-
-        function filtrarYRecalcular() {
-            const b = document.getElementById("tablaFiltro").value.toLowerCase();
-            const filtrados = movimientos.filter(m => m.obra.toLowerCase().includes(b));
-            renderizarTabla(filtrados);
-        }
-
-        function prepararEdicion(id) {
-            const m = movimientos.find(x => x.id == id);
-            document.getElementById('editId').value = m.id;
-            document.getElementById('fecha').value = new Date(m.fecha).toISOString().split('T')[0];
-            document.getElementById('obraSelect').value = m.obra;
-            document.getElementById('descripcion').value = m.desc;
-            document.getElementById('cuenta').value = m.cuenta;
-            document.getElementById('tipoMov').value = m.tipo;
-            document.getElementById('montoReal').value = m.monto;
-            document.getElementById('montoVisual').value = m.monto.toLocaleString('es-AR');
-            document.getElementById('btnGuardar').innerText = "Guardar Cambios";
-        }
-
-        function cancelarEdicion() {
-            document.getElementById('formMovimiento').reset();
-            document.getElementById('editId').value = "";
-            document.getElementById('btnGuardar').innerText = "Confirmar Registro";
-        }
-
-        const vIn = document.getElementById('montoVisual');
-        const rIn = document.getElementById('montoReal');
-        vIn.addEventListener('input', (e) => {
-            let val = e.target.value.replace(/\D/g, "");
-            let num = parseFloat(val) / 100 || 0;
-            rIn.value = num.toFixed(2);
-            vIn.value = num.toLocaleString('es-AR', { minimumFractionDigits: 2 });
+function abrirModalCuotas(nombre) {
+    const obra = obrasPresupuestos.find(o => o.nombre === nombre);
+    if (!obra) return;
+    document.getElementById('modalCuotasNombre').textContent = nombre;
+    const cuotas = generarCuotas(obra);
+    const hoy = new Date(); hoy.setHours(0,0,0,0);
+    let html = '';
+    if (!cuotas.length) {
+        html = '<p class="text-xs text-slate-400 text-center py-4">Sin cuotas programadas. Indicá anticipo, cantidad de cuotas y fecha al crear la obra.</p>';
+    } else {
+        const cobradas = cuotas.filter(c=>c.cobrada).length;
+        const totalPend = cuotas.filter(c=>!c.cobrada).reduce((s,c)=>s+c.monto,0);
+        html += `<div class="grid grid-cols-3 gap-2 mb-4">
+            <div class="text-center p-2 rounded-xl" style="background:#f0fdf4"><div class="tf font-black text-emerald-600 text-lg">${cobradas}</div><div class="text-[9px] font-bold text-slate-500">Cobradas</div></div>
+            <div class="text-center p-2 rounded-xl" style="background:#fff7ed"><div class="tf font-black text-amber-600 text-lg">${cuotas.length-cobradas}</div><div class="text-[9px] font-bold text-slate-500">Pendientes</div></div>
+            <div class="text-center p-2 rounded-xl" style="background:#f8fafc"><div class="tf font-black text-slate-700 text-sm">$ ${fmt(obra.montoCuota||0)}</div><div class="text-[9px] font-bold text-slate-500">c/ cuota</div></div>
+        </div>
+        <div class="text-xs font-bold text-slate-500 mb-3">Total pendiente: <span class="text-red-500">$ ${fmt(totalPend)}</span></div>`;
+        cuotas.forEach((c, i) => {
+            const fd = new Date(c.fecha+'T00:00:00');
+            const venc = !c.cobrada && fd < hoy;
+            const prox = !c.cobrada && !venc;
+            let cls = 'cr', tag = '';
+            if (c.cobrada) { cls += ' cok'; tag = '<span class="badge" style="background:#86efac;color:#065f46;margin-left:auto">✓ Cobrada</span>'; }
+            else if (venc) { cls += ' cvenc'; tag = '<span class="badge" style="background:#fca5a5;color:#991b1b;margin-left:auto">⚠ Vencida</span>'; }
+            else { cls += ' cprox'; tag = `<span class="badge" style="background:#bfdbfe;color:#1e3a8a;margin-left:auto">${diasHasta(c.fecha)}d</span>`; }
+            html += `<div class="${cls}">
+                <span class="tf font-black text-slate-500 text-sm w-6">${i+1}</span>
+                <div class="flex-grow"><div class="font-black text-slate-800 text-xs">${formatFecha(c.fecha)}</div><div class="text-[9px] text-slate-400">$ ${fmt(c.monto)}</div></div>
+                ${tag}
+                ${!c.cobrada ? `<button onclick="marcarCuotaCobrada('${nombre}',${i})" class="btn-sm" style="background:#d1fae5;color:#065f46;">✓ Cobrar</button>` : ''}
+            </div>`;
         });
+    }
+    document.getElementById('modalCuotasContent').innerHTML = html;
+    document.getElementById('modalCuotas').classList.remove('hidden');
+}
 
-        document.getElementById('obraSelect').onchange = (e) => document.getElementById('obraNuevaInput').classList.toggle('hidden', e.target.value !== 'NUEVA');
-        document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
-    </script>
+function marcarCuotaCobrada(nombreObra, idx) {
+    const obra = obrasPresupuestos.find(o => o.nombre === nombreObra);
+    if (!obra) return;
+    if (!obra.cuotas) obra.cuotas = generarCuotas(obra);
+    if (obra.cuotas[idx]) obra.cuotas[idx].cobrada = true;
+    saveLocal(); enviarObrasAGoogle(); actualizarInterfaz();
+    abrirModalCuotas(nombreObra);
+    showToast('Cuota cobrada ✓', 'ok');
+}
+
+// ================================================================
+// CARGA DATOS DESDE GOOGLE SHEETS
+// ================================================================
+async function cargarDatos() {
+    if (cargando) return;
+    cargando = true; setSyncing(true);
+    try {
+        const ctrl = new AbortController();
+        const tid = setTimeout(() => ctrl.abort(), 14000);
+        const res = await fetch(WEB_APP_URL + "?action=get&t=" + Date.now(), { signal: ctrl.signal });
+        clearTimeout(tid);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+
+        // Movimientos
+        const rows = Array.isArray(data) ? data : (data.movimientos || []);
+        movimientos = rows.map(r => {
+            const monto = Math.abs(parseFloat(r[7]) || 0);
+            const tipo = (r[6]||'egreso').toLowerCase().trim();
+            return { id:(r[0]||Date.now()).toString(), fecha:r[1]||todayISO(), obra:(r[2]||'SIN ASIGNAR').toUpperCase(),
+                operacion:r[3]||'General', desc:r[4]||'', cuenta:r[5]||'Ivan', tipo, monto,
+                monto_real: tipo==='ingreso' ? monto : -monto };
+        });
+        movimientos.sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
+
+        // Obras (si el Apps Script las retorna)
+        if (data.obras && Array.isArray(data.obras)) {
+            data.obras.forEach(ro => {
+                const local = obrasPresupuestos.find(o => o.nombre === ro[0]);
+                const remote = {
+                    nombre:ro[0], cliente:ro[1]||'', direccion:ro[2]||'',
+                    presupuesto:parseFloat(ro[3])||0, anticipo:parseFloat(ro[4])||0,
+                    cantCuotas:parseInt(ro[5])||0, fechaPrimeraCuota:ro[6]||'',
+                    estado:ro[7]||'activa', notas:ro[8]||'',
+                    montoCuota:parseFloat(ro[9])||0,
+                    cuotas: local ? local.cuotas : safeJSON(ro[10], [])
+                };
+                if (local) Object.assign(local, remote);
+                else obrasPresupuestos.push(remote);
+            });
+            saveLocal();
+        }
+
+        setSyncing(false); showToast('Datos actualizados', 'ok');
+    } catch(err) {
+        console.error(err); setSyncing(false, true);
+        showToast(err.name==='AbortError' ? 'Tiempo agotado — usando datos locales' : 'Sin conexión — datos locales', 'error');
+    } finally { cargando = false; actualizarInterfaz(); }
+}
+
+// ================================================================
+// ENVÍO A GOOGLE — MOVIMIENTOS
+// ================================================================
+async function enviarAGoogle(payload) {
+    await fetch(WEB_APP_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'}, body:JSON.stringify(payload) });
+}
+
+// ================================================================
+// ENVÍO A GOOGLE — OBRAS (pestaña "Obras" del Sheet)
+// ================================================================
+async function enviarObrasAGoogle() {
+    try {
+        await fetch(WEB_APP_URL, {
+            method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'},
+            body: JSON.stringify({
+                action: 'saveObras',
+                obras: obrasPresupuestos.map(o => ([
+                    o.nombre, o.cliente||'', o.direccion||'',
+                    o.presupuesto||0, o.anticipo||0, o.cantCuotas||0,
+                    o.fechaPrimeraCuota||'', o.estado||'activa', o.notas||'',
+                    o.montoCuota||0, JSON.stringify(o.cuotas||[])
+                ]))
+            })
+        });
+    } catch(e) { console.warn('No se pudo sincronizar obras:', e); }
+}
+
+// ================================================================
+// FORMULARIO MOVIMIENTO
+// ================================================================
+document.getElementById('formMovimiento').onsubmit = async function(e) {
+    e.preventDefault();
+    const btn = document.getElementById('btnSubmit');
+    const monto = parseFloat(document.getElementById('montoReal').value) || 0;
+    if (monto <= 0) { showToast('Ingresá un monto válido', 'error'); return; }
+    const d = {
+        id: Date.now().toString(), fecha: document.getElementById('fecha').value,
+        obra: document.getElementById('obraSelect').value,
+        operacion: document.getElementById('tipoOperacion').value,
+        desc: document.getElementById('descripcion').value.trim().toUpperCase(),
+        cuenta: document.getElementById('cuenta').value,
+        tipo: document.getElementById('tipoMov').value, monto
+    };
+    movimientos.unshift({...d, monto_real: d.tipo==='ingreso' ? d.monto : -d.monto});
+    actualizarInterfaz();
+    showToast('Guardado — enviando a nube...', 'info');
+    btn.disabled = true; setSyncing(true);
+    try {
+        await enviarAGoogle({action:'add', ...d});
+        setTimeout(() => { setSyncing(false); showToast('✓ Sincronizado', 'ok'); btn.disabled = false; }, 2000);
+    } catch(err) { setSyncing(false, true); showToast('Error de red — guardado localmente', 'error'); btn.disabled = false; }
+    this.reset();
+    document.getElementById('montoVisual').value = '';
+    document.getElementById('fecha').value = todayISO();
+    actualizarSelectObras();
+};
+
+async function borrarMovimiento(id) {
+    if (!confirm('¿Eliminar este movimiento?')) return;
+    movimientos = movimientos.filter(m => m.id.toString() !== id.toString());
+    actualizarInterfaz(); setSyncing(true);
+    try { await enviarAGoogle({action:'delete', id}); setTimeout(()=>setSyncing(false), 1500); showToast('Eliminado', 'ok'); }
+    catch(e) { setSyncing(false, true); showToast('Error al sincronizar', 'error'); }
+}
+
+// ================================================================
+// HELPERS CUOTAS
+// ================================================================
+function generarCuotas(obra) {
+    if (!obra.cantCuotas || !obra.fechaPrimeraCuota) return obra.cuotas || [];
+    const guardadas = obra.cuotas || [];
+    const cuotas = [];
+    for (let i = 0; i < obra.cantCuotas; i++) {
+        const fecha = new Date(obra.fechaPrimeraCuota + 'T00:00:00');
+        fecha.setDate(fecha.getDate() + i * 30);
+        cuotas.push({
+            fecha: fecha.toISOString().split('T')[0],
+            monto: obra.montoCuota || 0,
+            cobrada: guardadas[i] ? guardadas[i].cobrada : false
+        });
+    }
+    return cuotas;
+}
+
+function calcularMontoCuota(presupuesto, anticipo, cant) {
+    const saldo = presupuesto - anticipo;
+    return cant > 0 ? saldo / cant : 0;
+}
+
+function calcularPreviewCuotas() {
+    const p = parseMonto(document.getElementById('presupuestoTotal').value);
+    const a = parseMonto(document.getElementById('anticipoObra').value);
+    const cant = parseInt(document.getElementById('cantCuotas').value) || 0;
+    const fecha = document.getElementById('fechaPrimeraCuota').value;
+    const el = document.getElementById('previewCuotas');
+    if (p > 0 && cant > 0 && fecha) {
+        const mc = calcularMontoCuota(p, a, cant);
+        const fechaUlt = new Date(fecha + 'T00:00:00');
+        fechaUlt.setDate(fechaUlt.getDate() + (cant - 1) * 30);
+        el.innerHTML = `Anticipo: <b>$ ${fmt(a)}</b> · Saldo: <b>$ ${fmt(p-a)}</b> · ${cant} cuota${cant>1?'s':''} de <b>$ ${fmt(mc)}</b> c/30 días · Último cobro: ${formatFecha(fechaUlt.toISOString().split('T')[0])}`;
+        el.classList.remove('hidden');
+    } else el.classList.add('hidden');
+}
+
+// ================================================================
+// FORMULARIO OBRA
+// ================================================================
+document.getElementById('formObraConfig').onsubmit = function(e) {
+    e.preventDefault();
+    const nombre = document.getElementById('nombreObraConfig').value.trim().toUpperCase();
+    if (!nombre) return;
+    if (obrasPresupuestos.find(o => o.nombre === nombre)) { showToast('Ya existe esa obra', 'error'); return; }
+    const presupuesto = parseMonto(document.getElementById('presupuestoTotal').value);
+    const anticipo = parseMonto(document.getElementById('anticipoObra').value);
+    const cantCuotas = parseInt(document.getElementById('cantCuotas').value) || 0;
+    const fechaPrimeraCuota = document.getElementById('fechaPrimeraCuota').value;
+    const montoCuota = calcularMontoCuota(presupuesto, anticipo, cantCuotas);
+    const cuotas = [];
+    for (let i = 0; i < cantCuotas; i++) {
+        const f = new Date(fechaPrimeraCuota + 'T00:00:00');
+        f.setDate(f.getDate() + i * 30);
+        cuotas.push({ fecha: f.toISOString().split('T')[0], monto: montoCuota, cobrada: false });
+    }
+    const nObra = {
+        nombre, cliente: document.getElementById('clienteObra').value.trim(),
+        direccion: document.getElementById('direccionObra').value.trim(),
+        fechaInicio: document.getElementById('fechaInicioObra').value,
+        estado: document.getElementById('estadoObra').value,
+        notas: document.getElementById('notasObra').value.trim(),
+        presupuesto, anticipo, cantCuotas, fechaPrimeraCuota, montoCuota, cuotas
+    };
+    obrasPresupuestos.push(nObra);
+    saveLocal(); enviarObrasAGoogle(); actualizarInterfaz();
+    this.reset();
+    document.getElementById('previewCuotas').classList.add('hidden');
+    showToast(`Obra "${nombre}" agregada`, 'ok');
+};
+
+function borrarObra(nombre) {
+    if (!confirm(`¿Eliminar la obra "${nombre}"?`)) return;
+    obrasPresupuestos = obrasPresupuestos.filter(o => o.nombre !== nombre);
+    saveLocal(); enviarObrasAGoogle(); actualizarInterfaz();
+    showToast('Obra eliminada', 'ok');
+}
+
+// ================================================================
+// COBROS ADICIONALES
+// ================================================================
+document.getElementById('formPendiente').onsubmit = function(e) {
+    e.preventDefault();
+    const p = { id: Date.now().toString(), obra: document.getElementById('pendienteObra').value,
+        desc: document.getElementById('pendienteDesc').value.trim(),
+        monto: parseMonto(document.getElementById('pendienteMonto').value), fecha: todayISO() };
+    pendientes.push(p); saveLocal(); renderPendientes(); this.reset();
+    showToast('Cobro adicional registrado', 'ok');
+};
+function marcarCobrado(id) {
+    if (!confirm('¿Marcar como cobrado?')) return;
+    pendientes = pendientes.filter(p => p.id !== id); saveLocal(); renderPendientes();
+    showToast('✓ Cobro realizado', 'ok');
+}
+function borrarPendiente(id) {
+    if (!confirm('¿Eliminar?')) return;
+    pendientes = pendientes.filter(p => p.id !== id); saveLocal(); renderPendientes();
+}
+
+// ================================================================
+// RENDER — MOVIMIENTOS
+// ================================================================
+function renderTablaMovimientos() {
+    const txt = (document.getElementById('tablaFiltro').value||'').toLowerCase();
+    const obra = document.getElementById('filtroObra').value;
+    let lista = movimientos;
+    if (txt) lista = lista.filter(m => m.obra.toLowerCase().includes(txt)||(m.desc||'').toLowerCase().includes(txt)||(m.operacion||'').toLowerCase().includes(txt)||m.cuenta.toLowerCase().includes(txt));
+    if (obra) lista = lista.filter(m => m.obra === obra);
+    const tbody = document.getElementById('tablaBody');
+    if (!lista.length) { tbody.innerHTML='<tr><td colspan="5" class="p-6 text-center text-slate-400 text-xs">Sin movimientos</td></tr>'; return; }
+    tbody.innerHTML = lista.map(m => {
+        const bc = m.cuenta==='Ivan' ? 'bi' : 'bm';
+        const cm = m.tipo==='ingreso' ? 'text-emerald-600' : 'text-red-500';
+        const sg = m.tipo==='ingreso' ? '+' : '-';
+        return `<tr><td class="font-bold text-slate-500 text-xs">${formatFecha(m.fecha)}</td>
+            <td><span class="badge ${bc}">${m.cuenta}</span></td>
+            <td><div class="font-black text-slate-800 uppercase text-xs">${m.obra}</div>
+                <div class="text-[9px] text-slate-400 font-semibold uppercase">${m.operacion} · ${m.desc}</div></td>
+            <td class="text-right font-black ${cm} text-xs">${sg} $ ${fmt(m.monto)}</td>
+            <td class="text-center"><button onclick="borrarMovimiento('${m.id}')" class="btn-d"><i class="fas fa-times"></i></button></td>
+        </tr>`;
+    }).join('');
+}
+
+// ================================================================
+// RENDER — OBRAS
+// ================================================================
+function renderTablaObras() {
+    const lista = filtroEstadoObras ? obrasPresupuestos.filter(o=>o.estado===filtroEstadoObras) : obrasPresupuestos;
+    document.getElementById('obraCount').textContent = lista.length + ' obra' + (lista.length!==1?'s':'');
+    const tbody = document.getElementById('tablaObrasBody');
+    if (!lista.length) { tbody.innerHTML='<tr><td colspan="8" class="p-6 text-center text-slate-400 text-xs">Sin obras cargadas</td></tr>'; return; }
+    tbody.innerHTML = lista.map(o => {
+        const cobradoMov = movimientos.filter(m=>m.obra===o.nombre&&m.tipo==='ingreso').reduce((s,m)=>s+m.monto,0);
+        const totalCobrado = (o.anticipo||0) + cobradoMov;
+        const saldo = o.presupuesto - totalCobrado;
+        const pct = o.presupuesto > 0 ? Math.min(100, totalCobrado / o.presupuesto * 100) : 0;
+        const sc = saldo < 0 ? 'text-red-500' : saldo < o.presupuesto * 0.1 ? 'text-amber-500' : 'text-emerald-600';
+        const eCls = {activa:'ba',pausada:'bp',terminada:'bt'}[o.estado]||'';
+        const eLbl = {activa:'🟢 Activa',pausada:'🟡 Pausada',terminada:'⚫ Terminada'}[o.estado]||o.estado;
+        const cuotas = generarCuotas(o);
+        const cpend = cuotas.filter(c=>!c.cobrada).length;
+        const cbadge = cpend > 0
+            ? `<span class="badge bp">${cpend} pendiente${cpend>1?'s':''}</span>`
+            : cuotas.length > 0 ? '<span class="badge ba">✓ Al día</span>' : '<span class="text-[9px] text-slate-400">—</span>';
+        return `<tr>
+            <td><div class="font-black uppercase text-slate-800 text-xs">${o.nombre}</div>
+                ${o.direccion?`<div class="text-[9px] text-slate-400">${o.direccion}</div>`:''}
+                <div class="progress-bg mt-1.5 w-28"><div class="progress-fill" style="width:${pct.toFixed(1)}%;background:${pct<50?'#3b82f6':pct<80?'#f59e0b':'#10b981'}"></div></div>
+                <div class="text-[9px] text-slate-400 mt-0.5">${pct.toFixed(0)}% cobrado</div></td>
+            <td class="text-xs text-slate-600">${o.cliente||'—'}</td>
+            <td class="font-bold text-xs text-slate-700 text-right">$ ${fmt(o.presupuesto)}</td>
+            <td class="font-bold text-xs text-emerald-600 text-right">$ ${fmt(totalCobrado)}</td>
+            <td class="font-black text-xs ${sc} text-right">$ ${fmt(Math.abs(saldo))}</td>
+            <td class="text-center"><button onclick="abrirModalEstado('${o.nombre}')" class="badge ${eCls} cursor-pointer hover:opacity-80">${eLbl}</button></td>
+            <td class="text-center"><button onclick="abrirModalCuotas('${o.nombre}')" class="flex flex-col items-center gap-0.5 hover:opacity-80 w-full">${cbadge}</button></td>
+            <td class="text-center"><button onclick="borrarObra('${o.nombre}')" class="btn-d text-[10px]"><i class="fas fa-times"></i></button></td>
+        </tr>`;
+    }).join('');
+}
+
+// ================================================================
+// RENDER — RESUMEN
+// ================================================================
+function renderResumen() {
+    const totalIn = movimientos.filter(m=>m.tipo==='ingreso').reduce((s,m)=>s+m.monto,0);
+    const totalOut = movimientos.filter(m=>m.tipo==='egreso').reduce((s,m)=>s+m.monto,0);
+    const activas = obrasPresupuestos.filter(o=>o.estado==='activa').length;
+    document.getElementById('resIngresos').textContent = '$ ' + fmt(totalIn);
+    document.getElementById('resEgresos').textContent = '$ ' + fmt(totalOut);
+    document.getElementById('resObras').textContent = activas;
+    document.getElementById('resSaldo').textContent = '$ ' + fmt(totalIn - totalOut);
+
+    // Selector obras donut
+    const sel = document.getElementById('obraResumenSelect');
+    const prev = sel.value;
+    sel.innerHTML = '<option value="">— Seleccionar Obra —</option>';
+    obrasPresupuestos.forEach(o => sel.innerHTML += `<option value="${o.nombre}" ${prev===o.nombre?'selected':''}>${o.nombre}</option>`);
+    if (prev) renderGraficoObra(); else limpiarDonut();
+
+    // Categorías global
+    const cats = {};
+    movimientos.filter(m=>m.tipo==='egreso').forEach(m => { cats[m.operacion]=(cats[m.operacion]||0)+m.monto; });
+    const catTot = Object.values(cats).reduce((a,b)=>a+b,0)||1;
+    document.getElementById('categoriaChart').innerHTML = Object.entries(cats).sort((a,b)=>b[1]-a[1]).map(([k,v]) =>
+        `<div><div class="flex justify-between text-xs mb-1"><span class="font-semibold text-slate-600">${k}</span><span class="font-black">$ ${fmt(v)}</span></div>
+        <div class="progress-bg"><div class="progress-fill bg-red-400" style="width:${(v/catTot*100).toFixed(1)}%"></div></div></div>`
+    ).join('') || '<p class="text-xs text-slate-400">Sin egresos</p>';
+
+    // Balance por obra
+    const obras = {};
+    movimientos.forEach(m => { obras[m.obra]=(obras[m.obra]||0)+m.monto_real; });
+    const oMax = Math.max(...Object.values(obras).map(Math.abs), 1);
+    document.getElementById('obraChart').innerHTML = Object.entries(obras).sort((a,b)=>b[1]-a[1]).map(([k,v]) =>
+        `<div><div class="flex justify-between text-xs mb-1"><span class="font-semibold text-slate-600 uppercase">${k}</span>
+        <span class="font-black ${v>=0?'text-emerald-600':'text-red-500'}">$ ${fmt(Math.abs(v))}</span></div>
+        <div class="progress-bg"><div class="progress-fill" style="width:${(Math.abs(v)/oMax*100).toFixed(1)}%;background:${v>=0?'#10b981':'#f87171'}"></div></div></div>`
+    ).join('') || '<p class="text-xs text-slate-400">Sin movimientos</p>';
+
+    // Comparativa cuenta
+    const cuentas = {Ivan:{in:0,out:0}, Mario:{in:0,out:0}};
+    movimientos.forEach(m => { if(cuentas[m.cuenta]) { if(m.tipo==='ingreso') cuentas[m.cuenta].in+=m.monto; else cuentas[m.cuenta].out+=m.monto; }});
+    document.getElementById('cuentaResumen').innerHTML = Object.entries(cuentas).map(([c,v]) =>
+        `<div class="card-glass p-4" style="border-left:4px solid ${c==='Ivan'?'#3b82f6':'#10b981'}">
+            <div class="font-black text-slate-700 text-sm mb-2">${c==='Ivan'?'👤 Iván':'👤 Mario'}</div>
+            <div class="text-xs text-emerald-600 font-bold">Ingresos: $ ${fmt(v.in)}</div>
+            <div class="text-xs text-red-500 font-bold">Egresos: $ ${fmt(v.out)}</div>
+            <div class="text-xs font-black ${v.in-v.out>=0?'text-slate-800':'text-red-600'} mt-1">Neto: $ ${fmt(v.in-v.out)}</div>
+        </div>`
+    ).join('');
+}
+
+// ================================================================
+// GRÁFICO DONUT
+// ================================================================
+function limpiarDonut() {
+    document.getElementById('donutArcs').innerHTML = '';
+    document.getElementById('donutTotal').textContent = '';
+    document.getElementById('donutLeyenda').innerHTML = '<p class="text-xs text-slate-400">Seleccioná una obra para ver la distribución de sus egresos.</p>';
+}
+function renderGraficoObra() {
+    const nombre = document.getElementById('obraResumenSelect').value;
+    if (!nombre) { limpiarDonut(); return; }
+    const movObra = movimientos.filter(m => m.obra === nombre && m.tipo === 'egreso');
+    if (!movObra.length) {
+        document.getElementById('donutArcs').innerHTML = '';
+        document.getElementById('donutTotal').textContent = '';
+        document.getElementById('donutLeyenda').innerHTML = '<p class="text-xs text-slate-400">Sin egresos para esta obra.</p>';
+        return;
+    }
+    const cats = {};
+    movObra.forEach(m => { cats[m.operacion]=(cats[m.operacion]||0)+m.monto; });
+    const total = Object.values(cats).reduce((a,b)=>a+b,0);
+    const entries = Object.entries(cats).sort((a,b)=>b[1]-a[1]);
+    const r=60, cx=80, cy=80, sw=22, circum=2*Math.PI*r;
+    let offset=0;
+    document.getElementById('donutArcs').innerHTML = entries.map(([k,v],i) => {
+        const dash = (v/total)*circum;
+        const arc = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${DONUT_COLORS[i%DONUT_COLORS.length]}" stroke-width="${sw}" stroke-dasharray="${dash} ${circum-dash}" stroke-dashoffset="${-offset}" style="transition:stroke-dashoffset .5s"/>`;
+        offset += dash; return arc;
+    }).join('');
+    document.getElementById('donutTotal').innerHTML = `$ ${fmt(total)}`;
+    document.getElementById('donutLeyenda').innerHTML = entries.map(([k,v],i) =>
+        `<div class="flex items-center gap-2">
+            <div class="w-3 h-3 rounded-full shrink-0" style="background:${DONUT_COLORS[i%DONUT_COLORS.length]}"></div>
+            <div class="flex-grow min-w-0">
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-semibold text-slate-600 truncate">${k}</span>
+                    <span class="text-xs font-black text-slate-800 ml-2 shrink-0">$ ${fmt(v)}</span>
+                </div>
+                <div class="progress-bg mt-0.5" style="height:5px;"><div style="height:100%;border-radius:99px;width:${(v/total*100).toFixed(1)}%;background:${DONUT_COLORS[i%DONUT_COLORS.length]};"></div></div>
+            </div>
+            <span class="text-[9px] font-black text-slate-400 shrink-0">${(v/total*100).toFixed(0)}%</span>
+        </div>`
+    ).join('');
+}
+
+// ================================================================
+// RENDER — COBROS PENDIENTES
+// ================================================================
+function renderPendientes() {
+    const hoy = new Date(); hoy.setHours(0,0,0,0);
+    const en7 = new Date(hoy); en7.setDate(en7.getDate()+7);
+
+    // Cuotas automáticas
+    let todasCuotas = [];
+    obrasPresupuestos.forEach(o => {
+        generarCuotas(o).forEach((c,i) => {
+            if (!c.cobrada) todasCuotas.push({ obra:o.nombre, cliente:o.cliente||'', nro:i+1, total:o.cantCuotas||0, fecha:c.fecha, monto:c.monto, idx:i });
+        });
+    });
+    todasCuotas.sort((a,b) => new Date(a.fecha)-new Date(b.fecha));
+
+    const pCount = todasCuotas.length;
+    document.getElementById('totalCuotasPend').textContent = pCount + ' pendiente' + (pCount!==1?'s':'');
+
+    const badge = document.getElementById('pendBadge');
+    const tot = pCount + pendientes.length;
+    if (tot > 0) { badge.textContent = tot; badge.classList.remove('hidden'); }
+    else badge.classList.add('hidden');
+
+    const lc = document.getElementById('listaCuotasProg');
+    if (!todasCuotas.length) { lc.innerHTML='<p class="text-center text-slate-400 text-xs py-4">✓ Sin cuotas pendientes</p>'; }
+    else {
+        lc.innerHTML = todasCuotas.map(c => {
+            const fd = new Date(c.fecha+'T00:00:00');
+            const venc = fd < hoy;
+            const prox7 = !venc && fd <= en7;
+            let cls = 'pi', tag = '';
+            if (venc) { cls+=' venc'; tag='<span class="badge" style="background:#fca5a5;color:#991b1b;">⚠ Vencida</span>'; }
+            else if (prox7) { cls+=' prox'; tag=`<span class="badge" style="background:#bfdbfe;color:#1e3a8a;">en ${diasHasta(c.fecha)}d</span>`; }
+            else tag=`<span class="badge bt">${formatFecha(c.fecha)}</span>`;
+            return `<div class="${cls}">
+                <div class="flex-grow min-w-0">
+                    <div class="flex items-center gap-2 flex-wrap"><span class="font-black text-slate-700 uppercase text-xs">${c.obra}</span>${tag}</div>
+                    <div class="text-[10px] text-slate-500">Cuota ${c.nro}${c.total?'/'+c.total:''} · ${c.cliente||''}</div>
+                </div>
+                <div class="font-black text-amber-600 text-sm shrink-0">$ ${fmt(c.monto)}</div>
+                <button onclick="marcarCuotaCobrada('${c.obra}',${c.idx})" class="btn-sm shrink-0" style="background:#d1fae5;color:#065f46;">✓ Cobrar</button>
+            </div>`;
+        }).join('');
+    }
+
+    // Adicionales
+    const totalAd = pendientes.reduce((s,p)=>s+p.monto,0);
+    document.getElementById('totalPendiente').textContent = '$ ' + fmt(totalAd);
+    const lp = document.getElementById('listaPendientes');
+    if (!pendientes.length) { lp.innerHTML='<p class="text-center text-slate-400 text-xs py-4">Sin cobros adicionales</p>'; }
+    else {
+        lp.innerHTML = pendientes.map(p => `
+            <div class="pi">
+                <div class="flex-grow min-w-0">
+                    <div class="font-black text-slate-700 uppercase text-xs">${p.obra}</div>
+                    <div class="text-[10px] text-slate-500">${p.desc} · ${formatFecha(p.fecha)}</div>
+                </div>
+                <div class="font-black text-purple-600 text-sm shrink-0">$ ${fmt(p.monto)}</div>
+                <button onclick="marcarCobrado('${p.id}')" class="btn-sm shrink-0" style="background:#d1fae5;color:#065f46;">✓</button>
+                <button onclick="borrarPendiente('${p.id}')" class="btn-d shrink-0"><i class="fas fa-times"></i></button>
+            </div>`).join('');
+    }
+}
+
+// ================================================================
+// SALDOS
+// ================================================================
+function calcularSaldos() {
+    let sI=0, sM=0;
+    movimientos.forEach(m => { if(m.cuenta==='Ivan') sI+=m.monto_real; else if(m.cuenta==='Mario') sM+=m.monto_real; });
+    setM('saldoIvan',sI); setM('saldoMario',sM); setM('saldoTotal',sI+sM,true);
+}
+function setM(id, val, big=false) {
+    const el = document.getElementById(id);
+    el.textContent = '$ ' + fmt(val);
+    el.className = `tf font-black text-xl ${val<0?'text-red-400':big?'text-white':'text-slate-800'}`;
+}
+
+// ================================================================
+// SELECTS
+// ================================================================
+function actualizarSelectObras() {
+    const nombres = ['SIN ASIGNAR', ...obrasPresupuestos.map(o=>o.nombre).sort()];
+    ['obraSelect','filtroObra','pendienteObra'].forEach(sid => {
+        const s = document.getElementById(sid); if(!s) return;
+        const prev = s.value;
+        if (sid==='filtroObra') s.innerHTML='<option value="">Todas las obras</option>';
+        else if (sid==='pendienteObra') s.innerHTML='<option value="" disabled selected>— Obra —</option>';
+        else s.innerHTML='<option value="" disabled selected>— Seleccionar Obra —</option>';
+        nombres.forEach(n => {
+            if (sid==='pendienteObra' && n==='SIN ASIGNAR') return;
+            s.innerHTML += `<option value="${n}" ${prev===n?'selected':''}>${n}</option>`;
+        });
+    });
+}
+
+// ================================================================
+// INTERFAZ
+// ================================================================
+function actualizarInterfaz() {
+    calcularSaldos(); renderTablaMovimientos(); renderTablaObras();
+    actualizarSelectObras(); renderResumen(); renderPendientes();
+}
+
+// ================================================================
+// NAVEGACIÓN
+// ================================================================
+function showPage(p) {
+    ['caja','obras','resumen','pendientes'].forEach(pg => {
+        document.getElementById('page-'+pg).classList.toggle('hidden', pg!==p);
+        document.getElementById('btn-'+pg).classList.toggle('active', pg===p);
+    });
+    if (p==='resumen') renderResumen();
+}
+
+// ================================================================
+// FILTRO ESTADO
+// ================================================================
+function setFiltroEstado(estado) {
+    filtroEstadoObras = estado;
+    ['all','activa','pausada','terminada'].forEach(s => document.getElementById('filtro-'+s)?.classList.remove('ring-2','ring-amber-400'));
+    document.getElementById('filtro-'+(estado||'all'))?.classList.add('ring-2','ring-amber-400');
+    renderTablaObras();
+}
+
+// ================================================================
+// HELPERS
+// ================================================================
+function fmt(n) { return (parseFloat(n)||0).toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function todayISO() { return new Date().toISOString().split('T')[0]; }
+function formatFecha(f) {
+    if (!f) return '—';
+    const p = f.split('T')[0].split('-');
+    return p.length===3 ? `${p[2]}/${p[1]}/${p[0].slice(-2)}` : f;
+}
+function diasHasta(fechaStr) {
+    const hoy = new Date(); hoy.setHours(0,0,0,0);
+    const fd = new Date(fechaStr+'T00:00:00');
+    return Math.max(0, Math.round((fd - hoy) / 86400000));
+}
+function parseMonto(str) {
+    return parseFloat((str||'').replace(/\./g,'').replace(',','.')) || 0;
+}
+function safeJSON(str, fallback) {
+    try { return JSON.parse(str); } catch(e) { return fallback; }
+}
+
+// Input monto
+const mv = document.getElementById('montoVisual'), mr = document.getElementById('montoReal');
+mv.addEventListener('input', e => {
+    const d = e.target.value.replace(/\D/g,'');
+    const n = parseFloat(d)/100||0;
+    mr.value = n.toFixed(2);
+    e.target.value = n>0 ? n.toLocaleString('es-AR',{minimumFractionDigits:2}) : '';
+});
+
+document.getElementById('fecha').value = todayISO();
+</script>
+
+<!--
+====================================================================
+CÓDIGO DE GOOGLE APPS SCRIPT (copiar en tu proyecto)
+====================================================================
+
+function doGet(e) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var movSheet = ss.getSheetByName("Movimientos") || ss.insertSheet("Movimientos");
+  var obrasSheet = ss.getSheetByName("Obras") || ss.insertSheet("Obras");
+
+  var movimientos = movSheet.getLastRow() > 1
+    ? movSheet.getRange(2, 1, movSheet.getLastRow()-1, movSheet.getLastColumn()).getValues()
+    : [];
+  var obras = obrasSheet.getLastRow() > 1
+    ? obrasSheet.getRange(2, 1, obrasSheet.getLastRow()-1, obrasSheet.getLastColumn()).getValues()
+    : [];
+
+  return ContentService
+    .createTextOutput(JSON.stringify({ movimientos: movimientos, obras: obras }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function doPost(e) {
+  var data = JSON.parse(e.postData.contents);
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  if (data.action === 'add') {
+    var sheet = ss.getSheetByName("Movimientos") || ss.insertSheet("Movimientos");
+    if (sheet.getLastRow() === 0)
+      sheet.appendRow(["id","fecha","obra","operacion","descripcion","cuenta","tipo","monto"]);
+    sheet.appendRow([data.id, data.fecha, data.obra, data.operacion, data.desc,
+                     data.cuenta, data.tipo, data.monto]);
+
+  } else if (data.action === 'delete') {
+    var sheet = ss.getSheetByName("Movimientos");
+    if (sheet) {
+      var vals = sheet.getDataRange().getValues();
+      for (var i = vals.length-1; i >= 1; i--) {
+        if (vals[i][0].toString() === data.id.toString()) {
+          sheet.deleteRow(i+1); break;
+        }
+      }
+    }
+
+  } else if (data.action === 'saveObras') {
+    var sheet = ss.getSheetByName("Obras") || ss.insertSheet("Obras");
+    sheet.clearContents();
+    sheet.appendRow(["nombre","cliente","direccion","presupuesto","anticipo",
+                     "cantCuotas","fechaPrimeraCuota","estado","notas","montoCuota","cuotas_json"]);
+    data.obras.forEach(function(row) { sheet.appendRow(row); });
+  }
+
+  return ContentService
+    .createTextOutput(JSON.stringify({ok:true}))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+Para publicar:
+1. Ir a "Implementar" > "Nueva implementación"
+2. Tipo: "Aplicación web"
+3. Ejecutar como: "Yo"
+4. Quién tiene acceso: "Cualquier persona"
+5. Copiar la URL generada y pegarla en WEB_APP_URL
+====================================================================
+-->
 </body>
 </html>
